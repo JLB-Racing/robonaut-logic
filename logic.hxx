@@ -52,7 +52,19 @@ namespace jlb
                 }
             }
 
-            double error = (leftmost - rsim::smodel::SENSOR_WIDTH / 2) / static_cast<double>(rsim::smodel::SENSOR_WIDTH / 2.0);
+            bool no_line = true;
+            for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
+            {
+                if (!line_sensor[i])
+                {
+                    no_line = false;
+                    break;
+                }
+            }
+
+            double selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : leftmost;
+
+            double error = (selected - rsim::smodel::SENSOR_WIDTH / 2) / static_cast<double>(rsim::smodel::SENSOR_WIDTH / 2.0);
 
             // Initialize PID control variables
             static double integral = 0.0;
