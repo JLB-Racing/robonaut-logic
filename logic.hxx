@@ -2,6 +2,7 @@
 #define LOGIC_HXX
 
 #include "vehicle_model.hxx"
+#include "environment.hxx"
 
 #include <chrono>
 #include <numbers>
@@ -16,7 +17,17 @@ namespace jlb
         Controller() {}
         ~Controller() {}
 
-        double lateral_control([[maybe_unused]] const rsim::vmodel::State &state, [[maybe_unused]] bool line_sensor[rsim::smodel::SENSOR_WIDTH])
+        enum class Direction
+        {
+            LEFT,
+            RIGHT,
+            STRAIGHT,
+            REVERSE_LEFT,
+            REVERSE_RIGHT,
+            REVERSE_STRAIGHT
+        };
+
+        double lateral_control(const rsim::env::Car &car, const Direction &dir)
         {
             // Constants for the control law
             constexpr double Kp = 0.8;  // Proportional gain
@@ -27,7 +38,7 @@ namespace jlb
             int closest = 0;
             for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
             {
-                if (!line_sensor[i] && std::abs(i - 8) < std::abs(closest - 8))
+                if (!car.line_sensor.detection[i] && std::abs(i - 8) < std::abs(closest - 8))
                 {
                     closest = i;
                 }
@@ -37,7 +48,7 @@ namespace jlb
             int rightmost = 0;
             for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
             {
-                if (!line_sensor[i] && i > rightmost)
+                if (!car.line_sensor.detection[i] && i > rightmost)
                 {
                     rightmost = i;
                 }
@@ -46,7 +57,7 @@ namespace jlb
             int leftmost = 15;
             for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
             {
-                if (!line_sensor[i] && i < leftmost)
+                if (!car.line_sensor.detection[i] && i < leftmost)
                 {
                     leftmost = i;
                 }
@@ -55,14 +66,27 @@ namespace jlb
             bool no_line = true;
             for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
             {
-                if (!line_sensor[i])
+                if (!car.line_sensor.detection[i])
                 {
                     no_line = false;
                     break;
                 }
             }
 
-            double selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : rightmost;
+            double selected;
+
+            if (dir == Direction::LEFT || dir == Direction::REVERSE_LEFT)
+            {
+                selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : leftmost;
+            }
+            else if (dir == Direction::RIGHT || dir == Direction::REVERSE_RIGHT)
+            {
+                selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : rightmost;
+            }
+            else
+            {
+                selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : closest;
+            }
 
             double error = (selected - rsim::smodel::SENSOR_WIDTH / 2) / static_cast<double>(rsim::smodel::SENSOR_WIDTH / 2.0);
 
@@ -72,9 +96,26 @@ namespace jlb
             double derivative_term = Kd * (error - prev_error) / rsim::vmodel::DELTA_T;
             double target_angle = proportional_term + integral + derivative_term;
 
+            if (dir == Direction::REVERSE_LEFT || dir == Direction::REVERSE_RIGHT || dir == Direction::REVERSE_STRAIGHT)
+            {
+                target_angle = -target_angle;
+            }
+
             prev_error = error;
 
             return target_angle;
+        }
+
+        double longitudinal_control(const Direction &dir)
+        {
+            double target_speed = 10.0;
+
+            if (dir == Direction::REVERSE_LEFT || dir == Direction::REVERSE_RIGHT || dir == Direction::REVERSE_STRAIGHT)
+            {
+                target_speed = -target_speed;
+            }
+
+            return target_speed;
         }
 
     private:
