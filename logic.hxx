@@ -62,32 +62,24 @@ namespace jlb
                 }
             }
 
-            double selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : leftmost;
+            double selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : rightmost;
 
             double error = (selected - rsim::smodel::SENSOR_WIDTH / 2) / static_cast<double>(rsim::smodel::SENSOR_WIDTH / 2.0);
-
-            // Initialize PID control variables
-            static double integral = 0.0;
-            static double prev_error = 0.0;
 
             // Calculate PID terms
             double proportional_term = Kp * error;
             integral += Ki * error * rsim::vmodel::DELTA_T;
             double derivative_term = Kd * (error - prev_error) / rsim::vmodel::DELTA_T;
-
-            // Calculate the target wheel angle based on the control law
             double target_angle = proportional_term + integral + derivative_term;
 
-            std::cout << "target_angle: " << target_angle << std::endl;
-
-            // Limit the target angle to the maximum allowed value
-            // target_angle = std::max(-MAX_WHEEL_ANGLE, std::min(MAX_WHEEL_ANGLE, target_angle));
-
-            // Update the previous error
             prev_error = error;
 
             return target_angle;
         }
+
+    private:
+        double integral = 0.0;
+        double prev_error = 0.0;
     };
 
     void test_sgl()
