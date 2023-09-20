@@ -11,114 +11,137 @@
 
 namespace jlb
 {
+    enum class Direction
+    {
+        LEFT,
+        RIGHT,
+        STRAIGHT,
+        REVERSE_LEFT,
+        REVERSE_RIGHT,
+        REVERSE_STRAIGHT
+    };
+
+    enum class Mission
+    {
+        LABYRINTH,
+        FAST,
+        FAST_TURN,
+        FAST_OVERTAKE
+    };
+
     class Controller
     {
     public:
-        int selected = 0;
+        static constexpr double DELTA_T = 0.1;
+        static constexpr double Kp = 0.6;
+        static constexpr double Ki = 0.01;
+        static constexpr double Kd = 0.4;
+
+        static constexpr double LABYRINTH_SPEED = 10.0;
+        static constexpr double LABYRINTH_SPEED_REVERSE = 5.0;
+        static constexpr double FAST_SPEED = 30.0;
+        static constexpr double FAST_SPEED_TURN = 10.0;
+        static constexpr double FAST_SPEED_OVERTAKE = 20.0;
+
+        unsigned long selected = 0;
+        double target_angle = 0.0;
+        double target_speed = 0.0;
+
+        Direction direction = Direction::STRAIGHT;
+        Mission mission = Mission::LABYRINTH;
 
         Controller() {}
         ~Controller() {}
 
-        enum class Direction
+        double PID(const double error)
         {
-            LEFT,
-            RIGHT,
-            STRAIGHT,
-            REVERSE_LEFT,
-            REVERSE_RIGHT,
-            REVERSE_STRAIGHT
-        };
-
-        double lateral_control(const rsim::env::Car &car, const Direction &dir)
-        {
-            // Constants for the control law
-            constexpr double Kp = 0.6;  // Proportional gain
-            constexpr double Ki = 0.01; // Integral gain
-            constexpr double Kd = 0.4;  // Derivative gain
-
-            int sensor_center = rsim::smodel::SENSOR_WIDTH / 2;
-
-            // rightmost false
-            int rightmost = 0;
-            for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
-            {
-                if (!car.line_sensor.detection[i] && i > rightmost)
-                {
-                    rightmost = i;
-                }
-            }
-
-            int leftmost = 15;
-            for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
-            {
-                if (!car.line_sensor.detection[i] && i < leftmost)
-                {
-                    leftmost = i;
-                }
-            }
-
-            // the center of the detected falses
-            int center = leftmost;
-            int theoretical_center = (rightmost + leftmost) / 2;
-            for (int i = leftmost; i <= rightmost; i++)
-            {
-                if (!car.line_sensor.detection[i] && std::abs(i - theoretical_center) < std::abs(center - theoretical_center))
-                {
-                    center = i;
-                }
-            }
-
-            bool no_line = true;
-            for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
-            {
-                if (!car.line_sensor.detection[i])
-                {
-                    no_line = false;
-                    break;
-                }
-            }
-
-            if (dir == Direction::LEFT || dir == Direction::REVERSE_LEFT)
-            {
-                selected = no_line ? sensor_center : leftmost;
-            }
-            else if (dir == Direction::RIGHT || dir == Direction::REVERSE_RIGHT)
-            {
-                selected = no_line ? sensor_center : rightmost;
-            }
-            else
-            {
-                selected = no_line ? sensor_center : center;
-            }
-
-            double error = (selected - sensor_center) / static_cast<double>(sensor_center);
-
-            // Calculate PID terms
             double proportional_term = Kp * error;
-            integral += Ki * error * rsim::vmodel::DELTA_T;
-            double derivative_term = Kd * (error - prev_error) / rsim::vmodel::DELTA_T;
-            double target_angle = proportional_term + integral + derivative_term;
+            integral += Ki * error * DELTA_T;
+            double derivative_term = Kd * (error - prev_error) / DELTA_T;
+            return proportional_term + integral + derivative_term;
+        }
 
-            if (dir == Direction::REVERSE_LEFT || dir == Direction::REVERSE_RIGHT || dir == Direction::REVERSE_STRAIGHT)
+        template <size_t cols>
+        void lateral_control(bool (&detection_)[cols])
+        {
+            if (std::all_of(std::begin(detection_), std::end(detection_), [](bool b)
+                            { return b; }))
+            {
+                return;
+            }
+
+            unsigned long sensor_center = cols / 2;
+
+            unsigned long rightmost = 0;
+            for (unsigned long i = 0; i < cols; i++)
+                if (!detection_[i] && i > rightmost)
+                    rightmost = i;
+
+            unsigned long leftmost = cols;
+            for (unsigned long i = 0; i < cols; i++)
+                if (!detection_[i] && i < leftmost)
+                    leftmost = i;
+
+            unsigned long center = leftmost;
+            for (unsigned long i = leftmost; i <= rightmost; i++)
+                if (!detection_[i] && std::abs(static_cast<int>(i - (rightmost + leftmost) / 2)) < std::abs(static_cast<int>(center - (rightmost + leftmost) / 2)))
+                    center = i;
+
+            if (direction == Direction::LEFT || direction == Direction::REVERSE_LEFT)
+                selected = leftmost;
+            if (direction == Direction::RIGHT || direction == Direction::REVERSE_RIGHT)
+                selected = rightmost;
+            if (direction == Direction::STRAIGHT || direction == Direction::REVERSE_STRAIGHT)
+                selected = center;
+
+            double error = (static_cast<int>(selected - sensor_center)) / static_cast<double>(sensor_center);
+            target_angle = PID(error);
+
+            if (direction == Direction::REVERSE_LEFT || direction == Direction::REVERSE_RIGHT || direction == Direction::REVERSE_STRAIGHT)
             {
                 target_angle = -target_angle;
             }
 
             prev_error = error;
-
-            return target_angle;
         }
 
-        double longitudinal_control(const Direction &dir)
+        void longitudinal_control()
         {
-            double target_speed = 10.0;
-
-            if (dir == Direction::REVERSE_LEFT || dir == Direction::REVERSE_RIGHT || dir == Direction::REVERSE_STRAIGHT)
+            switch (mission)
             {
-                target_speed = -target_speed;
-            }
+            case Mission::LABYRINTH:
+            {
+                target_speed = LABYRINTH_SPEED;
 
-            return target_speed;
+                if (direction == Direction::REVERSE_LEFT || direction == Direction::REVERSE_RIGHT || direction == Direction::REVERSE_STRAIGHT)
+                {
+                    target_speed = -target_speed;
+                }
+            }
+            break;
+
+            case Mission::FAST:
+                target_speed = FAST_SPEED;
+                break;
+
+            case Mission::FAST_TURN:
+                target_speed = FAST_SPEED_TURN;
+                break;
+
+            case Mission::FAST_OVERTAKE:
+                target_speed = FAST_SPEED_OVERTAKE;
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        template <size_t cols>
+        void update(bool (&detection_)[cols])
+        {
+            lateral_control(detection_);
+            longitudinal_control();
         }
 
     private:
