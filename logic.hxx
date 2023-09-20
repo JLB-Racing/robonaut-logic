@@ -32,9 +32,9 @@ namespace jlb
         double lateral_control(const rsim::env::Car &car, const Direction &dir)
         {
             // Constants for the control law
-            constexpr double Kp = 0.8;  // Proportional gain
+            constexpr double Kp = 0.6;  // Proportional gain
             constexpr double Ki = 0.01; // Integral gain
-            constexpr double Kd = 0.6;  // Derivative gain
+            constexpr double Kd = 0.4;  // Derivative gain
 
             int sensor_center = rsim::smodel::SENSOR_WIDTH / 2;
 
