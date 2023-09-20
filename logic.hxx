@@ -14,6 +14,8 @@ namespace jlb
     class Controller
     {
     public:
+        int selected = 0;
+
         Controller() {}
         ~Controller() {}
 
@@ -34,15 +36,7 @@ namespace jlb
             constexpr double Ki = 0.01; // Integral gain
             constexpr double Kd = 0.6;  // Derivative gain
 
-            // closest false to the center
-            int closest = 0;
-            for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
-            {
-                if (!car.line_sensor.detection[i] && std::abs(i - 8) < std::abs(closest - 8))
-                {
-                    closest = i;
-                }
-            }
+            int sensor_center = rsim::smodel::SENSOR_WIDTH / 2;
 
             // rightmost false
             int rightmost = 0;
@@ -63,6 +57,17 @@ namespace jlb
                 }
             }
 
+            // the center of the detected falses
+            int center = leftmost;
+            int theoretical_center = (rightmost + leftmost) / 2;
+            for (int i = leftmost; i <= rightmost; i++)
+            {
+                if (!car.line_sensor.detection[i] && std::abs(i - theoretical_center) < std::abs(center - theoretical_center))
+                {
+                    center = i;
+                }
+            }
+
             bool no_line = true;
             for (int i = 0; i < rsim::smodel::SENSOR_WIDTH; i++)
             {
@@ -73,22 +78,20 @@ namespace jlb
                 }
             }
 
-            double selected;
-
             if (dir == Direction::LEFT || dir == Direction::REVERSE_LEFT)
             {
-                selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : leftmost;
+                selected = no_line ? sensor_center : leftmost;
             }
             else if (dir == Direction::RIGHT || dir == Direction::REVERSE_RIGHT)
             {
-                selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : rightmost;
+                selected = no_line ? sensor_center : rightmost;
             }
             else
             {
-                selected = no_line ? rsim::smodel::SENSOR_WIDTH / 2 : closest;
+                selected = no_line ? sensor_center : center;
             }
 
-            double error = (selected - rsim::smodel::SENSOR_WIDTH / 2) / static_cast<double>(rsim::smodel::SENSOR_WIDTH / 2.0);
+            double error = (selected - sensor_center) / static_cast<double>(sensor_center);
 
             // Calculate PID terms
             double proportional_term = Kp * error;
