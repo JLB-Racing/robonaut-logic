@@ -5,9 +5,10 @@
 #include "environment.hxx"
 
 #include <chrono>
-#include <numbers>
 #include "SGL/sgl.hxx"
-#define PI std::numbers::pi_v<float>
+
+#include "odometry.hxx"
+#include "common.hxx"
 
 namespace jlb
 {
@@ -32,20 +33,9 @@ namespace jlb
     class Controller
     {
     public:
-        static constexpr double DELTA_T = 0.1;
-        static constexpr double Kp = 0.6;
-        static constexpr double Ki = 0.01;
-        static constexpr double Kd = 0.4;
-
-        static constexpr double LABYRINTH_SPEED = 10.0;
-        static constexpr double LABYRINTH_SPEED_REVERSE = 5.0;
-        static constexpr double FAST_SPEED = 30.0;
-        static constexpr double FAST_SPEED_TURN = 10.0;
-        static constexpr double FAST_SPEED_OVERTAKE = 20.0;
-
         unsigned long selected = 0;
-        double target_angle = 0.0;
-        double target_speed = 0.0;
+        float target_angle = 0.0f;
+        float target_speed = 0.0f;
 
         Direction direction = Direction::STRAIGHT;
         Mission mission = Mission::LABYRINTH;
@@ -53,12 +43,22 @@ namespace jlb
         Controller() {}
         ~Controller() {}
 
-        double PID(const double error)
+        float PID(const float error, const float dt)
         {
-            double proportional_term = Kp * error;
-            integral += Ki * error * DELTA_T;
-            double derivative_term = Kd * (error - prev_error) / DELTA_T;
+            float proportional_term = Kp * error;
+            integral += Ki * error * dt;
+            float derivative_term = Kd * (error - prev_error) / dt;
             return proportional_term + integral + derivative_term;
+        }
+
+        float stanley(const float cross_track_error, const float heading_error)
+        {
+            float kAng = 0.5;
+            float kDist = 0.5;
+            float kSoft = 1.0;
+            float kDamp = 1.0;
+
+            return kAng * heading_error + atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
         }
 
         template <size_t cols>
@@ -69,6 +69,14 @@ namespace jlb
             {
                 return;
             }
+
+#ifdef STM32
+            // TODO: add timestamp
+#else
+            auto control_timestamp_ = std::chrono::steady_clock::now();
+            [[maybe_unused]] float dt = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
+            prev_control_timestamp_ = control_timestamp_;
+#endif
 
             unsigned long sensor_center = cols / 2;
 
@@ -94,8 +102,9 @@ namespace jlb
             if (direction == Direction::STRAIGHT || direction == Direction::REVERSE_STRAIGHT)
                 selected = center;
 
-            double error = (static_cast<int>(selected - sensor_center)) / static_cast<double>(sensor_center);
-            target_angle = PID(error);
+            [[maybe_unused]] float angle_error = (static_cast<int>(selected - sensor_center + 1)) / static_cast<float>(sensor_center) * M_PI / 2.0f;
+            float error = (static_cast<int>(selected - sensor_center + 1)) / static_cast<float>(sensor_center);
+            target_angle = PID(error, dt);
 
             if (direction == Direction::REVERSE_LEFT || direction == Direction::REVERSE_RIGHT || direction == Direction::REVERSE_STRAIGHT)
             {
@@ -144,18 +153,25 @@ namespace jlb
             longitudinal_control();
         }
 
+        void set_current_velocity(const float velocity)
+        {
+            current_velocity = velocity;
+        }
+
     private:
-        double integral = 0.0;
-        double prev_error = 0.0;
+        float integral = 0.0f;
+        float prev_error = 0.0f;
+        float current_velocity = 0.0f;
+
+#ifdef STM32
+        // TODO: add timestamp
+#else
+        std::chrono::time_point<std::chrono::steady_clock> prev_control_timestamp_ = std::chrono::steady_clock::now();
+#endif
     };
 
     void test_sgl()
     {
-        //////////////////////////////////////////////////////////////////////////////
-        //
-        //       ROBONAUT
-        //
-
         sgl::Graph<std::string, sgl::AdjacencyList> graph_robonaut;
 
         auto A = graph_robonaut.add_vertex("A");
@@ -186,51 +202,51 @@ namespace jlb
         auto balance = graph_robonaut.add_vertex("/");
 
         graph_robonaut.add_edge(A, B, 4.0f);
-        graph_robonaut.add_edge(A, C, PI);
-        graph_robonaut.add_edge(A, D, PI);
-        graph_robonaut.add_edge(B, D, PI);
-        graph_robonaut.add_edge(B, E, PI);
-        graph_robonaut.add_edge(C, F, PI);
-        graph_robonaut.add_edge(D, F, PI);
+        graph_robonaut.add_edge(A, C, M_PI);
+        graph_robonaut.add_edge(A, D, M_PI);
+        graph_robonaut.add_edge(B, D, M_PI);
+        graph_robonaut.add_edge(B, E, M_PI);
+        graph_robonaut.add_edge(C, F, M_PI);
+        graph_robonaut.add_edge(D, F, M_PI);
         graph_robonaut.add_edge(D, I, 4.0f);
-        graph_robonaut.add_edge(D, G, PI);
-        graph_robonaut.add_edge(E, G, PI);
+        graph_robonaut.add_edge(D, G, M_PI);
+        graph_robonaut.add_edge(E, G, M_PI);
         graph_robonaut.add_edge(E, J, 4.0f);
-        graph_robonaut.add_edge(F, H, PI);
-        graph_robonaut.add_edge(F, I, PI);
+        graph_robonaut.add_edge(F, H, M_PI);
+        graph_robonaut.add_edge(F, I, M_PI);
         graph_robonaut.add_edge(F, G, 4.0f);
-        graph_robonaut.add_edge(G, I, PI);
-        graph_robonaut.add_edge(G, J, PI);
+        graph_robonaut.add_edge(G, I, M_PI);
+        graph_robonaut.add_edge(G, J, M_PI);
         graph_robonaut.add_edge(H, M, 4.0f);
-        graph_robonaut.add_edge(H, K, PI);
-        graph_robonaut.add_edge(I, K, PI);
+        graph_robonaut.add_edge(H, K, M_PI);
+        graph_robonaut.add_edge(I, K, M_PI);
         graph_robonaut.add_edge(I, N, 4.0f);
-        graph_robonaut.add_edge(I, L, PI);
-        graph_robonaut.add_edge(J, L, PI);
-        graph_robonaut.add_edge(K, M, PI);
-        graph_robonaut.add_edge(K, N, PI);
+        graph_robonaut.add_edge(I, L, M_PI);
+        graph_robonaut.add_edge(J, L, M_PI);
+        graph_robonaut.add_edge(K, M, M_PI);
+        graph_robonaut.add_edge(K, N, M_PI);
         graph_robonaut.add_edge(K, L, 4.0f);
-        graph_robonaut.add_edge(L, N, PI);
-        graph_robonaut.add_edge(L, O, PI);
-        graph_robonaut.add_edge(M, P, PI);
+        graph_robonaut.add_edge(L, N, M_PI);
+        graph_robonaut.add_edge(L, O, M_PI);
+        graph_robonaut.add_edge(M, P, M_PI);
         graph_robonaut.add_edge(M, Q, 2.0f);
-        graph_robonaut.add_edge(M, R, PI);
-        graph_robonaut.add_edge(N, R, PI);
+        graph_robonaut.add_edge(M, R, M_PI);
+        graph_robonaut.add_edge(N, R, M_PI);
         graph_robonaut.add_edge(N, S, 2.0f);
-        graph_robonaut.add_edge(N, T, PI);
-        graph_robonaut.add_edge(O, T, PI);
+        graph_robonaut.add_edge(N, T, M_PI);
+        graph_robonaut.add_edge(O, T, M_PI);
         graph_robonaut.add_edge(O, X, 2.0f);
-        graph_robonaut.add_edge(O, U, PI);
+        graph_robonaut.add_edge(O, U, M_PI);
         graph_robonaut.add_edge(P, Q, 2.0f);
-        graph_robonaut.add_edge(Q, balance, 5.0f + PI);
-        graph_robonaut.add_edge(Q, V, PI);
+        graph_robonaut.add_edge(Q, balance, 5.0f + M_PI);
+        graph_robonaut.add_edge(Q, V, M_PI);
         graph_robonaut.add_edge(Q, R, 2.0f);
         graph_robonaut.add_edge(R, S, 2.0f);
-        graph_robonaut.add_edge(S, V, PI);
-        graph_robonaut.add_edge(S, W, PI);
+        graph_robonaut.add_edge(S, V, M_PI);
+        graph_robonaut.add_edge(S, W, M_PI);
         graph_robonaut.add_edge(S, T, 2.0f);
         graph_robonaut.add_edge(T, X, 2.0f);
-        graph_robonaut.add_edge(X, W, PI);
+        graph_robonaut.add_edge(X, W, M_PI);
         graph_robonaut.add_edge(X, U, 2.0f);
         graph_robonaut.add_edge(V, W, 4.0f);
 
@@ -243,11 +259,6 @@ namespace jlb
         sgl::print_dijkstra(graph_robonaut, map_robonaut);
     }
 
-    //
-    //       END OF ROBONAUT
-    //
-    //////////////////////////////////////////////////////////////////////////////
-
-} // namespace
+} // namespace jlb
 
 #endif // LOGIC_HXX
