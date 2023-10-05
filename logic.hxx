@@ -53,10 +53,10 @@ namespace jlb
 
         float stanley(const float cross_track_error, const float heading_error)
         {
-            float kAng = 0.5;
-            float kDist = 0.5;
-            float kSoft = 1.0;
-            float kDamp = 1.0;
+            float kAng = 0.5f;
+            float kDist = 0.5f;
+            float kSoft = 1.0f;
+            float kDamp = 1.0f;
 
             return kAng * heading_error + atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
         }
@@ -147,15 +147,11 @@ namespace jlb
         }
 
         template <size_t cols>
-        void update(bool (&detection_)[cols])
+        void update(bool (&detection_)[cols], const float current_velocity_)
         {
+            current_velocity = current_velocity_;
             lateral_control(detection_);
             longitudinal_control();
-        }
-
-        void set_current_velocity(const float velocity)
-        {
-            current_velocity = velocity;
         }
 
     private:

@@ -82,9 +82,9 @@ namespace jlb
     PARAM float FAST_SPEED_TURN = 10.0f;        // m/s
     PARAM float FAST_SPEED_OVERTAKE = 20.0f;    // m/s
 #else
-    PARAM float Kp = 0.55f;
-    PARAM float Ki = 0.3f;
-    PARAM float Kd = 0.2f;
+    PARAM float Kp = 0.6f;
+    PARAM float Ki = 0.01f;
+    PARAM float Kd = 0.4f;
 
     PARAM float LABYRINTH_SPEED = 50.0f;         // px/s
     PARAM float LABYRINTH_SPEED_REVERSE = 25.0f; // px/s
