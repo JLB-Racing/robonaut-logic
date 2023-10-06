@@ -20,6 +20,34 @@ namespace jlb
 {
     ///////////////////////////////////////////////////////////////////////////
     //
+    //      ENUMS
+    //
+
+    enum class Direction
+    {
+        LEFT,
+        RIGHT,
+        STRAIGHT,
+        REVERSE_LEFT,
+        REVERSE_RIGHT,
+        REVERSE_STRAIGHT
+    };
+
+    enum class Mission
+    {
+        LABYRINTH,
+        FAST,
+        FAST_TURN,
+        FAST_OVERTAKE
+    };
+
+    //
+    //      END ENUMS
+    //
+    ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     //      ODOMETRY
     //
 
@@ -52,15 +80,15 @@ namespace jlb
     PARAM int SENSOR_WIDTH = 16;       // -
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_VELOCITY = 50.0f;       // px/s
+    PARAM float MAX_VELOCITY = 500.0f;      // px/s
     PARAM float MAX_YAW_RATE = 1.5f * M_PI; // rad/s
 
     /* GEAR RATIOS */
     PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(3 / 2) * 1.0f;
 
     /* ALGORITHM PARAMETERS */
-    PARAM int VELOCITY_BUFFER_SIZE = 5;
-    PARAM int IMU_BUFFER_SIZE = 5;
+    PARAM int VELOCITY_BUFFER_SIZE = 1;
+    PARAM int IMU_BUFFER_SIZE = 1;
 #endif
 
     //
@@ -88,19 +116,36 @@ namespace jlb
 #else
     /* LONGITUDINAL CONTROLLER PARAMETERS */
     PARAM float Kp = 0.6f;
-    PARAM float Ki = 0.01f;
-    PARAM float Kd = 0.4f;
+    PARAM float Ki = 0.001f;
+    PARAM float Kd = 0.1f;
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED = 50.0f;         // px/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 25.0f; // px/s
-    PARAM float FAST_SPEED = 300.0f;             // px/s
-    PARAM float FAST_SPEED_TURN = 100.0f;        // px/s
-    PARAM float FAST_SPEED_OVERTAKE = 200.0f;    // px/s
+    PARAM float LABYRINTH_SPEED = 40.0f;         // px/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 20.0f; // px/s
+    PARAM float FAST_SPEED = 80.0f;              // px/s
+    PARAM float FAST_SPEED_TURN = 40.0f;         // px/s
+    PARAM float FAST_SPEED_OVERTAKE = 60.0f;     // px/s
 #endif
 
     //
     //      END LOGIC
+    //
+    ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    //      SIGNALS
+    //
+
+    PARAM int SERVER_PORT = 5000;
+    PARAM const char *SERVER_ADDRESS = "localhost";
+    PARAM unsigned long SIGNALS_SIZE = 50;
+
+    PARAM uint8_t TARGET_ANGLE_ID = 0;
+    PARAM uint8_t TARGET_SPEED_ID = 1;
+
+    //
+    //      END SIGNALS
     //
     ///////////////////////////////////////////////////////////////////////////
 

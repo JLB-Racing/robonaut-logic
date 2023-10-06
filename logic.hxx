@@ -1,269 +1,36 @@
 #ifndef LOGIC_HXX
 #define LOGIC_HXX
 
-#include "vehicle_model.hxx"
-#include "environment.hxx"
-
-#include <chrono>
-#include "SGL/sgl.hxx"
-
 #include "odometry.hxx"
+#include "controller.hxx"
 #include "common.hxx"
+#include "signals.hxx"
 
 namespace jlb
 {
-    enum class Direction
-    {
-        LEFT,
-        RIGHT,
-        STRAIGHT,
-        REVERSE_LEFT,
-        REVERSE_RIGHT,
-        REVERSE_STRAIGHT
-    };
 
-    enum class Mission
-    {
-        LABYRINTH,
-        FAST,
-        FAST_TURN,
-        FAST_OVERTAKE
-    };
-
-    class Controller
+    class Logic
     {
     public:
-        unsigned long selected = 0;
-        float target_angle = 0.0f;
-        float target_speed = 0.0f;
+        Controller controller;
+        Odometry odometry;
 
-        Direction direction = Direction::STRAIGHT;
-        Mission mission = Mission::LABYRINTH;
+        Logic(Direction direction_ = Direction::STRAIGHT, const float x_t_ = 0.0f, const float y_t_ = 0.0f, const float theta_t_ = 0.0f) : controller(direction_), odometry(x_t_, y_t_, theta_t_) {}
 
-        Controller(jlb::Direction direction_ = Direction::STRAIGHT) : direction{direction_} {}
-        ~Controller() {}
-
-        float PID(const float error, const float dt)
+        void send_telemetry()
         {
-            float proportional_term = Kp * error;
-            integral += Ki * error * dt;
-            float derivative_term = Kd * (error - prev_error) / dt;
-            return proportional_term + integral + derivative_term;
-        }
 
-        float stanley(const float cross_track_error, const float heading_error)
-        {
-            float kAng = 0.5f;
-            float kDist = 0.5f;
-            float kSoft = 1.0f;
-            float kDamp = 1.0f;
-
-            return kAng * heading_error + atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
-        }
-
-        void lateral_control()
-        {
-            if (std::all_of(std::begin(detection), std::end(detection), [](bool b)
-                            { return b; }))
-            {
-                return;
-            }
-
-#ifdef STM32
-            // TODO: add timestamp
-#else
-            auto control_timestamp_ = std::chrono::steady_clock::now();
-            [[maybe_unused]] float dt = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
-            prev_control_timestamp_ = control_timestamp_;
-#endif
-
-            unsigned long sensor_center = SENSOR_WIDTH / 2;
-
-            unsigned long rightmost = 0;
-            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
-                if (!detection[i] && i > rightmost)
-                    rightmost = i;
-
-            unsigned long leftmost = SENSOR_WIDTH;
-            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
-                if (!detection[i] && i < leftmost)
-                    leftmost = i;
-
-            unsigned long center = leftmost;
-            for (unsigned long i = leftmost; i <= rightmost; i++)
-                if (!detection[i] && std::abs(static_cast<int>(i - (rightmost + leftmost) / 2)) < std::abs(static_cast<int>(center - (rightmost + leftmost) / 2)))
-                    center = i;
-
-            if (direction == Direction::LEFT || direction == Direction::REVERSE_LEFT)
-                selected = leftmost;
-            if (direction == Direction::RIGHT || direction == Direction::REVERSE_RIGHT)
-                selected = rightmost;
-            if (direction == Direction::STRAIGHT || direction == Direction::REVERSE_STRAIGHT)
-                selected = center;
-
-            [[maybe_unused]] float angle_error = (static_cast<int>(selected - sensor_center + 1)) / static_cast<float>(sensor_center) * M_PI / 2.0f;
-            float error = (static_cast<int>(selected - sensor_center + 1)) / static_cast<float>(sensor_center);
-            target_angle = PID(error, dt);
-
-            if (direction == Direction::REVERSE_LEFT || direction == Direction::REVERSE_RIGHT || direction == Direction::REVERSE_STRAIGHT)
-            {
-                target_angle = -target_angle;
-            }
-
-            prev_error = error;
-        }
-
-        void longitudinal_control()
-        {
-            switch (mission)
-            {
-            case Mission::LABYRINTH:
-            {
-                target_speed = LABYRINTH_SPEED;
-
-                if (direction == Direction::REVERSE_LEFT || direction == Direction::REVERSE_RIGHT || direction == Direction::REVERSE_STRAIGHT)
-                {
-                    target_speed = -target_speed;
-                }
-            }
-            break;
-
-            case Mission::FAST:
-                target_speed = FAST_SPEED;
-                break;
-
-            case Mission::FAST_TURN:
-                target_speed = FAST_SPEED_TURN;
-                break;
-
-            case Mission::FAST_OVERTAKE:
-                target_speed = FAST_SPEED_OVERTAKE;
-                break;
-
-            default:
-                break;
-            }
-        }
-
-        void update()
-        {
-            lateral_control();
-            longitudinal_control();
-        }
-
-        void set_current_velocity(const float current_velocity_)
-        {
-            current_velocity = current_velocity_;
-        }
-
-        void set_detection(bool *detection_)
-        {
-            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
-                detection[i] = detection_[i];
+            uint8_t msg[5] = {0};
+            Value::packet_from_value(msg, 5, signal_library[TARGET_ANGLE_ID], controller.target_angle);
+            signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[TARGET_SPEED_ID], controller.target_speed);
+            signal_sender.send(msg, 5);
         }
 
     private:
-        float integral = 0.0f;
-        float prev_error = 0.0f;
-        float current_velocity = 0.0f;
-        bool detection[SENSOR_WIDTH];
-
-#ifdef STM32
-        // TODO: add timestamp
-#else
-        std::chrono::time_point<std::chrono::steady_clock>
-            prev_control_timestamp_ = std::chrono::steady_clock::now();
-#endif
+        SignalLibrary &signal_library = SignalLibrary::get_instance();
+        SignalSender &signal_sender = SignalSender::get_instance();
     };
-
-    void test_sgl()
-    {
-        sgl::Graph<std::string, sgl::AdjacencyList> graph_robonaut;
-
-        auto A = graph_robonaut.add_vertex("A");
-        auto B = graph_robonaut.add_vertex("B");
-        auto C = graph_robonaut.add_vertex("C");
-        auto D = graph_robonaut.add_vertex("D");
-        auto E = graph_robonaut.add_vertex("E");
-        auto F = graph_robonaut.add_vertex("F");
-        auto G = graph_robonaut.add_vertex("G");
-        auto H = graph_robonaut.add_vertex("H");
-        auto I = graph_robonaut.add_vertex("I");
-        auto J = graph_robonaut.add_vertex("J");
-        auto K = graph_robonaut.add_vertex("K");
-        auto L = graph_robonaut.add_vertex("L");
-        auto M = graph_robonaut.add_vertex("M");
-        auto N = graph_robonaut.add_vertex("N");
-        auto O = graph_robonaut.add_vertex("O");
-        auto P = graph_robonaut.add_vertex("P");
-        auto Q = graph_robonaut.add_vertex("Q");
-        auto R = graph_robonaut.add_vertex("R");
-        auto S = graph_robonaut.add_vertex("S");
-        auto T = graph_robonaut.add_vertex("T");
-        auto U = graph_robonaut.add_vertex("U");
-        auto V = graph_robonaut.add_vertex("V");
-        auto W = graph_robonaut.add_vertex("W");
-        // extra node not present on the sheet
-        auto X = graph_robonaut.add_vertex("X");
-        auto balance = graph_robonaut.add_vertex("/");
-
-        graph_robonaut.add_edge(A, B, 4.0f);
-        graph_robonaut.add_edge(A, C, M_PI);
-        graph_robonaut.add_edge(A, D, M_PI);
-        graph_robonaut.add_edge(B, D, M_PI);
-        graph_robonaut.add_edge(B, E, M_PI);
-        graph_robonaut.add_edge(C, F, M_PI);
-        graph_robonaut.add_edge(D, F, M_PI);
-        graph_robonaut.add_edge(D, I, 4.0f);
-        graph_robonaut.add_edge(D, G, M_PI);
-        graph_robonaut.add_edge(E, G, M_PI);
-        graph_robonaut.add_edge(E, J, 4.0f);
-        graph_robonaut.add_edge(F, H, M_PI);
-        graph_robonaut.add_edge(F, I, M_PI);
-        graph_robonaut.add_edge(F, G, 4.0f);
-        graph_robonaut.add_edge(G, I, M_PI);
-        graph_robonaut.add_edge(G, J, M_PI);
-        graph_robonaut.add_edge(H, M, 4.0f);
-        graph_robonaut.add_edge(H, K, M_PI);
-        graph_robonaut.add_edge(I, K, M_PI);
-        graph_robonaut.add_edge(I, N, 4.0f);
-        graph_robonaut.add_edge(I, L, M_PI);
-        graph_robonaut.add_edge(J, L, M_PI);
-        graph_robonaut.add_edge(K, M, M_PI);
-        graph_robonaut.add_edge(K, N, M_PI);
-        graph_robonaut.add_edge(K, L, 4.0f);
-        graph_robonaut.add_edge(L, N, M_PI);
-        graph_robonaut.add_edge(L, O, M_PI);
-        graph_robonaut.add_edge(M, P, M_PI);
-        graph_robonaut.add_edge(M, Q, 2.0f);
-        graph_robonaut.add_edge(M, R, M_PI);
-        graph_robonaut.add_edge(N, R, M_PI);
-        graph_robonaut.add_edge(N, S, 2.0f);
-        graph_robonaut.add_edge(N, T, M_PI);
-        graph_robonaut.add_edge(O, T, M_PI);
-        graph_robonaut.add_edge(O, X, 2.0f);
-        graph_robonaut.add_edge(O, U, M_PI);
-        graph_robonaut.add_edge(P, Q, 2.0f);
-        graph_robonaut.add_edge(Q, balance, 5.0f + M_PI);
-        graph_robonaut.add_edge(Q, V, M_PI);
-        graph_robonaut.add_edge(Q, R, 2.0f);
-        graph_robonaut.add_edge(R, S, 2.0f);
-        graph_robonaut.add_edge(S, V, M_PI);
-        graph_robonaut.add_edge(S, W, M_PI);
-        graph_robonaut.add_edge(S, T, 2.0f);
-        graph_robonaut.add_edge(T, X, 2.0f);
-        graph_robonaut.add_edge(X, W, M_PI);
-        graph_robonaut.add_edge(X, U, 2.0f);
-        graph_robonaut.add_edge(V, W, 4.0f);
-
-        auto start_robonaut = std::chrono::high_resolution_clock::now();
-        std::map<sgl::uuid, std::pair<float, std::vector<sgl::uuid>>> map_robonaut = dijkstra(graph_robonaut, U);
-        auto end_robonaut = std::chrono::high_resolution_clock::now();
-
-        std::cout << "time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_robonaut - start_robonaut).count() << "ms" << std::endl;
-
-        sgl::print_dijkstra(graph_robonaut, map_robonaut);
-    }
 
 } // namespace jlb
 
