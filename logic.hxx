@@ -19,7 +19,6 @@ namespace jlb
 
         void send_telemetry()
         {
-
             char msg[5] = {0};
             Value::packet_from_value(msg, 5, signal_library[TARGET_ANGLE_ID], controller.target_angle);
             signal_sender.send(msg, 5);

@@ -144,11 +144,15 @@ namespace jlb
     //
     //      SIGNALS
     //
-
+#ifndef SIMULATION
     PARAM int SERVER_PORT = 5000;
     PARAM const char *SERVER_ADDRESS = "localhost";
-    PARAM unsigned long SIGNALS_SIZE = 2;
+#else
+    PARAM int SERVER_PORT = 5000;
+    PARAM const char *SERVER_ADDRESS = "localhost";
+#endif
 
+    PARAM unsigned long SIGNALS_SIZE = 2;
     PARAM uint8_t TARGET_ANGLE_ID = 0;
     PARAM uint8_t TARGET_SPEED_ID = 1;
 

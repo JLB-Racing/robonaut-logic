@@ -120,13 +120,25 @@ namespace jlb
 
         int send(char *msg, size_t max_size)
         {
+#ifdef STM32
+            // TODO: send UDP packet for STM32
+#else
             return client.send(msg, max_size);
+#endif
         }
 
     private:
+#ifdef STM32
+        // TODO: add UDPClient for STM32
+#else
         UDPClient client;
+#endif
 
+#ifdef STM32
+        // TODO: initialize UDPClient for STM32
+#else
         SignalSender() : client(SERVER_ADDRESS, SERVER_PORT)
+#endif
         {
         }
     };
