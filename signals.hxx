@@ -57,7 +57,7 @@ namespace jlb
         float value;
         Signal signal;
 
-        Value(uint8_t *msg, size_t max_size)
+        Value(char *msg, size_t max_size)
         {
             if (max_size < 5)
             {
