@@ -30,6 +30,7 @@ namespace jlb
     [[maybe_unused]] PARAM float WHEEL_WIDTH = 0.05f;             // m
     [[maybe_unused]] PARAM float TRACK = 0.26f;                   // m
     [[maybe_unused]] PARAM float WHEELBASE = 0.275f;              // m
+    PARAM int SENSOR_WIDTH = 32;                                  // -
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_VELOCITY = 12.5f;       // m/s
@@ -46,8 +47,9 @@ namespace jlb
     PARAM int IMU_BUFFER_SIZE = 3;
 #else
     /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float WHEEL_DIAMETER = 1.0f;        // px
-    static constexpr float WHEELBASE = 16.0f; // px
+    PARAM float WHEEL_DIAMETER = 1.0f; // px
+    PARAM float WHEELBASE = 16.0f;     // px
+    PARAM int SENSOR_WIDTH = 16;       // -
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_VELOCITY = 50.0f;       // px/s
@@ -72,20 +74,24 @@ namespace jlb
     //
 
 #ifndef SIMULATION
+    /* LONGITUDINAL CONTROLLER PARAMETERS */
     PARAM float Kp = 0.6f;
     PARAM float Ki = 0.01f;
     PARAM float Kd = 0.4f;
 
+    /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = 10.0f;        // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 5.0f; // m/s
     PARAM float FAST_SPEED = 30.0f;             // m/s
     PARAM float FAST_SPEED_TURN = 10.0f;        // m/s
     PARAM float FAST_SPEED_OVERTAKE = 20.0f;    // m/s
 #else
+    /* LONGITUDINAL CONTROLLER PARAMETERS */
     PARAM float Kp = 0.6f;
     PARAM float Ki = 0.01f;
     PARAM float Kd = 0.4f;
 
+    /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = 50.0f;         // px/s
     PARAM float LABYRINTH_SPEED_REVERSE = 25.0f; // px/s
     PARAM float FAST_SPEED = 300.0f;             // px/s

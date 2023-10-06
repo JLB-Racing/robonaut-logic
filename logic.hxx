@@ -40,7 +40,7 @@ namespace jlb
         Direction direction = Direction::STRAIGHT;
         Mission mission = Mission::LABYRINTH;
 
-        Controller() {}
+        Controller(jlb::Direction direction_ = Direction::STRAIGHT) : direction{direction_} {}
         ~Controller() {}
 
         float PID(const float error, const float dt)
@@ -61,10 +61,9 @@ namespace jlb
             return kAng * heading_error + atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
         }
 
-        template <size_t cols>
-        void lateral_control(bool (&detection_)[cols])
+        void lateral_control()
         {
-            if (std::all_of(std::begin(detection_), std::end(detection_), [](bool b)
+            if (std::all_of(std::begin(detection), std::end(detection), [](bool b)
                             { return b; }))
             {
                 return;
@@ -78,21 +77,21 @@ namespace jlb
             prev_control_timestamp_ = control_timestamp_;
 #endif
 
-            unsigned long sensor_center = cols / 2;
+            unsigned long sensor_center = SENSOR_WIDTH / 2;
 
             unsigned long rightmost = 0;
-            for (unsigned long i = 0; i < cols; i++)
-                if (!detection_[i] && i > rightmost)
+            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
+                if (!detection[i] && i > rightmost)
                     rightmost = i;
 
-            unsigned long leftmost = cols;
-            for (unsigned long i = 0; i < cols; i++)
-                if (!detection_[i] && i < leftmost)
+            unsigned long leftmost = SENSOR_WIDTH;
+            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
+                if (!detection[i] && i < leftmost)
                     leftmost = i;
 
             unsigned long center = leftmost;
             for (unsigned long i = leftmost; i <= rightmost; i++)
-                if (!detection_[i] && std::abs(static_cast<int>(i - (rightmost + leftmost) / 2)) < std::abs(static_cast<int>(center - (rightmost + leftmost) / 2)))
+                if (!detection[i] && std::abs(static_cast<int>(i - (rightmost + leftmost) / 2)) < std::abs(static_cast<int>(center - (rightmost + leftmost) / 2)))
                     center = i;
 
             if (direction == Direction::LEFT || direction == Direction::REVERSE_LEFT)
@@ -146,23 +145,34 @@ namespace jlb
             }
         }
 
-        template <size_t cols>
-        void update(bool (&detection_)[cols], const float current_velocity_)
+        void update()
+        {
+            lateral_control();
+            longitudinal_control();
+        }
+
+        void set_current_velocity(const float current_velocity_)
         {
             current_velocity = current_velocity_;
-            lateral_control(detection_);
-            longitudinal_control();
+        }
+
+        void set_detection(bool *detection_)
+        {
+            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
+                detection[i] = detection_[i];
         }
 
     private:
         float integral = 0.0f;
         float prev_error = 0.0f;
         float current_velocity = 0.0f;
+        bool detection[SENSOR_WIDTH];
 
 #ifdef STM32
         // TODO: add timestamp
 #else
-        std::chrono::time_point<std::chrono::steady_clock> prev_control_timestamp_ = std::chrono::steady_clock::now();
+        std::chrono::time_point<std::chrono::steady_clock>
+            prev_control_timestamp_ = std::chrono::steady_clock::now();
 #endif
     };
 

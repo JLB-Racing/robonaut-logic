@@ -18,6 +18,13 @@
 
 namespace jlb
 {
+    struct Odom
+    {
+        float vx = 0.0f;
+        float x = 0.0f;
+        float y = 0.0f;
+        float theta = 0.0f;
+    };
 
     class Odometry
     {
@@ -68,7 +75,7 @@ namespace jlb
             w_t = std::accumulate(w_buffer_.begin(), w_buffer_.end(), 0.0f) / w_buffer_.size();
         }
 
-        void update_odom()
+        Odom update_odom()
         {
 #ifdef STM32
             // TODO: add timestamp and dt
@@ -96,6 +103,8 @@ namespace jlb
             }
 
             odom_timestamp_ = update_timestamp > odom_timestamp_ ? update_timestamp : odom_timestamp_;
+
+            return {vx_t, x_t, y_t, theta_t};
         }
 
     private:
