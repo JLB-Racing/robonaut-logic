@@ -89,6 +89,11 @@ namespace jlb
             float error = (static_cast<int>(selected - sensor_center + 1)) / static_cast<float>(sensor_center);
             target_angle = PID(error, dt);
 
+            if (target_angle > MAX_WHEEL_ANGLE)
+                target_angle = MAX_WHEEL_ANGLE;
+            if (target_angle < -MAX_WHEEL_ANGLE)
+                target_angle = -MAX_WHEEL_ANGLE;
+
             if (direction == Direction::REVERSE_LEFT || direction == Direction::REVERSE_RIGHT || direction == Direction::REVERSE_STRAIGHT)
             {
                 target_angle = -target_angle;

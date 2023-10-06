@@ -102,6 +102,9 @@ namespace jlb
     //
 
 #ifndef SIMULATION
+    /* STATIC PARAMETERS OF THE VEHICLE */
+    PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
+
     /* LONGITUDINAL CONTROLLER PARAMETERS */
     PARAM float Kp = 0.6f;
     PARAM float Ki = 0.01f;
@@ -114,6 +117,9 @@ namespace jlb
     PARAM float FAST_SPEED_TURN = 10.0f;        // m/s
     PARAM float FAST_SPEED_OVERTAKE = 20.0f;    // m/s
 #else
+    /* STATIC PARAMETERS OF THE VEHICLE */
+    PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
+
     /* LONGITUDINAL CONTROLLER PARAMETERS */
     PARAM float Kp = 0.6f;
     PARAM float Ki = 0.001f;

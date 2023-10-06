@@ -76,7 +76,7 @@ namespace jlb
             uint32_t unsigned_value = (second_byte << 24) | (third_byte << 16) | (fourth_byte << 8) | fifth_byte;
 
             // convert to float
-            value = *reinterpret_cast<float *>(&unsigned_value);
+            value = static_cast<float>(unsigned_value);
 
             // apply offset and multiplier
             value = value / signal.multiplier - signal.offset;
