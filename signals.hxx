@@ -90,8 +90,8 @@ namespace jlb
             // Assuming little-endian byte order, reconstruct the unsigned_value from bytes 1-8.
             for (int i = 4; i >= 1; --i)
             {
-                reconstructed_value <<= 8; // Shift left to make room for the next byte
-                reconstructed_value |= static_cast<uint8_t>(msg[i]);
+                reconstructed_value <<= 8;                           // Shift left to make room for the next byte
+                reconstructed_value |= static_cast<uint8_t>(msg[i]); // Extract the next byte and add it to the reconstructed value
             }
 
             value = static_cast<float>(reconstructed_value) / signal.multiplier - signal.offset;
