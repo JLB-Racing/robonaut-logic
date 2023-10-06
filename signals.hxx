@@ -56,6 +56,24 @@ namespace jlb
         uint8_t id;
         float value;
         Signal signal;
+        static void packet_from_value(char *msg, size_t max_size, const Signal &signal, float value)
+        {
+            if (max_size < 5)
+            {
+                return;
+            }
+
+            msg[0] = signal.id;
+
+            uint32_t unsigned_value = static_cast<uint32_t>((value + signal.offset) * signal.multiplier);
+
+            // Assuming little-endian byte order, populate bytes 1-8 with the unsigned_value.
+            for (int i = 1; i <= 4; ++i)
+            {
+                msg[i] = static_cast<uint8_t>(unsigned_value & 0xFF); // Extract the least significant byte
+                unsigned_value >>= 8;                                 // Shift right to get the next byte
+            }
+        }
 
         Value(char *msg, size_t max_size)
         {
@@ -64,45 +82,23 @@ namespace jlb
                 return;
             }
 
-            // first byte is the id
             id = msg[0];
-            signal = signal_library.signals[id];
+            signal = signal_library[id];
 
-            // the following 4 bytes are the value in MSB order
-            uint32_t second_byte = msg[1];
-            uint32_t third_byte = msg[2];
-            uint32_t fourth_byte = msg[3];
-            uint32_t fifth_byte = msg[4];
-            uint32_t unsigned_value = (second_byte << 24) | (third_byte << 16) | (fourth_byte << 8) | fifth_byte;
+            uint32_t reconstructed_value = 0;
 
-            // convert to float
-            value = static_cast<float>(unsigned_value);
-
-            // apply offset and multiplier
-            value = value / signal.multiplier - signal.offset;
-        }
-
-        ~Value() {}
-
-        static void packet_from_value(char *msg, size_t max_size, const Signal &signal, float value)
-        {
-            if (max_size < 5)
+            // Assuming little-endian byte order, reconstruct the unsigned_value from bytes 1-8.
+            for (int i = 4; i >= 1; --i)
             {
-                return;
+                reconstructed_value <<= 8; // Shift left to make room for the next byte
+                reconstructed_value |= static_cast<uint8_t>(msg[i]);
             }
 
-            // first byte is the id
-            msg[0] = signal.id;
+            value = static_cast<float>(reconstructed_value) / signal.multiplier - signal.offset;
+        }
 
-            // apply offset and multiplier
-            value = (value + signal.offset) * signal.multiplier;
-
-            // the following 4 bytes are the value in MSB order
-            uint32_t unsigned_value = static_cast<uint32_t>(value);
-            msg[1] = static_cast<uint8_t>(unsigned_value >> 24);
-            msg[2] = static_cast<uint8_t>(unsigned_value >> 16);
-            msg[3] = static_cast<uint8_t>(unsigned_value >> 8);
-            msg[4] = static_cast<uint8_t>(unsigned_value);
+        ~Value()
+        {
         }
 
     private:
