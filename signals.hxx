@@ -84,7 +84,7 @@ namespace jlb
 
         ~Value() {}
 
-        static void packet_from_value(uint8_t *msg, size_t max_size, const Signal &signal, float value)
+        static void packet_from_value(char *msg, size_t max_size, const Signal &signal, float value)
         {
             if (max_size < 5)
             {
@@ -98,11 +98,11 @@ namespace jlb
             value = (value + signal.offset) * signal.multiplier;
 
             // the following 4 bytes are the value in MSB order
-            uint32_t unsigned_value = *reinterpret_cast<uint32_t *>(&value);
-            msg[1] = (unsigned_value >> 24) & 0xFF;
-            msg[2] = (unsigned_value >> 16) & 0xFF;
-            msg[3] = (unsigned_value >> 8) & 0xFF;
-            msg[4] = unsigned_value & 0xFF;
+            uint32_t unsigned_value = static_cast<uint32_t>(value);
+            msg[1] = static_cast<uint8_t>(unsigned_value >> 24);
+            msg[2] = static_cast<uint8_t>(unsigned_value >> 16);
+            msg[3] = static_cast<uint8_t>(unsigned_value >> 8);
+            msg[4] = static_cast<uint8_t>(unsigned_value);
         }
 
     private:
@@ -122,7 +122,7 @@ namespace jlb
             return instance;
         }
 
-        int send(uint8_t *msg, size_t max_size)
+        int send(char *msg, size_t max_size)
         {
             return client.send(msg, max_size);
         }

@@ -20,7 +20,7 @@ namespace jlb
         void send_telemetry()
         {
 
-            uint8_t msg[5] = {0};
+            char msg[5] = {0};
             Value::packet_from_value(msg, 5, signal_library[TARGET_ANGLE_ID], controller.target_angle);
             signal_sender.send(msg, 5);
             Value::packet_from_value(msg, 5, signal_library[TARGET_SPEED_ID], controller.target_speed);
