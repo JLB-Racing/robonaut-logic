@@ -152,9 +152,12 @@ namespace jlb
     PARAM const char *SERVER_ADDRESS = "localhost";
 #endif
 
-    PARAM unsigned long SIGNALS_SIZE = 2;
+    PARAM unsigned long SIGNALS_SIZE = 5;
     PARAM uint8_t TARGET_ANGLE_ID = 0;
     PARAM uint8_t TARGET_SPEED_ID = 1;
+    PARAM uint8_t POSITION_X_ID = 2;
+    PARAM uint8_t POSITION_Y_ID = 3;
+    PARAM uint8_t POSITION_THETA_ID = 4;
 
     //
     //      END SIGNALS

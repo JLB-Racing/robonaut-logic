@@ -24,6 +24,12 @@ namespace jlb
             signal_sender.send(msg, 5);
             Value::packet_from_value(msg, 5, signal_library[TARGET_SPEED_ID], controller.target_speed);
             signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[POSITION_X_ID], odometry.x_t);
+            signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[POSITION_Y_ID], odometry.y_t);
+            signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[POSITION_THETA_ID], odometry.theta_t);
+            signal_sender.send(msg, 5);
         }
 
     private:
