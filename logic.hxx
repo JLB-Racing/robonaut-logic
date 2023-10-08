@@ -30,6 +30,14 @@ namespace jlb
             signal_sender.send(msg, 5);
             Value::packet_from_value(msg, 5, signal_library[POSITION_THETA_ID], odometry.theta_t);
             signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[ODOM_LINEAR_VELOCITY_X_ID], odometry.vx_t);
+            signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[ODOM_ANGULAR_VELOCITY_Z_ID], odometry.w_t);
+            signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[MEAS_MOTOR_RPM_ID], odometry.meas_motor_rpm);
+            signal_sender.send(msg, 5);
+            Value::packet_from_value(msg, 5, signal_library[MEAS_ANGULAR_VELOCITY_Z_ID], odometry.meas_ang_vel_z);
+            signal_sender.send(msg, 5);
         }
 
     private:

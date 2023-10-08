@@ -35,13 +35,18 @@ namespace jlb
         float y_t = 0.0f;     // y position
         float theta_t = 0.0f; // orientation
 
+        float meas_motor_rpm = 0.0f;
+        float meas_ang_vel_z = 0.0f;
+
         Odometry(const float x_t_ = 0.0f, const float y_t_ = 0.0f, const float theta_t_ = 0.0f)
-            : x_t(x_t_), y_t(y_t_), theta_t(theta_t_) {}
+            : x_t(x_t_), y_t(y_t_), theta_t(normalize_angle(theta_t_)) {}
 
         ~Odometry() {}
 
         void rpm_callback(const float motor_rpm)
         {
+            meas_motor_rpm = motor_rpm;
+
             float wheel_rpm = motor_rpm * jlb::GEAR_RATIO_MOTOR_TO_WHEEL;
             float velocity = M_PI * jlb::WHEEL_DIAMETER * wheel_rpm / 60.0f;
 
@@ -61,6 +66,8 @@ namespace jlb
 
         void imu_callback(const float ang_vel_z)
         {
+            meas_ang_vel_z = ang_vel_z;
+
             if (std::fabs(ang_vel_z) > jlb::MAX_YAW_RATE)
             {
                 return;
@@ -99,12 +106,22 @@ namespace jlb
 
                 x_t += (vx_t * std::cos(theta_t) - vy_t * std::sin(theta_t)) * dt;
                 y_t += (vx_t * std::sin(theta_t) + vy_t * std::cos(theta_t)) * dt;
-                theta_t = std::fmod(theta_t + w_t * dt, 2.0f * M_PI);
+                theta_t = normalize_angle(theta_t + w_t * dt);
             }
 
             odom_timestamp_ = update_timestamp > odom_timestamp_ ? update_timestamp : odom_timestamp_;
 
             return {vx_t, x_t, y_t, theta_t};
+        }
+
+        float normalize_angle(float angle)
+        {
+            angle = std::fmod(angle, 2.0f * M_PI);
+            if (angle < 0.0f)
+            {
+                angle += 2.0f * M_PI;
+            }
+            return angle;
         }
 
     private:

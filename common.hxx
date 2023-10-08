@@ -67,6 +67,7 @@ namespace jlb
     PARAM float MAX_YAW_RATE = 1.5f * M_PI; // rad/s
 
     /* GEAR RATIOS */
+    PARAM int MAX_MOTOR_RPM = 10000;
     PARAM int SPUR_GEAR_TOOTH_COUNT = 48;
     PARAM int PINION_GEAR_TOOTH_COUNT = 13;
     PARAM float INTERNAL_GEAR_RATIO = 1.0f;
@@ -86,6 +87,7 @@ namespace jlb
     PARAM float MAX_YAW_RATE = 1.5f * M_PI; // rad/s
 
     /* GEAR RATIOS */
+    PARAM int MAX_MOTOR_RPM = 10000;
     PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(3 / 2) * 1.0f;
 
     /* ALGORITHM PARAMETERS */
@@ -152,12 +154,16 @@ namespace jlb
     PARAM const char *SERVER_ADDRESS = "localhost";
 #endif
 
-    PARAM unsigned long SIGNALS_SIZE = 5;
+    PARAM unsigned long SIGNALS_SIZE = 9;
     PARAM uint8_t TARGET_ANGLE_ID = 0;
     PARAM uint8_t TARGET_SPEED_ID = 1;
     PARAM uint8_t POSITION_X_ID = 2;
     PARAM uint8_t POSITION_Y_ID = 3;
     PARAM uint8_t POSITION_THETA_ID = 4;
+    PARAM uint8_t ODOM_LINEAR_VELOCITY_X_ID = 5;
+    PARAM uint8_t ODOM_ANGULAR_VELOCITY_Z_ID = 6;
+    PARAM uint8_t MEAS_MOTOR_RPM_ID = 7;
+    PARAM uint8_t MEAS_ANGULAR_VELOCITY_Z_ID = 8;
 
     //
     //      END SIGNALS

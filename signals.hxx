@@ -45,10 +45,14 @@ namespace jlb
 
 #else
             signals.at(TARGET_ANGLE_ID) = Signal({TARGET_ANGLE_ID, "target_angle", "rad", -1.0f, 1.0f, 1.0f, 1000.0f});
-            signals.at(TARGET_SPEED_ID) = Signal({TARGET_SPEED_ID, "target_speed", "px/s", -500.0f, 500.0f, 500.0f, 1000.0f});
+            signals.at(TARGET_SPEED_ID) = Signal({TARGET_SPEED_ID, "target_speed", "px/s", -MAX_VELOCITY, MAX_VELOCITY, MAX_VELOCITY, 1000.0f});
             signals.at(POSITION_X_ID) = Signal({POSITION_X_ID, "position_x", "px", 0.0f, 1088.0f, 0.0f, 1.0f});
             signals.at(POSITION_Y_ID) = Signal({POSITION_Y_ID, "position_y", "px", 0.0f, 1024.0f, 0.0f, 1.0f});
-            signals.at(POSITION_THETA_ID) = Signal({POSITION_THETA_ID, "position_theta", "rad", -M_PI, M_PI, 0.0f, 1000.0f});
+            signals.at(POSITION_THETA_ID) = Signal({POSITION_THETA_ID, "position_theta", "rad", 0, 2 * M_PI, 0.0f, 1000.0f});
+            signals.at(ODOM_LINEAR_VELOCITY_X_ID) = Signal({ODOM_LINEAR_VELOCITY_X_ID, "odom_linear_velocity_x", "px/s", -MAX_VELOCITY, MAX_VELOCITY, MAX_VELOCITY, 1000.0f});
+            signals.at(ODOM_ANGULAR_VELOCITY_Z_ID) = Signal({ODOM_ANGULAR_VELOCITY_Z_ID, "odom_angular_velocity_z", "rad/s", -MAX_YAW_RATE, MAX_YAW_RATE, MAX_YAW_RATE, 1000.0f});
+            signals.at(MEAS_MOTOR_RPM_ID) = Signal({MEAS_MOTOR_RPM_ID, "meas_motor_rpm", "rpm", -MAX_MOTOR_RPM, MAX_MOTOR_RPM, MAX_MOTOR_RPM, 1000.0f});
+            signals.at(MEAS_ANGULAR_VELOCITY_Z_ID) = Signal({MEAS_ANGULAR_VELOCITY_Z_ID, "meas_angular_velocity_z", "rad/s", -MAX_YAW_RATE, MAX_YAW_RATE, MAX_YAW_RATE, 1000.0f});
 #endif
         }
     };
