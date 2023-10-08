@@ -20,24 +20,24 @@ namespace jlb
         void send_telemetry()
         {
             char msg[5] = {0};
-            Value::packet_from_value(msg, 5, signal_library[TARGET_ANGLE_ID], controller.target_angle);
-            signal_sender.send(msg, 5);
-            Value::packet_from_value(msg, 5, signal_library[TARGET_SPEED_ID], controller.target_speed);
-            signal_sender.send(msg, 5);
+            // Value::packet_from_value(msg, 5, signal_library[TARGET_ANGLE_ID], controller.target_angle);
+            // signal_sender.send(msg, 5);
+            // Value::packet_from_value(msg, 5, signal_library[TARGET_SPEED_ID], controller.target_speed);
+            // signal_sender.send(msg, 5);
             Value::packet_from_value(msg, 5, signal_library[POSITION_X_ID], odometry.x_t);
             signal_sender.send(msg, 5);
             Value::packet_from_value(msg, 5, signal_library[POSITION_Y_ID], odometry.y_t);
             signal_sender.send(msg, 5);
             Value::packet_from_value(msg, 5, signal_library[POSITION_THETA_ID], odometry.theta_t);
             signal_sender.send(msg, 5);
-            Value::packet_from_value(msg, 5, signal_library[ODOM_LINEAR_VELOCITY_X_ID], odometry.vx_t);
-            signal_sender.send(msg, 5);
-            Value::packet_from_value(msg, 5, signal_library[ODOM_ANGULAR_VELOCITY_Z_ID], odometry.w_t);
-            signal_sender.send(msg, 5);
-            Value::packet_from_value(msg, 5, signal_library[MEAS_MOTOR_RPM_ID], odometry.meas_motor_rpm);
-            signal_sender.send(msg, 5);
-            Value::packet_from_value(msg, 5, signal_library[MEAS_ANGULAR_VELOCITY_Z_ID], odometry.meas_ang_vel_z);
-            signal_sender.send(msg, 5);
+            // Value::packet_from_value(msg, 5, signal_library[ODOM_LINEAR_VELOCITY_X_ID], odometry.vx_t);
+            // signal_sender.send(msg, 5);
+            // Value::packet_from_value(msg, 5, signal_library[ODOM_ANGULAR_VELOCITY_Z_ID], odometry.w_t);
+            // signal_sender.send(msg, 5);
+            // Value::packet_from_value(msg, 5, signal_library[MEAS_MOTOR_RPM_ID], odometry.meas_motor_rpm);
+            // signal_sender.send(msg, 5);
+            // Value::packet_from_value(msg, 5, signal_library[MEAS_ANGULAR_VELOCITY_Z_ID], odometry.meas_ang_vel_z);
+            // signal_sender.send(msg, 5);
 
             for (uint8_t i = 0; i < SENSOR_WIDTH; i++)
             {
@@ -49,6 +49,7 @@ namespace jlb
                 {
                     Value::packet_from_value(msg, 5, signal_library[LINE_SENSOR_1_ID + i], controller.detection[i]);
                 }
+                signal_sender.send(msg, 5);
             }
         }
 

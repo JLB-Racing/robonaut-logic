@@ -17,7 +17,7 @@ namespace jlb
     class Controller
     {
     public:
-        unsigned long selected = 0;
+        unsigned long selected = SENSOR_WIDTH / 2;
         float target_angle = 0.0f;
         float target_speed = 0.0f;
         bool detection[SENSOR_WIDTH];
