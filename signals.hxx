@@ -55,7 +55,7 @@ namespace jlb
             signals.at(MEAS_ANGULAR_VELOCITY_Z_ID) = Signal({MEAS_ANGULAR_VELOCITY_Z_ID, "meas_angular_velocity_z", "rad/s", -MAX_YAW_RATE, MAX_YAW_RATE, MAX_YAW_RATE, 1000.0f});
             for (uint8_t i = 0; i < 32; i++)
             {
-                signals.at(LINE_SENSOR_1_ID + i) = Signal({static_cast<uint8_t>(LINE_SENSOR_1_ID + i), "line_sensor_" + std::to_string(i), "bool", 0.0f, 1.0f, 0.0f, 1.0f});
+                signals.at(LINE_SENSOR_1_ID + i) = Signal({static_cast<uint8_t>(LINE_SENSOR_1_ID + i), "line_sensor_" + std::to_string(i + 1), "bool", 0.0f, 1.0f, 0.0f, 1.0f});
             }
 #endif
         }
