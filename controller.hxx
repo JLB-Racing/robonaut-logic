@@ -20,6 +20,7 @@ namespace jlb
         unsigned long selected = 0;
         float target_angle = 0.0f;
         float target_speed = 0.0f;
+        bool detection[SENSOR_WIDTH];
 
         Direction direction = Direction::STRAIGHT;
         Mission mission = Mission::LABYRINTH;
@@ -157,7 +158,6 @@ namespace jlb
         float integral = 0.0f;
         float prev_error = 0.0f;
         float current_velocity = 0.0f;
-        bool detection[SENSOR_WIDTH];
 
 #ifdef STM32
         // TODO: add timestamp

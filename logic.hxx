@@ -38,6 +38,18 @@ namespace jlb
             signal_sender.send(msg, 5);
             Value::packet_from_value(msg, 5, signal_library[MEAS_ANGULAR_VELOCITY_Z_ID], odometry.meas_ang_vel_z);
             signal_sender.send(msg, 5);
+
+            for (uint8_t i = 0; i < SENSOR_WIDTH; i++)
+            {
+                if (i == controller.selected)
+                {
+                    Value::packet_from_value(msg, 5, signal_library[LINE_SENSOR_1_ID + i], controller.detection[i] + 2.0f);
+                }
+                else
+                {
+                    Value::packet_from_value(msg, 5, signal_library[LINE_SENSOR_1_ID + i], controller.detection[i]);
+                }
+            }
         }
 
     private:

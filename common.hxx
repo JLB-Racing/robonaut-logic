@@ -91,8 +91,8 @@ namespace jlb
     PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(3 / 2) * 1.0f;
 
     /* ALGORITHM PARAMETERS */
-    PARAM int VELOCITY_BUFFER_SIZE = 1;
-    PARAM int IMU_BUFFER_SIZE = 1;
+    PARAM int VELOCITY_BUFFER_SIZE = 10;
+    PARAM int IMU_BUFFER_SIZE = 10;
 #endif
 
     //
@@ -154,7 +154,7 @@ namespace jlb
     PARAM const char *SERVER_ADDRESS = "localhost";
 #endif
 
-    PARAM unsigned long SIGNALS_SIZE = 9;
+    PARAM unsigned long SIGNALS_SIZE = 41;
     PARAM uint8_t TARGET_ANGLE_ID = 0;
     PARAM uint8_t TARGET_SPEED_ID = 1;
     PARAM uint8_t POSITION_X_ID = 2;
@@ -164,6 +164,38 @@ namespace jlb
     PARAM uint8_t ODOM_ANGULAR_VELOCITY_Z_ID = 6;
     PARAM uint8_t MEAS_MOTOR_RPM_ID = 7;
     PARAM uint8_t MEAS_ANGULAR_VELOCITY_Z_ID = 8;
+    PARAM uint8_t LINE_SENSOR_1_ID = 9;
+    PARAM uint8_t LINE_SENSOR_2_ID = 10;
+    PARAM uint8_t LINE_SENSOR_3_ID = 11;
+    PARAM uint8_t LINE_SENSOR_4_ID = 12;
+    PARAM uint8_t LINE_SENSOR_5_ID = 13;
+    PARAM uint8_t LINE_SENSOR_6_ID = 14;
+    PARAM uint8_t LINE_SENSOR_7_ID = 15;
+    PARAM uint8_t LINE_SENSOR_8_ID = 16;
+    PARAM uint8_t LINE_SENSOR_9_ID = 17;
+    PARAM uint8_t LINE_SENSOR_10_ID = 18;
+    PARAM uint8_t LINE_SENSOR_11_ID = 19;
+    PARAM uint8_t LINE_SENSOR_12_ID = 20;
+    PARAM uint8_t LINE_SENSOR_13_ID = 21;
+    PARAM uint8_t LINE_SENSOR_14_ID = 22;
+    PARAM uint8_t LINE_SENSOR_15_ID = 23;
+    PARAM uint8_t LINE_SENSOR_16_ID = 24;
+    PARAM uint8_t LINE_SENSOR_17_ID = 25;
+    PARAM uint8_t LINE_SENSOR_18_ID = 26;
+    PARAM uint8_t LINE_SENSOR_19_ID = 27;
+    PARAM uint8_t LINE_SENSOR_20_ID = 28;
+    PARAM uint8_t LINE_SENSOR_21_ID = 29;
+    PARAM uint8_t LINE_SENSOR_22_ID = 30;
+    PARAM uint8_t LINE_SENSOR_23_ID = 31;
+    PARAM uint8_t LINE_SENSOR_24_ID = 32;
+    PARAM uint8_t LINE_SENSOR_25_ID = 33;
+    PARAM uint8_t LINE_SENSOR_26_ID = 34;
+    PARAM uint8_t LINE_SENSOR_27_ID = 35;
+    PARAM uint8_t LINE_SENSOR_28_ID = 36;
+    PARAM uint8_t LINE_SENSOR_29_ID = 37;
+    PARAM uint8_t LINE_SENSOR_30_ID = 38;
+    PARAM uint8_t LINE_SENSOR_31_ID = 39;
+    PARAM uint8_t LINE_SENSOR_32_ID = 40;
 
     //
     //      END SIGNALS
