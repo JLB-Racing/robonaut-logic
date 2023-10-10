@@ -44,172 +44,140 @@ extern "C" {
 #define measurements_1_IDE (0U)
 #define measurements_1_DLC (8U)
 #define measurements_1_CANID (0U)
-// signal: @angular_velocity_x_ro
-#define JLB_angular_velocity_x_ro_CovFactor (0.0002)
-#define JLB_angular_velocity_x_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
-#define JLB_angular_velocity_x_ro_fromS(x) ( (((x) * (0.0002)) + (-6.5535)) )
-// signal: @angular_velocity_y_ro
-#define JLB_angular_velocity_y_ro_CovFactor (0.0002)
-#define JLB_angular_velocity_y_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
-#define JLB_angular_velocity_y_ro_fromS(x) ( (((x) * (0.0002)) + (-6.5535)) )
 
 typedef struct
 {
 #ifdef JLB_USE_BITS_SIGNAL
 
-  uint8_t line_sensor_1 : 1;                 //      Bits= 1
+  uint8_t line_sensor_1 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_2 : 1;                 //      Bits= 1
+  uint8_t line_sensor_2 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_3 : 1;                 //      Bits= 1
+  uint8_t line_sensor_3 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_4 : 1;                 //      Bits= 1
+  uint8_t line_sensor_4 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_5 : 1;                 //      Bits= 1
+  uint8_t line_sensor_5 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_6 : 1;                 //      Bits= 1
+  uint8_t line_sensor_6 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_7 : 1;                 //      Bits= 1
+  uint8_t line_sensor_7 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_8 : 1;                 //      Bits= 1
+  uint8_t line_sensor_8 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_9 : 1;                 //      Bits= 1
+  uint8_t line_sensor_9 : 2;                 //      Bits= 2
 
-  uint8_t line_sensor_10 : 1;                //      Bits= 1
+  uint8_t line_sensor_10 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_11 : 1;                //      Bits= 1
+  uint8_t line_sensor_11 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_12 : 1;                //      Bits= 1
+  uint8_t line_sensor_12 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_13 : 1;                //      Bits= 1
+  uint8_t line_sensor_13 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_14 : 1;                //      Bits= 1
+  uint8_t line_sensor_14 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_15 : 1;                //      Bits= 1
+  uint8_t line_sensor_15 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_16 : 1;                //      Bits= 1
+  uint8_t line_sensor_16 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_17 : 1;                //      Bits= 1
+  uint8_t line_sensor_17 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_18 : 1;                //      Bits= 1
+  uint8_t line_sensor_18 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_19 : 1;                //      Bits= 1
+  uint8_t line_sensor_19 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_20 : 1;                //      Bits= 1
+  uint8_t line_sensor_20 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_21 : 1;                //      Bits= 1
+  uint8_t line_sensor_21 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_22 : 1;                //      Bits= 1
+  uint8_t line_sensor_22 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_23 : 1;                //      Bits= 1
+  uint8_t line_sensor_23 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_24 : 1;                //      Bits= 1
+  uint8_t line_sensor_24 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_25 : 1;                //      Bits= 1
+  uint8_t line_sensor_25 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_26 : 1;                //      Bits= 1
+  uint8_t line_sensor_26 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_27 : 1;                //      Bits= 1
+  uint8_t line_sensor_27 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_28 : 1;                //      Bits= 1
+  uint8_t line_sensor_28 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_29 : 1;                //      Bits= 1
+  uint8_t line_sensor_29 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_30 : 1;                //      Bits= 1
+  uint8_t line_sensor_30 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_31 : 1;                //      Bits= 1
+  uint8_t line_sensor_31 : 2;                //      Bits= 2
 
-  uint8_t line_sensor_32 : 1;                //      Bits= 1
-
-  uint16_t angular_velocity_x_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
-
-#ifdef JLB_USE_SIGFLOAT
-  sigfloat_t angular_velocity_x_phys;
-#endif // JLB_USE_SIGFLOAT
-
-  uint16_t angular_velocity_y_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
-
-#ifdef JLB_USE_SIGFLOAT
-  sigfloat_t angular_velocity_y_phys;
-#endif // JLB_USE_SIGFLOAT
+  uint8_t line_sensor_32 : 2;                //      Bits= 2
 
 #else
 
-  uint8_t line_sensor_1;                     //      Bits= 1
+  uint8_t line_sensor_1;                     //      Bits= 2
 
-  uint8_t line_sensor_2;                     //      Bits= 1
+  uint8_t line_sensor_2;                     //      Bits= 2
 
-  uint8_t line_sensor_3;                     //      Bits= 1
+  uint8_t line_sensor_3;                     //      Bits= 2
 
-  uint8_t line_sensor_4;                     //      Bits= 1
+  uint8_t line_sensor_4;                     //      Bits= 2
 
-  uint8_t line_sensor_5;                     //      Bits= 1
+  uint8_t line_sensor_5;                     //      Bits= 2
 
-  uint8_t line_sensor_6;                     //      Bits= 1
+  uint8_t line_sensor_6;                     //      Bits= 2
 
-  uint8_t line_sensor_7;                     //      Bits= 1
+  uint8_t line_sensor_7;                     //      Bits= 2
 
-  uint8_t line_sensor_8;                     //      Bits= 1
+  uint8_t line_sensor_8;                     //      Bits= 2
 
-  uint8_t line_sensor_9;                     //      Bits= 1
+  uint8_t line_sensor_9;                     //      Bits= 2
 
-  uint8_t line_sensor_10;                    //      Bits= 1
+  uint8_t line_sensor_10;                    //      Bits= 2
 
-  uint8_t line_sensor_11;                    //      Bits= 1
+  uint8_t line_sensor_11;                    //      Bits= 2
 
-  uint8_t line_sensor_12;                    //      Bits= 1
+  uint8_t line_sensor_12;                    //      Bits= 2
 
-  uint8_t line_sensor_13;                    //      Bits= 1
+  uint8_t line_sensor_13;                    //      Bits= 2
 
-  uint8_t line_sensor_14;                    //      Bits= 1
+  uint8_t line_sensor_14;                    //      Bits= 2
 
-  uint8_t line_sensor_15;                    //      Bits= 1
+  uint8_t line_sensor_15;                    //      Bits= 2
 
-  uint8_t line_sensor_16;                    //      Bits= 1
+  uint8_t line_sensor_16;                    //      Bits= 2
 
-  uint8_t line_sensor_17;                    //      Bits= 1
+  uint8_t line_sensor_17;                    //      Bits= 2
 
-  uint8_t line_sensor_18;                    //      Bits= 1
+  uint8_t line_sensor_18;                    //      Bits= 2
 
-  uint8_t line_sensor_19;                    //      Bits= 1
+  uint8_t line_sensor_19;                    //      Bits= 2
 
-  uint8_t line_sensor_20;                    //      Bits= 1
+  uint8_t line_sensor_20;                    //      Bits= 2
 
-  uint8_t line_sensor_21;                    //      Bits= 1
+  uint8_t line_sensor_21;                    //      Bits= 2
 
-  uint8_t line_sensor_22;                    //      Bits= 1
+  uint8_t line_sensor_22;                    //      Bits= 2
 
-  uint8_t line_sensor_23;                    //      Bits= 1
+  uint8_t line_sensor_23;                    //      Bits= 2
 
-  uint8_t line_sensor_24;                    //      Bits= 1
+  uint8_t line_sensor_24;                    //      Bits= 2
 
-  uint8_t line_sensor_25;                    //      Bits= 1
+  uint8_t line_sensor_25;                    //      Bits= 2
 
-  uint8_t line_sensor_26;                    //      Bits= 1
+  uint8_t line_sensor_26;                    //      Bits= 2
 
-  uint8_t line_sensor_27;                    //      Bits= 1
+  uint8_t line_sensor_27;                    //      Bits= 2
 
-  uint8_t line_sensor_28;                    //      Bits= 1
+  uint8_t line_sensor_28;                    //      Bits= 2
 
-  uint8_t line_sensor_29;                    //      Bits= 1
+  uint8_t line_sensor_29;                    //      Bits= 2
 
-  uint8_t line_sensor_30;                    //      Bits= 1
+  uint8_t line_sensor_30;                    //      Bits= 2
 
-  uint8_t line_sensor_31;                    //      Bits= 1
+  uint8_t line_sensor_31;                    //      Bits= 2
 
-  uint8_t line_sensor_32;                    //      Bits= 1
-
-  uint16_t angular_velocity_x_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
-
-#ifdef JLB_USE_SIGFLOAT
-  sigfloat_t angular_velocity_x_phys;
-#endif // JLB_USE_SIGFLOAT
-
-  uint16_t angular_velocity_y_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
-
-#ifdef JLB_USE_SIGFLOAT
-  sigfloat_t angular_velocity_y_phys;
-#endif // JLB_USE_SIGFLOAT
+  uint8_t line_sensor_32;                    //      Bits= 2
 
 #endif // JLB_USE_BITS_SIGNAL
 
@@ -225,10 +193,75 @@ typedef struct
 #define measurements_2_IDE (0U)
 #define measurements_2_DLC (8U)
 #define measurements_2_CANID (0x1U)
+// signal: @angular_velocity_x_ro
+#define JLB_angular_velocity_x_ro_CovFactor (0.0002)
+#define JLB_angular_velocity_x_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
+#define JLB_angular_velocity_x_ro_fromS(x) ( (((x) * (0.0002)) + (-6.5535)) )
+// signal: @angular_velocity_y_ro
+#define JLB_angular_velocity_y_ro_CovFactor (0.0002)
+#define JLB_angular_velocity_y_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
+#define JLB_angular_velocity_y_ro_fromS(x) ( (((x) * (0.0002)) + (-6.5535)) )
 // signal: @angular_velocity_z_ro
 #define JLB_angular_velocity_z_ro_CovFactor (0.0002)
 #define JLB_angular_velocity_z_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
 #define JLB_angular_velocity_z_ro_fromS(x) ( (((x) * (0.0002)) + (-6.5535)) )
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint16_t angular_velocity_x_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_x_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t angular_velocity_y_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_y_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t angular_velocity_z_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_z_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#else
+
+  uint16_t angular_velocity_x_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_x_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t angular_velocity_y_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_y_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t angular_velocity_z_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_z_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} measurements_2_t;
+
+// def @measurements_3 CAN Message (2    0x2)
+#define measurements_3_IDE (0U)
+#define measurements_3_DLC (8U)
+#define measurements_3_CANID (0x2U)
 // signal: @linear_acceleration_x_ro
 #define JLB_linear_acceleration_x_ro_CovFactor (0.001)
 #define JLB_linear_acceleration_x_ro_toS(x) ( (uint16_t) (((x) - (-32.7675)) / (0.001)) )
@@ -246,12 +279,6 @@ typedef struct
 {
 #ifdef JLB_USE_BITS_SIGNAL
 
-  uint16_t angular_velocity_z_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
-
-#ifdef JLB_USE_SIGFLOAT
-  sigfloat_t angular_velocity_z_phys;
-#endif // JLB_USE_SIGFLOAT
-
   uint16_t linear_acceleration_x_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
 
 #ifdef JLB_USE_SIGFLOAT
@@ -271,12 +298,6 @@ typedef struct
 #endif // JLB_USE_SIGFLOAT
 
 #else
-
-  uint16_t angular_velocity_z_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
-
-#ifdef JLB_USE_SIGFLOAT
-  sigfloat_t angular_velocity_z_phys;
-#endif // JLB_USE_SIGFLOAT
 
   uint16_t linear_acceleration_x_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
 
@@ -304,12 +325,12 @@ typedef struct
 
 #endif // JLB_USE_DIAG_MONITORS
 
-} measurements_2_t;
+} measurements_3_t;
 
-// def @measurements_3 CAN Message (2    0x2)
-#define measurements_3_IDE (0U)
-#define measurements_3_DLC (2U)
-#define measurements_3_CANID (0x2U)
+// def @measurements_4 CAN Message (3    0x3)
+#define measurements_4_IDE (0U)
+#define measurements_4_DLC (8U)
+#define measurements_4_CANID (0x3U)
 // signal: @motor_rpm_ro
 #define JLB_motor_rpm_ro_CovFactor (0.1)
 #define JLB_motor_rpm_ro_toS(x) ( (uint16_t) (((x) - (-3276.75)) / (0.1)) )
@@ -341,7 +362,178 @@ typedef struct
 
 #endif // JLB_USE_DIAG_MONITORS
 
-} measurements_3_t;
+} measurements_4_t;
+
+// def @odometry_1 CAN Message (4    0x4)
+#define odometry_1_IDE (0U)
+#define odometry_1_DLC (8U)
+#define odometry_1_CANID (0x4U)
+// signal: @orientation_ro
+#define JLB_orientation_ro_CovFactor (0.0002)
+#define JLB_orientation_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
+#define JLB_orientation_ro_fromS(x) ( (((x) * (0.0002)) + (-6.5535)) )
+// signal: @position_x_ro
+#define JLB_position_x_ro_CovFactor (0.05)
+#define JLB_position_x_ro_toS(x) ( (uint16_t) (((x) - (-1638.375)) / (0.05)) )
+#define JLB_position_x_ro_fromS(x) ( (((x) * (0.05)) + (-1638.375)) )
+// signal: @position_y_ro
+#define JLB_position_y_ro_CovFactor (0.05)
+#define JLB_position_y_ro_toS(x) ( (uint16_t) (((x) - (-1638.375)) / (0.05)) )
+#define JLB_position_y_ro_fromS(x) ( (((x) * (0.05)) + (-1638.375)) )
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint16_t orientation_ro;                   //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t orientation_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t position_x_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t position_x_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t position_y_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t position_y_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#else
+
+  uint16_t orientation_ro;                   //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t orientation_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t position_x_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t position_x_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t position_y_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t position_y_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} odometry_1_t;
+
+// def @odometry_2 CAN Message (5    0x5)
+#define odometry_2_IDE (0U)
+#define odometry_2_DLC (8U)
+#define odometry_2_CANID (0x5U)
+// signal: @linear_velocity_x_ro
+#define JLB_linear_velocity_x_ro_CovFactor (0.0005)
+#define JLB_linear_velocity_x_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_linear_velocity_x_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint16_t angular_velocity_z_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_z_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t linear_velocity_x_ro;             //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t linear_velocity_x_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#else
+
+  uint16_t angular_velocity_z_ro;            //      Bits=16 Offset= -6.5535            Factor= 0.0002          Unit:'rad/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t angular_velocity_z_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t linear_velocity_x_ro;             //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t linear_velocity_x_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} odometry_2_t;
+
+// def @logic_1 CAN Message (6    0x6)
+#define logic_1_IDE (0U)
+#define logic_1_DLC (8U)
+#define logic_1_CANID (0x6U)
+// signal: @target_angle_ro
+#define JLB_target_angle_ro_CovFactor (0.0001)
+#define JLB_target_angle_ro_toS(x) ( (uint16_t) (((x) - (-3.27675)) / (0.0001)) )
+#define JLB_target_angle_ro_fromS(x) ( (((x) * (0.0001)) + (-3.27675)) )
+// signal: @target_speed_ro
+#define JLB_target_speed_ro_CovFactor (0.0005)
+#define JLB_target_speed_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_target_speed_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint16_t target_angle_ro;                  //      Bits=16 Offset= -3.27675           Factor= 0.0001          Unit:'rad'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t target_angle_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t target_speed_ro;                  //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t target_speed_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#else
+
+  uint16_t target_angle_ro;                  //      Bits=16 Offset= -3.27675           Factor= 0.0001          Unit:'rad'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t target_angle_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t target_speed_ro;                  //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t target_speed_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} logic_1_t;
 
 // Function signatures
 
@@ -364,6 +556,34 @@ uint32_t Unpack_measurements_3_jlb(measurements_3_t* _m, const uint8_t* _d, uint
 uint32_t Pack_measurements_3_jlb(measurements_3_t* _m, __CoderDbcCanFrame_t__* cframe);
 #else
 uint32_t Pack_measurements_3_jlb(measurements_3_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_measurements_4_jlb(measurements_4_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_measurements_4_jlb(measurements_4_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_measurements_4_jlb(measurements_4_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_odometry_1_jlb(odometry_1_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_odometry_1_jlb(odometry_1_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_odometry_1_jlb(odometry_1_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_odometry_2_jlb(odometry_2_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_odometry_2_jlb(odometry_2_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_odometry_2_jlb(odometry_2_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_logic_1_jlb(logic_1_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_logic_1_jlb(logic_1_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_logic_1_jlb(logic_1_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
 #endif // JLB_USE_CANSTRUCT
 
 #ifdef __cplusplus
