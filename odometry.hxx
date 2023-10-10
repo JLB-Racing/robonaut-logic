@@ -36,7 +36,12 @@ namespace jlb
         float theta_t = 0.0f; // orientation
 
         float meas_motor_rpm = 0.0f;
+        float meas_ang_vel_x = 0.0f;
+        float meas_ang_vel_y = 0.0f;
         float meas_ang_vel_z = 0.0f;
+        float meas_lin_acc_x = 0.0f;
+        float meas_lin_acc_y = 0.0f;
+        float meas_lin_acc_z = 0.0f;
 
         Odometry(const float x_t_ = 0.0f, const float y_t_ = 0.0f, const float theta_t_ = 0.0f)
             : x_t(x_t_), y_t(y_t_), theta_t(normalize_angle(theta_t_)) {}

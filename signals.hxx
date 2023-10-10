@@ -7,6 +7,8 @@
 #include "common.hxx"
 #include "udp.hxx"
 
+#include "jlb-binutil.h"
+
 namespace jlb
 {
     struct Signal
@@ -119,6 +121,8 @@ namespace jlb
     class SignalSender
     {
     public:
+        jlb_rx_t jlb_rx_t;
+
         ~SignalSender()
         {
         }
