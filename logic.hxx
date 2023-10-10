@@ -93,9 +93,9 @@ namespace jlb
             signal_sender.jlb_rx_t.measurements_2.linear_acceleration_z_ro = odometry.meas_lin_acc_z;
             signal_sender.jlb_rx_t.measurements_3.motor_rpm_ro = odometry.meas_motor_rpm;
 
-            uint8_t ide;
-            char data[8];
-            uint8_t dlc = 8u;
+            uint8_t ide = measurements_1_IDE;
+            uint8_t dlc = measurements_1_DLC;
+            char data[measurements_1_DLC];
             Pack_measurements_1_jlb(&signal_sender.jlb_rx_t.measurements_1, reinterpret_cast<uint8_t *>(data), &dlc, &ide);
             signal_sender.send(data, dlc);
         }
