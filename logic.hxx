@@ -95,9 +95,10 @@ namespace jlb
 
             uint8_t ide = measurements_1_IDE;
             uint8_t dlc = measurements_1_DLC;
-            char data[measurements_1_DLC];
-            Pack_measurements_1_jlb(&signal_sender.jlb_rx_t.measurements_1, reinterpret_cast<uint8_t *>(data), &dlc, &ide);
-            signal_sender.send(data, dlc);
+            char data[measurements_1_DLC + 1];
+            data[0] = measurements_1_CANID;
+            Pack_measurements_1_jlb(&signal_sender.jlb_rx_t.measurements_1, reinterpret_cast<uint8_t *>(data + 1), &dlc, &ide);
+            signal_sender.send(data, measurements_1_DLC + 1);
         }
 
     private:
