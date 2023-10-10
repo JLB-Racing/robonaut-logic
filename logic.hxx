@@ -51,9 +51,12 @@ namespace jlb
             // signal_sender.jlb_rx_t.measurements_1.line_sensor_30 = 29 == controller.selected ? controller.detection[29] + 2.0f : controller.detection[29];
             // signal_sender.jlb_rx_t.measurements_1.line_sensor_31 = 30 == controller.selected ? controller.detection[30] + 2.0f : controller.detection[30];
             // signal_sender.jlb_rx_t.measurements_1.line_sensor_32 = 31 == controller.selected ? controller.detection[31] + 2.0f : controller.detection[31];
+
+            char data[measurements_1_DLC + 2];
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
             uint8_t ide = measurements_1_IDE;
             uint8_t dlc = measurements_1_DLC;
-            char data[measurements_1_DLC + 2];
             data[0] = measurements_1_CANID;
             data[1] = measurements_1_DLC;
             Pack_measurements_1_jlb(&signal_sender.jlb_rx_t.measurements_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
@@ -63,6 +66,8 @@ namespace jlb
             signal_sender.jlb_rx_t.measurements_2.angular_velocity_y_ro = odometry.meas_ang_vel_y;
             signal_sender.jlb_rx_t.measurements_2.angular_velocity_z_ro = odometry.meas_ang_vel_z;
 
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
             ide = measurements_2_IDE;
             dlc = measurements_2_DLC;
             data[0] = measurements_2_CANID;
@@ -74,6 +79,8 @@ namespace jlb
             signal_sender.jlb_rx_t.measurements_3.linear_acceleration_y_ro = odometry.meas_lin_acc_y;
             signal_sender.jlb_rx_t.measurements_3.linear_acceleration_z_ro = odometry.meas_lin_acc_z;
 
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
             ide = measurements_3_IDE;
             dlc = measurements_3_DLC;
             data[0] = measurements_3_CANID;
@@ -83,6 +90,8 @@ namespace jlb
 
             signal_sender.jlb_rx_t.measurements_4.motor_rpm_ro = odometry.meas_motor_rpm;
 
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
             ide = measurements_4_IDE;
             dlc = measurements_4_DLC;
             data[0] = measurements_4_CANID;
@@ -94,6 +103,8 @@ namespace jlb
             signal_sender.jlb_rx_t.odometry_1.position_y_ro = odometry.y_t;
             signal_sender.jlb_rx_t.odometry_1.orientation_ro = odometry.theta_t;
 
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
             ide = odometry_1_IDE;
             dlc = odometry_1_DLC;
             data[0] = odometry_1_CANID;
@@ -104,6 +115,8 @@ namespace jlb
             signal_sender.jlb_rx_t.odometry_2.linear_velocity_x_ro = odometry.vx_t;
             signal_sender.jlb_rx_t.odometry_2.angular_velocity_z_ro = odometry.w_t;
 
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
             ide = odometry_2_IDE;
             dlc = odometry_2_DLC;
             data[0] = odometry_2_CANID;
@@ -114,6 +127,8 @@ namespace jlb
             signal_sender.jlb_rx_t.logic_1.target_angle_ro = controller.target_angle;
             signal_sender.jlb_rx_t.logic_1.target_speed_ro = controller.target_speed;
 
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
             ide = logic_1_IDE;
             dlc = logic_1_DLC;
             data[0] = logic_1_CANID;
