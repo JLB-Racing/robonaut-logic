@@ -3,7 +3,6 @@
 /* include common dbccode configurations */
 #include "dbccodeconf.h"
 
-
 /* ------------------------------------------------------------------------- *
   This define enables using CAN message structs with bit-fielded signals
   layout.
@@ -11,7 +10,6 @@
   Note(!): bit-feild was not tested properly. */
 
 /* #define JLB_USE_BITS_SIGNAL */
-
 
 /* ------------------------------------------------------------------------- *
   This macro enables using CAN message descriptive struct packing functions
@@ -27,7 +25,6 @@
   This struct definition have to be placed (or be included) in dbccodeconf.h */
 
 /* #define JLB_USE_CANSTRUCT */
-
 
 /* ------------------------------------------------------------------------- *
   All the signals which have values of factor != 1 or offset != 0
@@ -47,8 +44,7 @@
   3. In unpack function '_phys' signal will be written by '_ro' signal.
   User have to use '_phys' signal to read physical value. */
 
-/* #define JLB_USE_SIGFLOAT */
-
+#define JLB_USE_SIGFLOAT
 
 /* ------------------------------------------------------------------------- *
   Note(!) that the "canmonitorutil.h" must be accessed in include path:
@@ -68,7 +64,6 @@
 
 /* #define JLB_USE_DIAG_MONITORS */
 
-
 /* ------------------------------------------------------------------------- *
   When monitor using is enabled (JLB_USE_DIAG_MONITORS) and define below
   uncommented, additional signal will be added to message struct. ***_expt:
@@ -76,7 +71,6 @@
   automatically (result may be tested in dedicated Fmon_*** function) */
 
 /* #define JLB_AUTO_ROLL */
-
 
 /* ------------------------------------------------------------------------- *
   When monitor using is enabled (JLB_USE_DIAG_MONITORS) and define below
@@ -107,20 +101,19 @@
 
 /* #define JLB_AUTO_CSM */
 
-
 /* ------------------------------------------------------------------------- *
-  FMon handling model can be build in two ways: 
+  FMon handling model can be build in two ways:
 
-  1 - Default. In this case when specific frame unpack is called the 
+  1 - Default. In this case when specific frame unpack is called the
   specific FMon_{Frame name}_{driver name} functoin will be called.
   User's code scope has to define each of these functions. Each function is
   responsible for the error handling of one frame
 
-  2 - MONO. In this case there is only one function to perform any frame 
+  2 - MONO. In this case there is only one function to perform any frame
   monitoring. This function has to be implemented in the user's code scope.
   This function is named as FMon_MONO_{driver name}. It takes frame id
   which can be used for selection of the logic for a frame monitoring.
-  This mode costs a bit more in runtime but when you often edit you DBC and you 
+  This mode costs a bit more in runtime but when you often edit you DBC and you
   have more than one project it could be more maintanable (there is
   no necessity to replace source code)
 

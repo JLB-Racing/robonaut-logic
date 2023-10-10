@@ -62,9 +62,9 @@ namespace jlb
             Pack_measurements_1_jlb(&signal_sender.jlb_rx_t.measurements_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_1_DLC + 2);
 
-            signal_sender.jlb_rx_t.measurements_2.angular_velocity_x_ro = odometry.meas_ang_vel_x;
-            signal_sender.jlb_rx_t.measurements_2.angular_velocity_y_ro = odometry.meas_ang_vel_y;
-            signal_sender.jlb_rx_t.measurements_2.angular_velocity_z_ro = odometry.meas_ang_vel_z;
+            signal_sender.jlb_rx_t.measurements_2.angular_velocity_x_phys = odometry.meas_ang_vel_x;
+            signal_sender.jlb_rx_t.measurements_2.angular_velocity_y_phys = odometry.meas_ang_vel_y;
+            signal_sender.jlb_rx_t.measurements_2.angular_velocity_z_phys = odometry.meas_ang_vel_z;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;
@@ -75,9 +75,9 @@ namespace jlb
             Pack_measurements_2_jlb(&signal_sender.jlb_rx_t.measurements_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_2_DLC + 2);
 
-            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_x_ro = odometry.meas_lin_acc_x;
-            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_y_ro = odometry.meas_lin_acc_y;
-            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_z_ro = odometry.meas_lin_acc_z;
+            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_x_phys = odometry.meas_lin_acc_x;
+            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_y_phys = odometry.meas_lin_acc_y;
+            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_z_phys = odometry.meas_lin_acc_z;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;
@@ -88,7 +88,7 @@ namespace jlb
             Pack_measurements_3_jlb(&signal_sender.jlb_rx_t.measurements_3, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_3_DLC + 2);
 
-            signal_sender.jlb_rx_t.measurements_4.motor_rpm_ro = odometry.meas_motor_rpm;
+            signal_sender.jlb_rx_t.measurements_4.motor_rpm_phys = odometry.meas_motor_rpm;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;
@@ -99,9 +99,9 @@ namespace jlb
             Pack_measurements_4_jlb(&signal_sender.jlb_rx_t.measurements_4, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_4_DLC + 2);
 
-            signal_sender.jlb_rx_t.odometry_1.position_x_ro = odometry.x_t;
-            signal_sender.jlb_rx_t.odometry_1.position_y_ro = odometry.y_t;
-            signal_sender.jlb_rx_t.odometry_1.orientation_ro = odometry.theta_t;
+            signal_sender.jlb_rx_t.odometry_1.position_x_phys = odometry.x_t;
+            signal_sender.jlb_rx_t.odometry_1.position_y_phys = odometry.y_t;
+            signal_sender.jlb_rx_t.odometry_1.orientation_phys = odometry.theta_t;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;
@@ -112,8 +112,8 @@ namespace jlb
             Pack_odometry_1_jlb(&signal_sender.jlb_rx_t.odometry_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, odometry_1_DLC + 2);
 
-            signal_sender.jlb_rx_t.odometry_2.linear_velocity_x_ro = odometry.vx_t;
-            signal_sender.jlb_rx_t.odometry_2.angular_velocity_z_ro = odometry.w_t;
+            signal_sender.jlb_rx_t.odometry_2.linear_velocity_x_phys = odometry.vx_t;
+            signal_sender.jlb_rx_t.odometry_2.angular_velocity_z_phys = odometry.w_t;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;
@@ -124,8 +124,8 @@ namespace jlb
             Pack_odometry_2_jlb(&signal_sender.jlb_rx_t.odometry_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, odometry_2_DLC + 2);
 
-            signal_sender.jlb_rx_t.logic_1.target_angle_ro = controller.target_angle;
-            signal_sender.jlb_rx_t.logic_1.target_speed_ro = controller.target_speed;
+            signal_sender.jlb_rx_t.logic_1.target_angle_phys = controller.target_angle;
+            signal_sender.jlb_rx_t.logic_1.target_speed_phys = controller.target_speed;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;

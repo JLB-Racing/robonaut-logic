@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 // when USE_SIGFLOAT enabed the sigfloat_t must be defined
-// typedef double sigfloat_t;
+typedef float sigfloat_t;
 
 // when USE_CANSTRUCT enabled __CoderDbcCanFrame_t__ must be defined
 // #include "{header_with_can_struct}"
@@ -27,4 +27,3 @@ typedef int32_t bitext_t;
 // frame's data field you have to define macro @GetFrameHash
 
 // #define GetFrameHash(a,b,c,d,e) __get_hash__(a,b,c,d,e)
-
