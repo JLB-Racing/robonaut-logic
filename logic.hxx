@@ -87,12 +87,6 @@ namespace jlb
             signal_sender.jlb_rx_t.measurements_1.angular_velocity_x_ro = odometry.meas_ang_vel_x;
             signal_sender.jlb_rx_t.measurements_1.angular_velocity_y_ro = odometry.meas_ang_vel_y;
 
-            signal_sender.jlb_rx_t.measurements_2.angular_velocity_z_ro = odometry.meas_ang_vel_z;
-            signal_sender.jlb_rx_t.measurements_2.linear_acceleration_x_ro = odometry.meas_lin_acc_x;
-            signal_sender.jlb_rx_t.measurements_2.linear_acceleration_y_ro = odometry.meas_lin_acc_y;
-            signal_sender.jlb_rx_t.measurements_2.linear_acceleration_z_ro = odometry.meas_lin_acc_z;
-            signal_sender.jlb_rx_t.measurements_3.motor_rpm_ro = odometry.meas_motor_rpm;
-
             uint8_t ide = measurements_1_IDE;
             uint8_t dlc = measurements_1_DLC;
             char data[measurements_1_DLC + 2];
@@ -100,6 +94,19 @@ namespace jlb
             data[1] = measurements_1_DLC;
             Pack_measurements_1_jlb(&signal_sender.jlb_rx_t.measurements_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_1_DLC + 2);
+
+            signal_sender.jlb_rx_t.measurements_2.angular_velocity_z_ro = odometry.meas_ang_vel_z;
+            signal_sender.jlb_rx_t.measurements_2.linear_acceleration_x_ro = odometry.meas_lin_acc_x;
+            signal_sender.jlb_rx_t.measurements_2.linear_acceleration_y_ro = odometry.meas_lin_acc_y;
+            signal_sender.jlb_rx_t.measurements_2.linear_acceleration_z_ro = odometry.meas_lin_acc_z;
+            signal_sender.jlb_rx_t.measurements_3.motor_rpm_ro = odometry.meas_motor_rpm;
+
+            ide = measurements_2_IDE;
+            dlc = measurements_2_DLC;
+            data[0] = measurements_2_CANID;
+            data[1] = measurements_2_DLC;
+            Pack_measurements_2_jlb(&signal_sender.jlb_rx_t.measurements_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
+            signal_sender.send(data, measurements_2_DLC + 2);
         }
 
     private:
