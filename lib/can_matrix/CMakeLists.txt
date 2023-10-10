@@ -12,7 +12,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/lib
 )
 
-add_library(can_matrix SHARED butl/jlb-binutil.c lib/jlb.c)
+add_library(can_matrix STATIC butl/jlb-binutil.c lib/jlb.c)
 target_include_directories(can_matrix PUBLIC
     ${PROJECT_SOURCE_DIR}/butl
     ${PROJECT_SOURCE_DIR}/conf
