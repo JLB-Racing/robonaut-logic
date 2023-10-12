@@ -263,35 +263,35 @@ typedef struct
 #define measurements_3_DLC (8U)
 #define measurements_3_CANID (0x2U)
 // signal: @linear_acceleration_x_ro
-#define JLB_linear_acceleration_x_ro_CovFactor (0.001)
-#define JLB_linear_acceleration_x_ro_toS(x) ( (uint16_t) (((x) - (-32.7675)) / (0.001)) )
-#define JLB_linear_acceleration_x_ro_fromS(x) ( (((x) * (0.001)) + (-32.7675)) )
+#define JLB_linear_acceleration_x_ro_CovFactor (0.0005)
+#define JLB_linear_acceleration_x_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_linear_acceleration_x_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
 // signal: @linear_acceleration_y_ro
-#define JLB_linear_acceleration_y_ro_CovFactor (0.001)
-#define JLB_linear_acceleration_y_ro_toS(x) ( (uint16_t) (((x) - (-32.7675)) / (0.001)) )
-#define JLB_linear_acceleration_y_ro_fromS(x) ( (((x) * (0.001)) + (-32.7675)) )
+#define JLB_linear_acceleration_y_ro_CovFactor (0.0005)
+#define JLB_linear_acceleration_y_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_linear_acceleration_y_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
 // signal: @linear_acceleration_z_ro
-#define JLB_linear_acceleration_z_ro_CovFactor (0.001)
-#define JLB_linear_acceleration_z_ro_toS(x) ( (uint16_t) (((x) - (-32.7675)) / (0.001)) )
-#define JLB_linear_acceleration_z_ro_fromS(x) ( (((x) * (0.001)) + (-32.7675)) )
+#define JLB_linear_acceleration_z_ro_CovFactor (0.0005)
+#define JLB_linear_acceleration_z_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_linear_acceleration_z_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
 
 typedef struct
 {
 #ifdef JLB_USE_BITS_SIGNAL
 
-  uint16_t linear_acceleration_x_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
+  uint16_t linear_acceleration_x_ro;         //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s^2'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_acceleration_x_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t linear_acceleration_y_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
+  uint16_t linear_acceleration_y_ro;         //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s^2'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_acceleration_y_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t linear_acceleration_z_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
+  uint16_t linear_acceleration_z_ro;         //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s^2'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_acceleration_z_phys;
@@ -299,19 +299,19 @@ typedef struct
 
 #else
 
-  uint16_t linear_acceleration_x_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
+  uint16_t linear_acceleration_x_ro;         //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s^2'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_acceleration_x_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t linear_acceleration_y_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
+  uint16_t linear_acceleration_y_ro;         //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s^2'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_acceleration_y_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t linear_acceleration_z_ro;         //      Bits=16 Offset= -32.7675           Factor= 0.001           Unit:'m/s^2'
+  uint16_t linear_acceleration_z_ro;         //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s^2'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_acceleration_z_phys;
@@ -332,15 +332,15 @@ typedef struct
 #define measurements_4_DLC (8U)
 #define measurements_4_CANID (0x3U)
 // signal: @motor_rpm_ro
-#define JLB_motor_rpm_ro_CovFactor (0.1)
-#define JLB_motor_rpm_ro_toS(x) ( (uint16_t) (((x) - (-3276.75)) / (0.1)) )
-#define JLB_motor_rpm_ro_fromS(x) ( (((x) * (0.1)) + (-3276.75)) )
+#define JLB_motor_rpm_ro_CovFactor (0.05)
+#define JLB_motor_rpm_ro_toS(x) ( (uint16_t) (((x) - (-1638.375)) / (0.05)) )
+#define JLB_motor_rpm_ro_fromS(x) ( (((x) * (0.05)) + (-1638.375)) )
 
 typedef struct
 {
 #ifdef JLB_USE_BITS_SIGNAL
 
-  uint16_t motor_rpm_ro;                     //      Bits=16 Offset= -3276.75           Factor= 0.1             Unit:'RPM'
+  uint16_t motor_rpm_ro;                     //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'RPM'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t motor_rpm_phys;
@@ -348,7 +348,7 @@ typedef struct
 
 #else
 
-  uint16_t motor_rpm_ro;                     //      Bits=16 Offset= -3276.75           Factor= 0.1             Unit:'RPM'
+  uint16_t motor_rpm_ro;                     //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'RPM'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t motor_rpm_phys;
@@ -373,13 +373,13 @@ typedef struct
 #define JLB_orientation_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
 #define JLB_orientation_ro_fromS(x) ( (((x) * (0.0002)) + (-6.5535)) )
 // signal: @position_x_ro
-#define JLB_position_x_ro_CovFactor (0.05)
-#define JLB_position_x_ro_toS(x) ( (uint16_t) (((x) - (-1638.375)) / (0.05)) )
-#define JLB_position_x_ro_fromS(x) ( (((x) * (0.05)) + (-1638.375)) )
+#define JLB_position_x_ro_CovFactor (0.0005)
+#define JLB_position_x_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_position_x_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
 // signal: @position_y_ro
-#define JLB_position_y_ro_CovFactor (0.05)
-#define JLB_position_y_ro_toS(x) ( (uint16_t) (((x) - (-1638.375)) / (0.05)) )
-#define JLB_position_y_ro_fromS(x) ( (((x) * (0.05)) + (-1638.375)) )
+#define JLB_position_y_ro_CovFactor (0.0005)
+#define JLB_position_y_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_position_y_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
 
 typedef struct
 {
@@ -391,13 +391,13 @@ typedef struct
   sigfloat_t orientation_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t position_x_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+  uint16_t position_x_ro;                    //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t position_x_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t position_y_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+  uint16_t position_y_ro;                    //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t position_y_phys;
@@ -411,13 +411,13 @@ typedef struct
   sigfloat_t orientation_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t position_x_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+  uint16_t position_x_ro;                    //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t position_x_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t position_y_ro;                    //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'m'
+  uint16_t position_y_ro;                    //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t position_y_phys;
@@ -438,9 +438,9 @@ typedef struct
 #define odometry_2_DLC (8U)
 #define odometry_2_CANID (0x5U)
 // signal: @linear_velocity_x_ro
-#define JLB_linear_velocity_x_ro_CovFactor (0.0175)
-#define JLB_linear_velocity_x_ro_toS(x) ( (uint16_t) (((x) - (-573.43125)) / (0.0175)) )
-#define JLB_linear_velocity_x_ro_fromS(x) ( (((x) * (0.0175)) + (-573.43125)) )
+#define JLB_linear_velocity_x_ro_CovFactor (0.0005)
+#define JLB_linear_velocity_x_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
+#define JLB_linear_velocity_x_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
 
 typedef struct
 {
@@ -452,7 +452,7 @@ typedef struct
   sigfloat_t angular_velocity_z_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t linear_velocity_x_ro;             //      Bits=16 Offset= -573.43125         Factor= 0.0175          Unit:'m/s'
+  uint16_t linear_velocity_x_ro;             //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_velocity_x_phys;
@@ -466,7 +466,7 @@ typedef struct
   sigfloat_t angular_velocity_z_phys;
 #endif // JLB_USE_SIGFLOAT
 
-  uint16_t linear_velocity_x_ro;             //      Bits=16 Offset= -573.43125         Factor= 0.0175          Unit:'m/s'
+  uint16_t linear_velocity_x_ro;             //      Bits=16 Offset= -16.38375          Factor= 0.0005          Unit:'m/s'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t linear_velocity_x_phys;
