@@ -41,21 +41,21 @@ BO_ 6 logic_1: 8 Vector__XXX
  SG_ target_angle : 0|16@1+ (0.0001,-3.27675) [-3.27675|3.27675] "rad" Vector__XXX
 
 BO_ 5 odometry_2: 8 Vector__XXX
- SG_ linear_velocity_x : 16|16@1+ (0.0175,-573.43125) [-573.43125|573.43125] "m/s" Vector__XXX
+ SG_ linear_velocity_x : 16|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s" Vector__XXX
  SG_ angular_velocity_z : 0|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad/s" Vector__XXX
 
 BO_ 4 odometry_1: 8 Vector__XXX
- SG_ position_y : 32|16@1+ (0.05,-1638.375) [-1638.375|1638.375] "m" Vector__XXX
- SG_ position_x : 16|16@1+ (0.05,-1638.375) [-1638.375|1638.375] "m" Vector__XXX
+ SG_ position_y : 32|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m" Vector__XXX
+ SG_ position_x : 16|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m" Vector__XXX
  SG_ orientation : 0|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad" Vector__XXX
 
 BO_ 3 measurements_4: 8 Vector__XXX
- SG_ motor_rpm : 0|16@1+ (0.1,-3276.75) [-3276.75|3276.75] "RPM" Vector__XXX
+ SG_ motor_rpm : 0|16@1+ (0.05,-1638.375) [-1638.375|1638.375] "RPM" Vector__XXX
 
 BO_ 2 measurements_3: 8 Vector__XXX
- SG_ linear_acceleration_z : 32|16@1+ (0.001,-32.7675) [-32.7675|32.7675] "m/s^2" Vector__XXX
- SG_ linear_acceleration_y : 16|16@1+ (0.001,-32.7675) [-32.7675|32.7675] "m/s^2" Vector__XXX
- SG_ linear_acceleration_x : 0|16@1+ (0.001,-32.7675) [-32.7675|32.7675] "m/s^2" Vector__XXX
+ SG_ linear_acceleration_z : 32|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s^2" Vector__XXX
+ SG_ linear_acceleration_y : 16|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s^2" Vector__XXX
+ SG_ linear_acceleration_x : 0|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s^2" Vector__XXX
 
 BO_ 1 measurements_2: 8 Vector__XXX
  SG_ angular_velocity_y : 16|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad/s" Vector__XXX
