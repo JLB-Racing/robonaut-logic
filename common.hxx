@@ -50,6 +50,23 @@ namespace jlb
 
     ///////////////////////////////////////////////////////////////////////////
     //
+    //      LOGIC
+    //
+
+#ifndef SIMULATION
+#else
+    /* STATIC PARAMETERS OF THE TRACK */
+    PARAM float SQUARE_LENGTH = 0.6; // m
+    PARAM unsigned BITMAP_SIZE = 64; // px
+#endif
+
+    //
+    //      END LOGIC
+    //
+    ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     //      ODOMETRY
     //
 
@@ -78,13 +95,13 @@ namespace jlb
     PARAM int IMU_BUFFER_SIZE = 3;
 #else
     /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float WHEEL_DIAMETER = 1.0f; // px
-    PARAM float WHEELBASE = 16.0f;     // px
-    PARAM int SENSOR_WIDTH = 16;       // -
+    PARAM float WHEEL_DIAMETER = px_to_m(1.0f); // m
+    PARAM float WHEELBASE = px_to_m(16.0f);     // m
+    PARAM int SENSOR_WIDTH = 16;                // -
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_VELOCITY = 500.0f;      // px/s
-    PARAM float MAX_YAW_RATE = 1.5f * M_PI; // rad/s
+    PARAM float MAX_VELOCITY = px_to_m(500.0f); // m/s
+    PARAM float MAX_YAW_RATE = 1.5f * M_PI;     // rad/s
 
     /* GEAR RATIOS */
     PARAM int MAX_MOTOR_RPM = 10000;
@@ -102,7 +119,7 @@ namespace jlb
 
     ///////////////////////////////////////////////////////////////////////////
     //
-    //      LOGIC
+    //      CONTROLLER
     //
 
 #ifndef SIMULATION
@@ -130,15 +147,15 @@ namespace jlb
     PARAM float Kd = 0.1f;
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED = 40.0f;         // px/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 20.0f; // px/s
-    PARAM float FAST_SPEED = 80.0f;              // px/s
-    PARAM float FAST_SPEED_TURN = 40.0f;         // px/s
-    PARAM float FAST_SPEED_OVERTAKE = 60.0f;     // px/s
+    PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = px_to_m(20.0f); // m/s
+    PARAM float FAST_SPEED = px_to_m(80.0f);              // m/s
+    PARAM float FAST_SPEED_TURN = px_to_m(40.0f);         // m/s
+    PARAM float FAST_SPEED_OVERTAKE = px_to_m(60.0f);     // m/s
 #endif
 
     //
-    //      END LOGIC
+    //      END CONTROLLER
     //
     ///////////////////////////////////////////////////////////////////////////
 
@@ -146,6 +163,7 @@ namespace jlb
     //
     //      SIGNALS
     //
+
 #ifndef SIMULATION
     PARAM int SERVER_PORT = 5000;
     PARAM const char *SERVER_ADDRESS = "localhost";
@@ -153,49 +171,6 @@ namespace jlb
     PARAM int SERVER_PORT = 5000;
     PARAM const char *SERVER_ADDRESS = "localhost";
 #endif
-
-    PARAM unsigned long SIGNALS_SIZE = 41;
-    PARAM uint8_t TARGET_ANGLE_ID = 0;
-    PARAM uint8_t TARGET_SPEED_ID = 1;
-    PARAM uint8_t POSITION_X_ID = 2;
-    PARAM uint8_t POSITION_Y_ID = 3;
-    PARAM uint8_t POSITION_THETA_ID = 4;
-    PARAM uint8_t ODOM_LINEAR_VELOCITY_X_ID = 5;
-    PARAM uint8_t ODOM_ANGULAR_VELOCITY_Z_ID = 6;
-    PARAM uint8_t MEAS_MOTOR_RPM_ID = 7;
-    PARAM uint8_t MEAS_ANGULAR_VELOCITY_Z_ID = 8;
-    PARAM uint8_t LINE_SENSOR_1_ID = 9;
-    PARAM uint8_t LINE_SENSOR_2_ID = 10;
-    PARAM uint8_t LINE_SENSOR_3_ID = 11;
-    PARAM uint8_t LINE_SENSOR_4_ID = 12;
-    PARAM uint8_t LINE_SENSOR_5_ID = 13;
-    PARAM uint8_t LINE_SENSOR_6_ID = 14;
-    PARAM uint8_t LINE_SENSOR_7_ID = 15;
-    PARAM uint8_t LINE_SENSOR_8_ID = 16;
-    PARAM uint8_t LINE_SENSOR_9_ID = 17;
-    PARAM uint8_t LINE_SENSOR_10_ID = 18;
-    PARAM uint8_t LINE_SENSOR_11_ID = 19;
-    PARAM uint8_t LINE_SENSOR_12_ID = 20;
-    PARAM uint8_t LINE_SENSOR_13_ID = 21;
-    PARAM uint8_t LINE_SENSOR_14_ID = 22;
-    PARAM uint8_t LINE_SENSOR_15_ID = 23;
-    PARAM uint8_t LINE_SENSOR_16_ID = 24;
-    PARAM uint8_t LINE_SENSOR_17_ID = 25;
-    PARAM uint8_t LINE_SENSOR_18_ID = 26;
-    PARAM uint8_t LINE_SENSOR_19_ID = 27;
-    PARAM uint8_t LINE_SENSOR_20_ID = 28;
-    PARAM uint8_t LINE_SENSOR_21_ID = 29;
-    PARAM uint8_t LINE_SENSOR_22_ID = 30;
-    PARAM uint8_t LINE_SENSOR_23_ID = 31;
-    PARAM uint8_t LINE_SENSOR_24_ID = 32;
-    PARAM uint8_t LINE_SENSOR_25_ID = 33;
-    PARAM uint8_t LINE_SENSOR_26_ID = 34;
-    PARAM uint8_t LINE_SENSOR_27_ID = 35;
-    PARAM uint8_t LINE_SENSOR_28_ID = 36;
-    PARAM uint8_t LINE_SENSOR_29_ID = 37;
-    PARAM uint8_t LINE_SENSOR_30_ID = 38;
-    PARAM uint8_t LINE_SENSOR_31_ID = 39;
-    PARAM uint8_t LINE_SENSOR_32_ID = 40;
 
     //
     //      END SIGNALS
