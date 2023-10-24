@@ -137,20 +137,38 @@ uint32_t Pack_measurements_1_jlb(measurements_1_t* _m, uint8_t* _d, uint8_t* _le
 uint32_t Unpack_measurements_2_jlb(measurements_2_t* _m, const uint8_t* _d, uint8_t dlc_)
 {
   (void)dlc_;
-  _m->angular_velocity_x_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
-#ifdef JLB_USE_SIGFLOAT
-  _m->angular_velocity_x_phys = (sigfloat_t)(JLB_angular_velocity_x_ro_fromS(_m->angular_velocity_x_ro));
-#endif // JLB_USE_SIGFLOAT
-
-  _m->angular_velocity_y_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
-#ifdef JLB_USE_SIGFLOAT
-  _m->angular_velocity_y_phys = (sigfloat_t)(JLB_angular_velocity_y_ro_fromS(_m->angular_velocity_y_ro));
-#endif // JLB_USE_SIGFLOAT
-
-  _m->angular_velocity_z_ro = (uint16_t) ( ((_d[5] & (0xFFU)) << 8U) | (_d[4] & (0xFFU)) );
-#ifdef JLB_USE_SIGFLOAT
-  _m->angular_velocity_z_phys = (sigfloat_t)(JLB_angular_velocity_z_ro_fromS(_m->angular_velocity_z_ro));
-#endif // JLB_USE_SIGFLOAT
+  _m->line_sensor_1 = (uint8_t) ( (_d[0] & (0x03U)) );
+  _m->line_sensor_2 = (uint8_t) ( ((_d[0] >> 2U) & (0x03U)) );
+  _m->line_sensor_3 = (uint8_t) ( ((_d[0] >> 4U) & (0x03U)) );
+  _m->line_sensor_4 = (uint8_t) ( ((_d[0] >> 6U) & (0x03U)) );
+  _m->line_sensor_5 = (uint8_t) ( (_d[1] & (0x03U)) );
+  _m->line_sensor_6 = (uint8_t) ( ((_d[1] >> 2U) & (0x03U)) );
+  _m->line_sensor_7 = (uint8_t) ( ((_d[1] >> 4U) & (0x03U)) );
+  _m->line_sensor_8 = (uint8_t) ( ((_d[1] >> 6U) & (0x03U)) );
+  _m->line_sensor_9 = (uint8_t) ( (_d[2] & (0x03U)) );
+  _m->line_sensor_10 = (uint8_t) ( ((_d[2] >> 2U) & (0x03U)) );
+  _m->line_sensor_11 = (uint8_t) ( ((_d[2] >> 4U) & (0x03U)) );
+  _m->line_sensor_12 = (uint8_t) ( ((_d[2] >> 6U) & (0x03U)) );
+  _m->line_sensor_13 = (uint8_t) ( (_d[3] & (0x03U)) );
+  _m->line_sensor_14 = (uint8_t) ( ((_d[3] >> 2U) & (0x03U)) );
+  _m->line_sensor_15 = (uint8_t) ( ((_d[3] >> 4U) & (0x03U)) );
+  _m->line_sensor_16 = (uint8_t) ( ((_d[3] >> 6U) & (0x03U)) );
+  _m->line_sensor_17 = (uint8_t) ( (_d[4] & (0x03U)) );
+  _m->line_sensor_18 = (uint8_t) ( ((_d[4] >> 2U) & (0x03U)) );
+  _m->line_sensor_19 = (uint8_t) ( ((_d[4] >> 4U) & (0x03U)) );
+  _m->line_sensor_20 = (uint8_t) ( ((_d[4] >> 6U) & (0x03U)) );
+  _m->line_sensor_21 = (uint8_t) ( (_d[5] & (0x03U)) );
+  _m->line_sensor_22 = (uint8_t) ( ((_d[5] >> 2U) & (0x03U)) );
+  _m->line_sensor_23 = (uint8_t) ( ((_d[5] >> 4U) & (0x03U)) );
+  _m->line_sensor_24 = (uint8_t) ( ((_d[5] >> 6U) & (0x03U)) );
+  _m->line_sensor_25 = (uint8_t) ( (_d[6] & (0x03U)) );
+  _m->line_sensor_26 = (uint8_t) ( ((_d[6] >> 2U) & (0x03U)) );
+  _m->line_sensor_27 = (uint8_t) ( ((_d[6] >> 4U) & (0x03U)) );
+  _m->line_sensor_28 = (uint8_t) ( ((_d[6] >> 6U) & (0x03U)) );
+  _m->line_sensor_29 = (uint8_t) ( (_d[7] & (0x03U)) );
+  _m->line_sensor_30 = (uint8_t) ( ((_d[7] >> 2U) & (0x03U)) );
+  _m->line_sensor_31 = (uint8_t) ( ((_d[7] >> 4U) & (0x03U)) );
+  _m->line_sensor_32 = (uint8_t) ( ((_d[7] >> 6U) & (0x03U)) );
 
 #ifdef JLB_USE_DIAG_MONITORS
   _m->mon1.dlc_error = (dlc_ < measurements_2_DLC);
@@ -169,18 +187,14 @@ uint32_t Pack_measurements_2_jlb(measurements_2_t* _m, __CoderDbcCanFrame_t__* c
 {
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_2_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
 
-#ifdef JLB_USE_SIGFLOAT
-  _m->angular_velocity_x_ro = (uint16_t) JLB_angular_velocity_x_ro_toS(_m->angular_velocity_x_phys);
-  _m->angular_velocity_y_ro = (uint16_t) JLB_angular_velocity_y_ro_toS(_m->angular_velocity_y_phys);
-  _m->angular_velocity_z_ro = (uint16_t) JLB_angular_velocity_z_ro_toS(_m->angular_velocity_z_phys);
-#endif // JLB_USE_SIGFLOAT
-
-  cframe->Data[0] |= (uint8_t) ( (_m->angular_velocity_x_ro & (0xFFU)) );
-  cframe->Data[1] |= (uint8_t) ( ((_m->angular_velocity_x_ro >> 8U) & (0xFFU)) );
-  cframe->Data[2] |= (uint8_t) ( (_m->angular_velocity_y_ro & (0xFFU)) );
-  cframe->Data[3] |= (uint8_t) ( ((_m->angular_velocity_y_ro >> 8U) & (0xFFU)) );
-  cframe->Data[4] |= (uint8_t) ( (_m->angular_velocity_z_ro & (0xFFU)) );
-  cframe->Data[5] |= (uint8_t) ( ((_m->angular_velocity_z_ro >> 8U) & (0xFFU)) );
+  cframe->Data[0] |= (uint8_t) ( (_m->line_sensor_1 & (0x03U)) | ((_m->line_sensor_2 & (0x03U)) << 2U) | ((_m->line_sensor_3 & (0x03U)) << 4U) | ((_m->line_sensor_4 & (0x03U)) << 6U) );
+  cframe->Data[1] |= (uint8_t) ( (_m->line_sensor_5 & (0x03U)) | ((_m->line_sensor_6 & (0x03U)) << 2U) | ((_m->line_sensor_7 & (0x03U)) << 4U) | ((_m->line_sensor_8 & (0x03U)) << 6U) );
+  cframe->Data[2] |= (uint8_t) ( (_m->line_sensor_9 & (0x03U)) | ((_m->line_sensor_10 & (0x03U)) << 2U) | ((_m->line_sensor_11 & (0x03U)) << 4U) | ((_m->line_sensor_12 & (0x03U)) << 6U) );
+  cframe->Data[3] |= (uint8_t) ( (_m->line_sensor_13 & (0x03U)) | ((_m->line_sensor_14 & (0x03U)) << 2U) | ((_m->line_sensor_15 & (0x03U)) << 4U) | ((_m->line_sensor_16 & (0x03U)) << 6U) );
+  cframe->Data[4] |= (uint8_t) ( (_m->line_sensor_17 & (0x03U)) | ((_m->line_sensor_18 & (0x03U)) << 2U) | ((_m->line_sensor_19 & (0x03U)) << 4U) | ((_m->line_sensor_20 & (0x03U)) << 6U) );
+  cframe->Data[5] |= (uint8_t) ( (_m->line_sensor_21 & (0x03U)) | ((_m->line_sensor_22 & (0x03U)) << 2U) | ((_m->line_sensor_23 & (0x03U)) << 4U) | ((_m->line_sensor_24 & (0x03U)) << 6U) );
+  cframe->Data[6] |= (uint8_t) ( (_m->line_sensor_25 & (0x03U)) | ((_m->line_sensor_26 & (0x03U)) << 2U) | ((_m->line_sensor_27 & (0x03U)) << 4U) | ((_m->line_sensor_28 & (0x03U)) << 6U) );
+  cframe->Data[7] |= (uint8_t) ( (_m->line_sensor_29 & (0x03U)) | ((_m->line_sensor_30 & (0x03U)) << 2U) | ((_m->line_sensor_31 & (0x03U)) << 4U) | ((_m->line_sensor_32 & (0x03U)) << 6U) );
 
   cframe->MsgId = (uint32_t) measurements_2_CANID;
   cframe->DLC = (uint8_t) measurements_2_DLC;
@@ -194,18 +208,14 @@ uint32_t Pack_measurements_2_jlb(measurements_2_t* _m, uint8_t* _d, uint8_t* _le
 {
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_2_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
 
-#ifdef JLB_USE_SIGFLOAT
-  _m->angular_velocity_x_ro = (uint16_t) JLB_angular_velocity_x_ro_toS(_m->angular_velocity_x_phys);
-  _m->angular_velocity_y_ro = (uint16_t) JLB_angular_velocity_y_ro_toS(_m->angular_velocity_y_phys);
-  _m->angular_velocity_z_ro = (uint16_t) JLB_angular_velocity_z_ro_toS(_m->angular_velocity_z_phys);
-#endif // JLB_USE_SIGFLOAT
-
-  _d[0] |= (uint8_t) ( (_m->angular_velocity_x_ro & (0xFFU)) );
-  _d[1] |= (uint8_t) ( ((_m->angular_velocity_x_ro >> 8U) & (0xFFU)) );
-  _d[2] |= (uint8_t) ( (_m->angular_velocity_y_ro & (0xFFU)) );
-  _d[3] |= (uint8_t) ( ((_m->angular_velocity_y_ro >> 8U) & (0xFFU)) );
-  _d[4] |= (uint8_t) ( (_m->angular_velocity_z_ro & (0xFFU)) );
-  _d[5] |= (uint8_t) ( ((_m->angular_velocity_z_ro >> 8U) & (0xFFU)) );
+  _d[0] |= (uint8_t) ( (_m->line_sensor_1 & (0x03U)) | ((_m->line_sensor_2 & (0x03U)) << 2U) | ((_m->line_sensor_3 & (0x03U)) << 4U) | ((_m->line_sensor_4 & (0x03U)) << 6U) );
+  _d[1] |= (uint8_t) ( (_m->line_sensor_5 & (0x03U)) | ((_m->line_sensor_6 & (0x03U)) << 2U) | ((_m->line_sensor_7 & (0x03U)) << 4U) | ((_m->line_sensor_8 & (0x03U)) << 6U) );
+  _d[2] |= (uint8_t) ( (_m->line_sensor_9 & (0x03U)) | ((_m->line_sensor_10 & (0x03U)) << 2U) | ((_m->line_sensor_11 & (0x03U)) << 4U) | ((_m->line_sensor_12 & (0x03U)) << 6U) );
+  _d[3] |= (uint8_t) ( (_m->line_sensor_13 & (0x03U)) | ((_m->line_sensor_14 & (0x03U)) << 2U) | ((_m->line_sensor_15 & (0x03U)) << 4U) | ((_m->line_sensor_16 & (0x03U)) << 6U) );
+  _d[4] |= (uint8_t) ( (_m->line_sensor_17 & (0x03U)) | ((_m->line_sensor_18 & (0x03U)) << 2U) | ((_m->line_sensor_19 & (0x03U)) << 4U) | ((_m->line_sensor_20 & (0x03U)) << 6U) );
+  _d[5] |= (uint8_t) ( (_m->line_sensor_21 & (0x03U)) | ((_m->line_sensor_22 & (0x03U)) << 2U) | ((_m->line_sensor_23 & (0x03U)) << 4U) | ((_m->line_sensor_24 & (0x03U)) << 6U) );
+  _d[6] |= (uint8_t) ( (_m->line_sensor_25 & (0x03U)) | ((_m->line_sensor_26 & (0x03U)) << 2U) | ((_m->line_sensor_27 & (0x03U)) << 4U) | ((_m->line_sensor_28 & (0x03U)) << 6U) );
+  _d[7] |= (uint8_t) ( (_m->line_sensor_29 & (0x03U)) | ((_m->line_sensor_30 & (0x03U)) << 2U) | ((_m->line_sensor_31 & (0x03U)) << 4U) | ((_m->line_sensor_32 & (0x03U)) << 6U) );
 
   *_len = (uint8_t) measurements_2_DLC;
   *_ide = (uint8_t) measurements_2_IDE;
@@ -217,19 +227,19 @@ uint32_t Pack_measurements_2_jlb(measurements_2_t* _m, uint8_t* _d, uint8_t* _le
 uint32_t Unpack_measurements_3_jlb(measurements_3_t* _m, const uint8_t* _d, uint8_t dlc_)
 {
   (void)dlc_;
-  _m->linear_acceleration_x_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
+  _m->angular_velocity_x_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
 #ifdef JLB_USE_SIGFLOAT
-  _m->linear_acceleration_x_phys = (sigfloat_t)(JLB_linear_acceleration_x_ro_fromS(_m->linear_acceleration_x_ro));
+  _m->angular_velocity_x_phys = (sigfloat_t)(JLB_angular_velocity_x_ro_fromS(_m->angular_velocity_x_ro));
 #endif // JLB_USE_SIGFLOAT
 
-  _m->linear_acceleration_y_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
+  _m->angular_velocity_y_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
 #ifdef JLB_USE_SIGFLOAT
-  _m->linear_acceleration_y_phys = (sigfloat_t)(JLB_linear_acceleration_y_ro_fromS(_m->linear_acceleration_y_ro));
+  _m->angular_velocity_y_phys = (sigfloat_t)(JLB_angular_velocity_y_ro_fromS(_m->angular_velocity_y_ro));
 #endif // JLB_USE_SIGFLOAT
 
-  _m->linear_acceleration_z_ro = (uint16_t) ( ((_d[5] & (0xFFU)) << 8U) | (_d[4] & (0xFFU)) );
+  _m->angular_velocity_z_ro = (uint16_t) ( ((_d[5] & (0xFFU)) << 8U) | (_d[4] & (0xFFU)) );
 #ifdef JLB_USE_SIGFLOAT
-  _m->linear_acceleration_z_phys = (sigfloat_t)(JLB_linear_acceleration_z_ro_fromS(_m->linear_acceleration_z_ro));
+  _m->angular_velocity_z_phys = (sigfloat_t)(JLB_angular_velocity_z_ro_fromS(_m->angular_velocity_z_ro));
 #endif // JLB_USE_SIGFLOAT
 
 #ifdef JLB_USE_DIAG_MONITORS
@@ -250,17 +260,17 @@ uint32_t Pack_measurements_3_jlb(measurements_3_t* _m, __CoderDbcCanFrame_t__* c
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_3_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
 
 #ifdef JLB_USE_SIGFLOAT
-  _m->linear_acceleration_x_ro = (uint16_t) JLB_linear_acceleration_x_ro_toS(_m->linear_acceleration_x_phys);
-  _m->linear_acceleration_y_ro = (uint16_t) JLB_linear_acceleration_y_ro_toS(_m->linear_acceleration_y_phys);
-  _m->linear_acceleration_z_ro = (uint16_t) JLB_linear_acceleration_z_ro_toS(_m->linear_acceleration_z_phys);
+  _m->angular_velocity_x_ro = (uint16_t) JLB_angular_velocity_x_ro_toS(_m->angular_velocity_x_phys);
+  _m->angular_velocity_y_ro = (uint16_t) JLB_angular_velocity_y_ro_toS(_m->angular_velocity_y_phys);
+  _m->angular_velocity_z_ro = (uint16_t) JLB_angular_velocity_z_ro_toS(_m->angular_velocity_z_phys);
 #endif // JLB_USE_SIGFLOAT
 
-  cframe->Data[0] |= (uint8_t) ( (_m->linear_acceleration_x_ro & (0xFFU)) );
-  cframe->Data[1] |= (uint8_t) ( ((_m->linear_acceleration_x_ro >> 8U) & (0xFFU)) );
-  cframe->Data[2] |= (uint8_t) ( (_m->linear_acceleration_y_ro & (0xFFU)) );
-  cframe->Data[3] |= (uint8_t) ( ((_m->linear_acceleration_y_ro >> 8U) & (0xFFU)) );
-  cframe->Data[4] |= (uint8_t) ( (_m->linear_acceleration_z_ro & (0xFFU)) );
-  cframe->Data[5] |= (uint8_t) ( ((_m->linear_acceleration_z_ro >> 8U) & (0xFFU)) );
+  cframe->Data[0] |= (uint8_t) ( (_m->angular_velocity_x_ro & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( ((_m->angular_velocity_x_ro >> 8U) & (0xFFU)) );
+  cframe->Data[2] |= (uint8_t) ( (_m->angular_velocity_y_ro & (0xFFU)) );
+  cframe->Data[3] |= (uint8_t) ( ((_m->angular_velocity_y_ro >> 8U) & (0xFFU)) );
+  cframe->Data[4] |= (uint8_t) ( (_m->angular_velocity_z_ro & (0xFFU)) );
+  cframe->Data[5] |= (uint8_t) ( ((_m->angular_velocity_z_ro >> 8U) & (0xFFU)) );
 
   cframe->MsgId = (uint32_t) measurements_3_CANID;
   cframe->DLC = (uint8_t) measurements_3_DLC;
@@ -275,17 +285,17 @@ uint32_t Pack_measurements_3_jlb(measurements_3_t* _m, uint8_t* _d, uint8_t* _le
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_3_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
 
 #ifdef JLB_USE_SIGFLOAT
-  _m->linear_acceleration_x_ro = (uint16_t) JLB_linear_acceleration_x_ro_toS(_m->linear_acceleration_x_phys);
-  _m->linear_acceleration_y_ro = (uint16_t) JLB_linear_acceleration_y_ro_toS(_m->linear_acceleration_y_phys);
-  _m->linear_acceleration_z_ro = (uint16_t) JLB_linear_acceleration_z_ro_toS(_m->linear_acceleration_z_phys);
+  _m->angular_velocity_x_ro = (uint16_t) JLB_angular_velocity_x_ro_toS(_m->angular_velocity_x_phys);
+  _m->angular_velocity_y_ro = (uint16_t) JLB_angular_velocity_y_ro_toS(_m->angular_velocity_y_phys);
+  _m->angular_velocity_z_ro = (uint16_t) JLB_angular_velocity_z_ro_toS(_m->angular_velocity_z_phys);
 #endif // JLB_USE_SIGFLOAT
 
-  _d[0] |= (uint8_t) ( (_m->linear_acceleration_x_ro & (0xFFU)) );
-  _d[1] |= (uint8_t) ( ((_m->linear_acceleration_x_ro >> 8U) & (0xFFU)) );
-  _d[2] |= (uint8_t) ( (_m->linear_acceleration_y_ro & (0xFFU)) );
-  _d[3] |= (uint8_t) ( ((_m->linear_acceleration_y_ro >> 8U) & (0xFFU)) );
-  _d[4] |= (uint8_t) ( (_m->linear_acceleration_z_ro & (0xFFU)) );
-  _d[5] |= (uint8_t) ( ((_m->linear_acceleration_z_ro >> 8U) & (0xFFU)) );
+  _d[0] |= (uint8_t) ( (_m->angular_velocity_x_ro & (0xFFU)) );
+  _d[1] |= (uint8_t) ( ((_m->angular_velocity_x_ro >> 8U) & (0xFFU)) );
+  _d[2] |= (uint8_t) ( (_m->angular_velocity_y_ro & (0xFFU)) );
+  _d[3] |= (uint8_t) ( ((_m->angular_velocity_y_ro >> 8U) & (0xFFU)) );
+  _d[4] |= (uint8_t) ( (_m->angular_velocity_z_ro & (0xFFU)) );
+  _d[5] |= (uint8_t) ( ((_m->angular_velocity_z_ro >> 8U) & (0xFFU)) );
 
   *_len = (uint8_t) measurements_3_DLC;
   *_ide = (uint8_t) measurements_3_IDE;
@@ -297,9 +307,19 @@ uint32_t Pack_measurements_3_jlb(measurements_3_t* _m, uint8_t* _d, uint8_t* _le
 uint32_t Unpack_measurements_4_jlb(measurements_4_t* _m, const uint8_t* _d, uint8_t dlc_)
 {
   (void)dlc_;
-  _m->motor_rpm_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
+  _m->linear_acceleration_x_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
 #ifdef JLB_USE_SIGFLOAT
-  _m->motor_rpm_phys = (sigfloat_t)(JLB_motor_rpm_ro_fromS(_m->motor_rpm_ro));
+  _m->linear_acceleration_x_phys = (sigfloat_t)(JLB_linear_acceleration_x_ro_fromS(_m->linear_acceleration_x_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->linear_acceleration_y_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->linear_acceleration_y_phys = (sigfloat_t)(JLB_linear_acceleration_y_ro_fromS(_m->linear_acceleration_y_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->linear_acceleration_z_ro = (uint16_t) ( ((_d[5] & (0xFFU)) << 8U) | (_d[4] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->linear_acceleration_z_phys = (sigfloat_t)(JLB_linear_acceleration_z_ro_fromS(_m->linear_acceleration_z_ro));
 #endif // JLB_USE_SIGFLOAT
 
 #ifdef JLB_USE_DIAG_MONITORS
@@ -320,11 +340,17 @@ uint32_t Pack_measurements_4_jlb(measurements_4_t* _m, __CoderDbcCanFrame_t__* c
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_4_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
 
 #ifdef JLB_USE_SIGFLOAT
-  _m->motor_rpm_ro = (uint16_t) JLB_motor_rpm_ro_toS(_m->motor_rpm_phys);
+  _m->linear_acceleration_x_ro = (uint16_t) JLB_linear_acceleration_x_ro_toS(_m->linear_acceleration_x_phys);
+  _m->linear_acceleration_y_ro = (uint16_t) JLB_linear_acceleration_y_ro_toS(_m->linear_acceleration_y_phys);
+  _m->linear_acceleration_z_ro = (uint16_t) JLB_linear_acceleration_z_ro_toS(_m->linear_acceleration_z_phys);
 #endif // JLB_USE_SIGFLOAT
 
-  cframe->Data[0] |= (uint8_t) ( (_m->motor_rpm_ro & (0xFFU)) );
-  cframe->Data[1] |= (uint8_t) ( ((_m->motor_rpm_ro >> 8U) & (0xFFU)) );
+  cframe->Data[0] |= (uint8_t) ( (_m->linear_acceleration_x_ro & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( ((_m->linear_acceleration_x_ro >> 8U) & (0xFFU)) );
+  cframe->Data[2] |= (uint8_t) ( (_m->linear_acceleration_y_ro & (0xFFU)) );
+  cframe->Data[3] |= (uint8_t) ( ((_m->linear_acceleration_y_ro >> 8U) & (0xFFU)) );
+  cframe->Data[4] |= (uint8_t) ( (_m->linear_acceleration_z_ro & (0xFFU)) );
+  cframe->Data[5] |= (uint8_t) ( ((_m->linear_acceleration_z_ro >> 8U) & (0xFFU)) );
 
   cframe->MsgId = (uint32_t) measurements_4_CANID;
   cframe->DLC = (uint8_t) measurements_4_DLC;
@@ -339,15 +365,79 @@ uint32_t Pack_measurements_4_jlb(measurements_4_t* _m, uint8_t* _d, uint8_t* _le
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_4_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
 
 #ifdef JLB_USE_SIGFLOAT
+  _m->linear_acceleration_x_ro = (uint16_t) JLB_linear_acceleration_x_ro_toS(_m->linear_acceleration_x_phys);
+  _m->linear_acceleration_y_ro = (uint16_t) JLB_linear_acceleration_y_ro_toS(_m->linear_acceleration_y_phys);
+  _m->linear_acceleration_z_ro = (uint16_t) JLB_linear_acceleration_z_ro_toS(_m->linear_acceleration_z_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  _d[0] |= (uint8_t) ( (_m->linear_acceleration_x_ro & (0xFFU)) );
+  _d[1] |= (uint8_t) ( ((_m->linear_acceleration_x_ro >> 8U) & (0xFFU)) );
+  _d[2] |= (uint8_t) ( (_m->linear_acceleration_y_ro & (0xFFU)) );
+  _d[3] |= (uint8_t) ( ((_m->linear_acceleration_y_ro >> 8U) & (0xFFU)) );
+  _d[4] |= (uint8_t) ( (_m->linear_acceleration_z_ro & (0xFFU)) );
+  _d[5] |= (uint8_t) ( ((_m->linear_acceleration_z_ro >> 8U) & (0xFFU)) );
+
+  *_len = (uint8_t) measurements_4_DLC;
+  *_ide = (uint8_t) measurements_4_IDE;
+  return measurements_4_CANID;
+}
+
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_measurements_5_jlb(measurements_5_t* _m, const uint8_t* _d, uint8_t dlc_)
+{
+  (void)dlc_;
+  _m->motor_rpm_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->motor_rpm_phys = (sigfloat_t)(JLB_motor_rpm_ro_fromS(_m->motor_rpm_ro));
+#endif // JLB_USE_SIGFLOAT
+
+#ifdef JLB_USE_DIAG_MONITORS
+  _m->mon1.dlc_error = (dlc_ < measurements_5_DLC);
+  _m->mon1.last_cycle = GetSystemTick();
+  _m->mon1.frame_cnt++;
+
+  FMon_measurements_5_jlb(&_m->mon1, measurements_5_CANID);
+#endif // JLB_USE_DIAG_MONITORS
+
+  return measurements_5_CANID;
+}
+
+#ifdef JLB_USE_CANSTRUCT
+
+uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, __CoderDbcCanFrame_t__* cframe)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_5_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
+  _m->motor_rpm_ro = (uint16_t) JLB_motor_rpm_ro_toS(_m->motor_rpm_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  cframe->Data[0] |= (uint8_t) ( (_m->motor_rpm_ro & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( ((_m->motor_rpm_ro >> 8U) & (0xFFU)) );
+
+  cframe->MsgId = (uint32_t) measurements_5_CANID;
+  cframe->DLC = (uint8_t) measurements_5_DLC;
+  cframe->IDE = (uint8_t) measurements_5_IDE;
+  return measurements_5_CANID;
+}
+
+#else
+
+uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_5_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
   _m->motor_rpm_ro = (uint16_t) JLB_motor_rpm_ro_toS(_m->motor_rpm_phys);
 #endif // JLB_USE_SIGFLOAT
 
   _d[0] |= (uint8_t) ( (_m->motor_rpm_ro & (0xFFU)) );
   _d[1] |= (uint8_t) ( ((_m->motor_rpm_ro >> 8U) & (0xFFU)) );
 
-  *_len = (uint8_t) measurements_4_DLC;
-  *_ide = (uint8_t) measurements_4_IDE;
-  return measurements_4_CANID;
+  *_len = (uint8_t) measurements_5_DLC;
+  *_ide = (uint8_t) measurements_5_IDE;
+  return measurements_5_CANID;
 }
 
 #endif // JLB_USE_CANSTRUCT

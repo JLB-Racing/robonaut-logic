@@ -14,6 +14,7 @@ typedef struct
   measurements_2_t measurements_2;
   measurements_3_t measurements_3;
   measurements_4_t measurements_4;
+  measurements_5_t measurements_5;
   odometry_1_t odometry_1;
   odometry_2_t odometry_2;
   logic_1_t logic_1;
