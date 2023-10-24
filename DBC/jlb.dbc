@@ -36,33 +36,67 @@ BS_:
 BU_:
 
 
-BO_ 6 logic_1: 8 Vector__XXX
+BO_ 2 measurements_2: 8 Vector__XXX
+ SG_ line_sensor_9 : 16|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_8 : 14|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_7 : 12|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_6 : 10|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_5 : 8|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_4 : 6|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_32 : 62|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_31 : 60|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_30 : 58|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_3 : 4|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_29 : 56|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_28 : 54|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_27 : 52|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_26 : 50|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_25 : 48|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_24 : 46|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_23 : 44|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_22 : 42|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_21 : 40|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_20 : 38|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_2 : 2|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_19 : 36|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_18 : 34|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_17 : 32|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_16 : 30|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_15 : 28|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_14 : 26|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_13 : 24|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_12 : 22|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_11 : 20|2@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ line_sensor_10 : 18|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ line_sensor_1 : 0|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 33 logic_1: 8 Vector__XXX
  SG_ target_speed : 16|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s" Vector__XXX
  SG_ target_angle : 0|16@1+ (0.0001,-3.27675) [-3.27675|3.27675] "rad" Vector__XXX
 
-BO_ 5 odometry_2: 8 Vector__XXX
+BO_ 18 odometry_2: 8 Vector__XXX
  SG_ linear_velocity_x : 16|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s" Vector__XXX
  SG_ angular_velocity_z : 0|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad/s" Vector__XXX
 
-BO_ 4 odometry_1: 8 Vector__XXX
+BO_ 17 odometry_1: 8 Vector__XXX
  SG_ position_y : 32|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m" Vector__XXX
  SG_ position_x : 16|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m" Vector__XXX
  SG_ orientation : 0|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad" Vector__XXX
 
-BO_ 3 measurements_4: 8 Vector__XXX
+BO_ 5 measurements_5: 8 Vector__XXX
  SG_ motor_rpm : 0|16@1+ (0.05,-1638.375) [-1638.375|1638.375] "RPM" Vector__XXX
 
-BO_ 2 measurements_3: 8 Vector__XXX
+BO_ 4 measurements_4: 8 Vector__XXX
  SG_ linear_acceleration_z : 32|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s^2" Vector__XXX
  SG_ linear_acceleration_y : 16|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s^2" Vector__XXX
  SG_ linear_acceleration_x : 0|16@1+ (0.0005,-16.38375) [-16.38375|16.38375] "m/s^2" Vector__XXX
 
-BO_ 1 measurements_2: 8 Vector__XXX
+BO_ 3 measurements_3: 8 Vector__XXX
  SG_ angular_velocity_y : 16|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad/s" Vector__XXX
  SG_ angular_velocity_x : 0|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad/s" Vector__XXX
  SG_ angular_velocity_z : 32|16@1+ (0.0002,-6.5535) [-6.5535|6.5535] "rad/s" Vector__XXX
 
-BO_ 0 measurements_1: 8 Vector__XXX
+BO_ 1 measurements_1: 8 Vector__XXX
  SG_ line_sensor_9 : 16|2@1+ (1,0) [0|1] "" Vector__XXX
  SG_ line_sensor_8 : 14|2@1+ (1,0) [0|1] "" Vector__XXX
  SG_ line_sensor_7 : 12|2@1+ (1,0) [0|1] "" Vector__XXX
