@@ -40,10 +40,10 @@ extern "C" {
 #endif
 
 
-// def @measurements_1 CAN Message (0    0)
+// def @measurements_1 CAN Message (1    0x1)
 #define measurements_1_IDE (0U)
 #define measurements_1_DLC (8U)
-#define measurements_1_CANID (0U)
+#define measurements_1_CANID (0x1U)
 
 typedef struct
 {
@@ -189,10 +189,159 @@ typedef struct
 
 } measurements_1_t;
 
-// def @measurements_2 CAN Message (1    0x1)
+// def @measurements_2 CAN Message (2    0x2)
 #define measurements_2_IDE (0U)
 #define measurements_2_DLC (8U)
-#define measurements_2_CANID (0x1U)
+#define measurements_2_CANID (0x2U)
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint8_t line_sensor_1 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_2 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_3 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_4 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_5 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_6 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_7 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_8 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_9 : 2;                 //      Bits= 2
+
+  uint8_t line_sensor_10 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_11 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_12 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_13 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_14 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_15 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_16 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_17 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_18 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_19 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_20 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_21 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_22 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_23 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_24 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_25 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_26 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_27 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_28 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_29 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_30 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_31 : 2;                //      Bits= 2
+
+  uint8_t line_sensor_32 : 2;                //      Bits= 2
+
+#else
+
+  uint8_t line_sensor_1;                     //      Bits= 2
+
+  uint8_t line_sensor_2;                     //      Bits= 2
+
+  uint8_t line_sensor_3;                     //      Bits= 2
+
+  uint8_t line_sensor_4;                     //      Bits= 2
+
+  uint8_t line_sensor_5;                     //      Bits= 2
+
+  uint8_t line_sensor_6;                     //      Bits= 2
+
+  uint8_t line_sensor_7;                     //      Bits= 2
+
+  uint8_t line_sensor_8;                     //      Bits= 2
+
+  uint8_t line_sensor_9;                     //      Bits= 2
+
+  uint8_t line_sensor_10;                    //      Bits= 2
+
+  uint8_t line_sensor_11;                    //      Bits= 2
+
+  uint8_t line_sensor_12;                    //      Bits= 2
+
+  uint8_t line_sensor_13;                    //      Bits= 2
+
+  uint8_t line_sensor_14;                    //      Bits= 2
+
+  uint8_t line_sensor_15;                    //      Bits= 2
+
+  uint8_t line_sensor_16;                    //      Bits= 2
+
+  uint8_t line_sensor_17;                    //      Bits= 2
+
+  uint8_t line_sensor_18;                    //      Bits= 2
+
+  uint8_t line_sensor_19;                    //      Bits= 2
+
+  uint8_t line_sensor_20;                    //      Bits= 2
+
+  uint8_t line_sensor_21;                    //      Bits= 2
+
+  uint8_t line_sensor_22;                    //      Bits= 2
+
+  uint8_t line_sensor_23;                    //      Bits= 2
+
+  uint8_t line_sensor_24;                    //      Bits= 2
+
+  uint8_t line_sensor_25;                    //      Bits= 2
+
+  uint8_t line_sensor_26;                    //      Bits= 2
+
+  uint8_t line_sensor_27;                    //      Bits= 2
+
+  uint8_t line_sensor_28;                    //      Bits= 2
+
+  uint8_t line_sensor_29;                    //      Bits= 2
+
+  uint8_t line_sensor_30;                    //      Bits= 2
+
+  uint8_t line_sensor_31;                    //      Bits= 2
+
+  uint8_t line_sensor_32;                    //      Bits= 2
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} measurements_2_t;
+
+// def @measurements_3 CAN Message (3    0x3)
+#define measurements_3_IDE (0U)
+#define measurements_3_DLC (8U)
+#define measurements_3_CANID (0x3U)
 // signal: @angular_velocity_x_ro
 #define JLB_angular_velocity_x_ro_CovFactor (0.0002)
 #define JLB_angular_velocity_x_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
@@ -256,12 +405,12 @@ typedef struct
 
 #endif // JLB_USE_DIAG_MONITORS
 
-} measurements_2_t;
+} measurements_3_t;
 
-// def @measurements_3 CAN Message (2    0x2)
-#define measurements_3_IDE (0U)
-#define measurements_3_DLC (8U)
-#define measurements_3_CANID (0x2U)
+// def @measurements_4 CAN Message (4    0x4)
+#define measurements_4_IDE (0U)
+#define measurements_4_DLC (8U)
+#define measurements_4_CANID (0x4U)
 // signal: @linear_acceleration_x_ro
 #define JLB_linear_acceleration_x_ro_CovFactor (0.0005)
 #define JLB_linear_acceleration_x_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
@@ -325,12 +474,12 @@ typedef struct
 
 #endif // JLB_USE_DIAG_MONITORS
 
-} measurements_3_t;
+} measurements_4_t;
 
-// def @measurements_4 CAN Message (3    0x3)
-#define measurements_4_IDE (0U)
-#define measurements_4_DLC (8U)
-#define measurements_4_CANID (0x3U)
+// def @measurements_5 CAN Message (5    0x5)
+#define measurements_5_IDE (0U)
+#define measurements_5_DLC (8U)
+#define measurements_5_CANID (0x5U)
 // signal: @motor_rpm_ro
 #define JLB_motor_rpm_ro_CovFactor (0.05)
 #define JLB_motor_rpm_ro_toS(x) ( (uint16_t) (((x) - (-1638.375)) / (0.05)) )
@@ -362,12 +511,12 @@ typedef struct
 
 #endif // JLB_USE_DIAG_MONITORS
 
-} measurements_4_t;
+} measurements_5_t;
 
-// def @odometry_1 CAN Message (4    0x4)
+// def @odometry_1 CAN Message (17   0x11)
 #define odometry_1_IDE (0U)
 #define odometry_1_DLC (8U)
-#define odometry_1_CANID (0x4U)
+#define odometry_1_CANID (0x11U)
 // signal: @orientation_ro
 #define JLB_orientation_ro_CovFactor (0.0002)
 #define JLB_orientation_ro_toS(x) ( (uint16_t) (((x) - (-6.5535)) / (0.0002)) )
@@ -433,10 +582,10 @@ typedef struct
 
 } odometry_1_t;
 
-// def @odometry_2 CAN Message (5    0x5)
+// def @odometry_2 CAN Message (18   0x12)
 #define odometry_2_IDE (0U)
 #define odometry_2_DLC (8U)
-#define odometry_2_CANID (0x5U)
+#define odometry_2_CANID (0x12U)
 // signal: @linear_velocity_x_ro
 #define JLB_linear_velocity_x_ro_CovFactor (0.0005)
 #define JLB_linear_velocity_x_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
@@ -482,10 +631,10 @@ typedef struct
 
 } odometry_2_t;
 
-// def @logic_1 CAN Message (6    0x6)
+// def @logic_1 CAN Message (33   0x21)
 #define logic_1_IDE (0U)
 #define logic_1_DLC (8U)
-#define logic_1_CANID (0x6U)
+#define logic_1_CANID (0x21U)
 // signal: @target_angle_ro
 #define JLB_target_angle_ro_CovFactor (0.0001)
 #define JLB_target_angle_ro_toS(x) ( (uint16_t) (((x) - (-3.27675)) / (0.0001)) )
@@ -563,6 +712,13 @@ uint32_t Unpack_measurements_4_jlb(measurements_4_t* _m, const uint8_t* _d, uint
 uint32_t Pack_measurements_4_jlb(measurements_4_t* _m, __CoderDbcCanFrame_t__* cframe);
 #else
 uint32_t Pack_measurements_4_jlb(measurements_4_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_measurements_5_jlb(measurements_5_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
 #endif // JLB_USE_CANSTRUCT
 
 uint32_t Unpack_odometry_1_jlb(odometry_1_t* _m, const uint8_t* _d, uint8_t dlc_);
