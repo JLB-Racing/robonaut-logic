@@ -62,22 +62,9 @@ namespace jlb
             Pack_measurements_1_jlb(&signal_sender.jlb_rx_t.measurements_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_1_DLC + 2);
 
-            signal_sender.jlb_rx_t.measurements_2.angular_velocity_x_phys = odometry.meas_ang_vel_x;
-            signal_sender.jlb_rx_t.measurements_2.angular_velocity_y_phys = odometry.meas_ang_vel_y;
-            signal_sender.jlb_rx_t.measurements_2.angular_velocity_z_phys = odometry.meas_ang_vel_z;
-
-            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
-                data[i] = 0;
-            ide = measurements_2_IDE;
-            dlc = measurements_2_DLC;
-            data[0] = measurements_2_CANID;
-            data[1] = measurements_2_DLC;
-            Pack_measurements_2_jlb(&signal_sender.jlb_rx_t.measurements_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-            signal_sender.send(data, measurements_2_DLC + 2);
-
-            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_x_phys = odometry.meas_lin_acc_x;
-            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_y_phys = odometry.meas_lin_acc_y;
-            signal_sender.jlb_rx_t.measurements_3.linear_acceleration_z_phys = odometry.meas_lin_acc_z;
+            signal_sender.jlb_rx_t.measurements_3.angular_velocity_x_phys = odometry.meas_ang_vel_x;
+            signal_sender.jlb_rx_t.measurements_3.angular_velocity_y_phys = odometry.meas_ang_vel_y;
+            signal_sender.jlb_rx_t.measurements_3.angular_velocity_z_phys = odometry.meas_ang_vel_z;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;
@@ -88,7 +75,9 @@ namespace jlb
             Pack_measurements_3_jlb(&signal_sender.jlb_rx_t.measurements_3, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_3_DLC + 2);
 
-            signal_sender.jlb_rx_t.measurements_4.motor_rpm_phys = odometry.meas_motor_rpm;
+            signal_sender.jlb_rx_t.measurements_4.linear_acceleration_x_phys = odometry.meas_lin_acc_x;
+            signal_sender.jlb_rx_t.measurements_4.linear_acceleration_y_phys = odometry.meas_lin_acc_y;
+            signal_sender.jlb_rx_t.measurements_4.linear_acceleration_z_phys = odometry.meas_lin_acc_z;
 
             for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
                 data[i] = 0;
@@ -98,6 +87,17 @@ namespace jlb
             data[1] = measurements_4_DLC;
             Pack_measurements_4_jlb(&signal_sender.jlb_rx_t.measurements_4, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             signal_sender.send(data, measurements_4_DLC + 2);
+
+            signal_sender.jlb_rx_t.measurements_5.motor_rpm_phys = odometry.meas_motor_rpm;
+
+            for (unsigned int i = 0; i < measurements_1_DLC + 2; i++)
+                data[i] = 0;
+            ide = measurements_5_IDE;
+            dlc = measurements_5_DLC;
+            data[0] = measurements_5_CANID;
+            data[1] = measurements_5_DLC;
+            Pack_measurements_5_jlb(&signal_sender.jlb_rx_t.measurements_5, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
+            signal_sender.send(data, measurements_5_DLC + 2);
 
             signal_sender.jlb_rx_t.odometry_1.position_x_phys = odometry.x_t;
             signal_sender.jlb_rx_t.odometry_1.position_y_phys = odometry.y_t;
