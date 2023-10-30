@@ -17,12 +17,12 @@ namespace jlb
     class Controller
     {
     public:
-        unsigned long selected_front = SENSOR_WIDTH / 2;
-        unsigned long selected_rear = SENSOR_WIDTH / 2;
+        unsigned long selected_front = SENSOR_COUNT / 2;
+        unsigned long selected_rear = SENSOR_COUNT / 2;
         float target_angle = 0.0f;
         float target_speed = 0.0f;
-        bool detection_front[SENSOR_WIDTH];
-        bool detection_rear[SENSOR_WIDTH];
+        bool detection_front[SENSOR_COUNT];
+        bool detection_rear[SENSOR_COUNT];
 
         Direction direction = Direction::STRAIGHT;
         Mission mission = Mission::LABYRINTH;
@@ -40,12 +40,36 @@ namespace jlb
 
         float stanley(const float cross_track_error, const float heading_error)
         {
-            float kAng = 0.5f;
-            float kDist = 0.5f;
-            float kSoft = 1.0f;
-            float kDamp = 1.0f;
-
             return kAng * heading_error + atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
+        }
+
+        unsigned long select_control_point(bool *detection)
+        {
+            unsigned long rightmost = 0;
+            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
+                if (!detection[i] && i > rightmost)
+                    rightmost = i;
+
+            unsigned long leftmost = SENSOR_COUNT;
+            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
+                if (!detection[i] && i < leftmost)
+                    leftmost = i;
+
+            unsigned long center = leftmost;
+            for (unsigned long i = leftmost; i <= rightmost; i++)
+                if (!detection[i] && std::abs(static_cast<int>(i - (rightmost + leftmost) / 2)) < std::abs(static_cast<int>(center - (rightmost + leftmost) / 2)))
+                    center = i;
+
+            unsigned long selected;
+
+            if (direction == Direction::LEFT || direction == Direction::REVERSE_LEFT)
+                selected = leftmost;
+            if (direction == Direction::RIGHT || direction == Direction::REVERSE_RIGHT)
+                selected = rightmost;
+            if (direction == Direction::STRAIGHT || direction == Direction::REVERSE_STRAIGHT)
+                selected = center;
+
+            return selected;
         }
 
         void lateral_control()
@@ -64,33 +88,20 @@ namespace jlb
             prev_control_timestamp_ = control_timestamp_;
 #endif
 
-            unsigned long sensor_center = SENSOR_WIDTH / 2;
+            unsigned long sensor_center = SENSOR_COUNT / 2.0f;
+            selected_front = select_control_point(detection_front);
+            selected_rear = select_control_point(detection_rear);
 
-            unsigned long rightmost = 0;
-            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
-                if (!detection_front[i] && i > rightmost)
-                    rightmost = i;
+            float sensor_rate = SENSOR_WIDTH / SENSOR_COUNT;
+            float sensor_center_m = static_cast<float>(sensor_center) * sensor_rate;
+            float selected_front_m = static_cast<float>(selected_front) * sensor_rate;
+            float selected_rear_m = static_cast<float>(selected_rear) * sensor_rate;
 
-            unsigned long leftmost = SENSOR_WIDTH;
-            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
-                if (!detection_front[i] && i < leftmost)
-                    leftmost = i;
+            [[maybe_unused]] float heading_error = std::atan2(selected_front_m - selected_rear_m, SENSOR_BASE);
 
-            unsigned long center = leftmost;
-            for (unsigned long i = leftmost; i <= rightmost; i++)
-                if (!detection_front[i] && std::abs(static_cast<int>(i - (rightmost + leftmost) / 2)) < std::abs(static_cast<int>(center - (rightmost + leftmost) / 2)))
-                    center = i;
-
-            if (direction == Direction::LEFT || direction == Direction::REVERSE_LEFT)
-                selected_front = leftmost;
-            if (direction == Direction::RIGHT || direction == Direction::REVERSE_RIGHT)
-                selected_front = rightmost;
-            if (direction == Direction::STRAIGHT || direction == Direction::REVERSE_STRAIGHT)
-                selected_front = center;
-
-            [[maybe_unused]] float angle_error = (static_cast<int>(selected_front - sensor_center + 1)) / static_cast<float>(sensor_center) * M_PI / 2.0f;
-            float error = (static_cast<int>(selected_front - sensor_center + 1)) / static_cast<float>(sensor_center);
-            target_angle = PID(error, dt);
+            float cross_track_error = (selected_front_m - sensor_center_m + sensor_rate) / sensor_center_m;
+            // target_angle = PID(cross_track_error, dt);
+            target_angle = stanley(cross_track_error, heading_error);
 
             if (target_angle > MAX_WHEEL_ANGLE)
                 target_angle = MAX_WHEEL_ANGLE;
@@ -102,7 +113,7 @@ namespace jlb
                 target_angle = -target_angle;
             }
 
-            prev_error = error;
+            prev_error = cross_track_error;
         }
 
         void longitudinal_control()
@@ -152,13 +163,13 @@ namespace jlb
 
         void set_detection_front(bool *detection_front_)
         {
-            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
+            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
                 detection_front[i] = detection_front_[i];
         }
 
         void set_detection_rear(bool *detection_rear_)
         {
-            for (unsigned long i = 0; i < SENSOR_WIDTH; i++)
+            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
                 detection_rear[i] = detection_rear_[i];
         }
 

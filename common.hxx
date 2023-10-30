@@ -83,7 +83,9 @@ namespace jlb
     [[maybe_unused]] PARAM float WHEEL_WIDTH = 0.05f;             // m
     [[maybe_unused]] PARAM float TRACK = 0.26f;                   // m
     [[maybe_unused]] PARAM float WHEELBASE = 0.275f;              // m
-    PARAM int SENSOR_WIDTH = 32;                                  // -
+    PARAM int SENSOR_COUNT = 32;                                  // -
+    PARAM float SENSOR_BASE = 0.5f;                               // m
+    PARAM float SENSOR_WIDTH = 0.25f;                             // m
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_VELOCITY = 12.5f;       // m/s
@@ -101,9 +103,11 @@ namespace jlb
     PARAM int IMU_BUFFER_SIZE = 3;
 #else
     /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float WHEEL_DIAMETER = px_to_m(1.0f); // m
-    PARAM float WHEELBASE = px_to_m(16.0f);     // m
-    PARAM int SENSOR_WIDTH = 16;                // -
+    PARAM float WHEEL_DIAMETER = px_to_m(1.0f);       // m
+    PARAM float WHEELBASE = px_to_m(16.0f);           // m
+    PARAM int SENSOR_COUNT = 8;                       // -
+    PARAM float SENSOR_BASE = px_to_m(16);            // m
+    PARAM float SENSOR_WIDTH = px_to_m(SENSOR_COUNT); // m
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_VELOCITY = px_to_m(500.0f); // m/s
@@ -129,13 +133,21 @@ namespace jlb
     //
 
 #ifndef SIMULATION
+    PARAM bool USE_STANLEY = true;
+
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
 
-    /* LONGITUDINAL CONTROLLER PARAMETERS */
+    /* PID CONTROLLER PARAMETERS */
     PARAM float Kp = 0.6f;
     PARAM float Ki = 0.01f;
     PARAM float Kd = 0.4f;
+
+    /* STANLEY CONTROLLER PARAMETERS */
+    PARAM float kAng = 0.5f;
+    PARAM float kDist = 0.5f;
+    PARAM float kSoft = 1.0f;
+    PARAM float kDamp = 1.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = 10.0f;        // m/s
@@ -144,13 +156,21 @@ namespace jlb
     PARAM float FAST_SPEED_TURN = 10.0f;        // m/s
     PARAM float FAST_SPEED_OVERTAKE = 20.0f;    // m/s
 #else
+    PARAM bool USE_STANLEY = true;
+
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
 
-    /* LONGITUDINAL CONTROLLER PARAMETERS */
+    /* PID CONTROLLER PARAMETERS */
     PARAM float Kp = 0.6f;
     PARAM float Ki = 0.001f;
     PARAM float Kd = 0.1f;
+
+    /* STANLEY CONTROLLER PARAMETERS */
+    PARAM float kAng = 0.35f;
+    PARAM float kDist = 0.5f;
+    PARAM float kSoft = 1.0f;
+    PARAM float kDamp = 0.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s
