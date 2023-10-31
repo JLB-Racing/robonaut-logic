@@ -85,7 +85,7 @@ namespace jlb
     [[maybe_unused]] PARAM float WHEELBASE = 0.275f;              // m
     PARAM int SENSOR_COUNT = 32;                                  // -
     PARAM float SENSOR_BASE = 0.5f;                               // m
-    PARAM float SENSOR_WIDTH = 0.25f;                             // m
+    PARAM float SENSOR_WIDTH = 0.2f;                              // m
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_VELOCITY = 12.5f;       // m/s

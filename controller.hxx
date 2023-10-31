@@ -80,6 +80,12 @@ namespace jlb
                 return;
             }
 
+            if (std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b)
+                            { return b; }))
+            {
+                return;
+            }
+
 #ifdef STM32
             // TODO: add timestamp
 #else
