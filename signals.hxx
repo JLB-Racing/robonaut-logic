@@ -18,9 +18,9 @@ namespace jlb
         {
         public:
                 jlb_rx_t jlb_rx_t;
-                Odometry odometry;
-                Controller controller;
-                ASState as_state;
+                const Odometry &odometry;
+                const Controller &controller;
+                const ASState &as_state;
 
 #ifdef STM32
                 // TODO: initialize UDPClient for STM32
@@ -72,7 +72,6 @@ namespace jlb
                         jlb_rx_t.measurements_1.line_sensor_6 = 5 == controller.selected_front ? controller.detection_front[5] + 2.0f : controller.detection_front[5];
                         jlb_rx_t.measurements_1.line_sensor_7 = 6 == controller.selected_front ? controller.detection_front[6] + 2.0f : controller.detection_front[6];
                         jlb_rx_t.measurements_1.line_sensor_8 = 7 == controller.selected_front ? controller.detection_front[7] + 2.0f : controller.detection_front[7];
-#ifndef SIMULATION
                         jlb_rx_t.measurements_1.line_sensor_9 = 8 == controller.selected_front ? controller.detection_front[8] + 2.0f : controller.detection_front[8];
                         jlb_rx_t.measurements_1.line_sensor_10 = 9 == controller.selected_front ? controller.detection_front[9] + 2.0f : controller.detection_front[9];
                         jlb_rx_t.measurements_1.line_sensor_11 = 10 == controller.selected_front ? controller.detection_front[10] + 2.0f : controller.detection_front[10];
@@ -81,6 +80,7 @@ namespace jlb
                         jlb_rx_t.measurements_1.line_sensor_14 = 13 == controller.selected_front ? controller.detection_front[13] + 2.0f : controller.detection_front[13];
                         jlb_rx_t.measurements_1.line_sensor_15 = 14 == controller.selected_front ? controller.detection_front[14] + 2.0f : controller.detection_front[14];
                         jlb_rx_t.measurements_1.line_sensor_16 = 15 == controller.selected_front ? controller.detection_front[15] + 2.0f : controller.detection_front[15];
+#ifndef SIMULATION
                         jlb_rx_t.measurements_1.line_sensor_17 = 16 == controller.selected_front ? controller.detection_front[16] + 2.0f : controller.detection_front[16];
                         jlb_rx_t.measurements_1.line_sensor_18 = 17 == controller.selected_front ? controller.detection_front[17] + 2.0f : controller.detection_front[17];
                         jlb_rx_t.measurements_1.line_sensor_19 = 18 == controller.selected_front ? controller.detection_front[18] + 2.0f : controller.detection_front[18];
@@ -118,15 +118,15 @@ namespace jlb
                         jlb_rx_t.measurements_2.line_sensor_6 = 5 == controller.selected_rear ? controller.detection_rear[5] + 2.0f : controller.detection_rear[5];
                         jlb_rx_t.measurements_2.line_sensor_7 = 6 == controller.selected_rear ? controller.detection_rear[6] + 2.0f : controller.detection_rear[6];
                         jlb_rx_t.measurements_2.line_sensor_8 = 7 == controller.selected_rear ? controller.detection_rear[7] + 2.0f : controller.detection_rear[7];
+                        jlb_rx_t.measurements_2.line_sensor_9 = 8 == controller.selected_rear ? controller.detection_rear[8] + 2.0f : controller.detection_rear[8];
+                        jlb_rx_t.measurements_2.line_sensor_10 = 9 == controller.selected_rear ? controller.detection_rear[9] + 2.0f : controller.detection_rear[9];
+                        jlb_rx_t.measurements_2.line_sensor_11 = 10 == controller.selected_rear ? controller.detection_rear[10] + 2.0f : controller.detection_rear[10];
+                        jlb_rx_t.measurements_2.line_sensor_12 = 11 == controller.selected_rear ? controller.detection_rear[11] + 2.0f : controller.detection_rear[11];
+                        jlb_rx_t.measurements_2.line_sensor_13 = 12 == controller.selected_rear ? controller.detection_rear[12] + 2.0f : controller.detection_rear[12];
+                        jlb_rx_t.measurements_2.line_sensor_14 = 13 == controller.selected_rear ? controller.detection_rear[13] + 2.0f : controller.detection_rear[13];
+                        jlb_rx_t.measurements_2.line_sensor_15 = 14 == controller.selected_rear ? controller.detection_rear[14] + 2.0f : controller.detection_rear[14];
+                        jlb_rx_t.measurements_2.line_sensor_16 = 15 == controller.selected_rear ? controller.detection_rear[15] + 2.0f : controller.detection_rear[15];
 #ifndef SIMULATION
-                        jlb_rx_t.measurements_1.line_sensor_9 = 8 == controller.selected_front ? controller.detection_front[8] + 2.0f : controller.detection_front[8];
-                        jlb_rx_t.measurements_1.line_sensor_10 = 9 == controller.selected_front ? controller.detection_front[9] + 2.0f : controller.detection_front[9];
-                        jlb_rx_t.measurements_1.line_sensor_11 = 10 == controller.selected_front ? controller.detection_front[10] + 2.0f : controller.detection_front[10];
-                        jlb_rx_t.measurements_1.line_sensor_12 = 11 == controller.selected_front ? controller.detection_front[11] + 2.0f : controller.detection_front[11];
-                        jlb_rx_t.measurements_1.line_sensor_13 = 12 == controller.selected_front ? controller.detection_front[12] + 2.0f : controller.detection_front[12];
-                        jlb_rx_t.measurements_1.line_sensor_14 = 13 == controller.selected_front ? controller.detection_front[13] + 2.0f : controller.detection_front[13];
-                        jlb_rx_t.measurements_1.line_sensor_15 = 14 == controller.selected_front ? controller.detection_front[14] + 2.0f : controller.detection_front[14];
-                        jlb_rx_t.measurements_1.line_sensor_16 = 15 == controller.selected_front ? controller.detection_front[15] + 2.0f : controller.detection_front[15];
                         jlb_rx_t.measurements_2.line_sensor_9 = 8 == controller.selected_rear ? controller.detection_rear[8] + 2.0f : controller.detection_rear[8];
                         jlb_rx_t.measurements_2.line_sensor_10 = 9 == controller.selected_rear ? controller.detection_rear[9] + 2.0f : controller.detection_rear[9];
                         jlb_rx_t.measurements_2.line_sensor_11 = 10 == controller.selected_rear ? controller.detection_rear[10] + 2.0f : controller.detection_rear[10];

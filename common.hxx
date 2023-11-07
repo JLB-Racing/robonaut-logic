@@ -105,7 +105,7 @@ namespace jlb
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float WHEEL_DIAMETER = px_to_m(1.0f);       // m
     PARAM float WHEELBASE = px_to_m(16.0f);           // m
-    PARAM int SENSOR_COUNT = 8;                       // -
+    PARAM int SENSOR_COUNT = 16;                      // -
     PARAM float SENSOR_BASE = px_to_m(16);            // m
     PARAM float SENSOR_WIDTH = px_to_m(SENSOR_COUNT); // m
 
@@ -167,13 +167,13 @@ namespace jlb
     PARAM float Kd = 0.1f;
 
     /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 0.35f;
-    PARAM float kDist = 0.5f;
+    PARAM float kAng = 0.5;
+    PARAM float kDist = 1.0f;
     PARAM float kSoft = 1.0f;
     PARAM float kDamp = 0.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s
+    PARAM float LABYRINTH_SPEED = px_to_m(5.0f);          // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = px_to_m(20.0f); // m/s
     PARAM float FAST_SPEED = px_to_m(80.0f);              // m/s
     PARAM float FAST_SPEED_TURN = px_to_m(40.0f);         // m/s
