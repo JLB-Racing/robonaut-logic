@@ -129,6 +129,12 @@ namespace jlb
             return angle;
         }
 
+        void correction([[maybe_unused]] float x_t_, [[maybe_unused]] float y_t_)
+        {
+            x_t = x_t_ - (SENSOR_BASE / 4.0f * std::cos(theta_t));
+            y_t = y_t_ - (SENSOR_BASE / 4.0f * std::sin(theta_t));
+        }
+
     private:
         std::deque<float> v_buffer_;
         std::deque<float> w_buffer_;

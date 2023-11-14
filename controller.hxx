@@ -19,10 +19,14 @@ namespace jlb
     public:
         unsigned long selected_front = SENSOR_COUNT / 2;
         unsigned long selected_rear = SENSOR_COUNT / 2;
+
         float target_angle = 0.0f;
         float target_speed = 0.0f;
+
         bool detection_front[SENSOR_COUNT];
         bool detection_rear[SENSOR_COUNT];
+        std::vector<float> line_positions_front;
+        std::vector<float> line_positions_rear;
 
         Direction direction = Direction::STRAIGHT;
         Mission mission = Mission::LABYRINTH;
@@ -162,21 +166,33 @@ namespace jlb
             return {target_angle, target_speed};
         }
 
+        void set_detection_front(bool *detection_front_, std::vector<float> line_positions_front_)
+        {
+            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
+                detection_front[i] = detection_front_[i];
+            line_positions_front = line_positions_front_;
+        }
+
+        void set_detection_rear(bool *detection_rear_, std::vector<float> line_positions_rear_)
+        {
+            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
+                detection_rear[i] = detection_rear_[i];
+            line_positions_rear = line_positions_rear_;
+        }
+
         void set_current_velocity(const float current_velocity_)
         {
             current_velocity = current_velocity_;
         }
 
-        void set_detection_front(bool *detection_front_)
+        void set_direction(const Direction direction_)
         {
-            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
-                detection_front[i] = detection_front_[i];
+            direction = direction_;
         }
 
-        void set_detection_rear(bool *detection_rear_)
+        void set_mission(const Mission mission_)
         {
-            for (unsigned long i = 0; i < SENSOR_COUNT; i++)
-                detection_rear[i] = detection_rear_[i];
+            mission = mission_;
         }
 
     private:
