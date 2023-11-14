@@ -19,6 +19,10 @@ namespace jlb
     public:
         unsigned long selected_front = SENSOR_COUNT / 2;
         unsigned long selected_rear = SENSOR_COUNT / 2;
+        [[maybe_unused]] float line_position_front = 0.0f;
+        [[maybe_unused]] float line_position_rear = 0.0f;
+        [[maybe_unused]] float prev_line_position_front = 0.0f;
+        [[maybe_unused]] float prev_line_position_rear = 0.0f;
 
         float target_angle = 0.0f;
         float target_speed = 0.0f;
@@ -49,6 +53,8 @@ namespace jlb
 
         unsigned long select_control_point(bool *detection)
         {
+            unsigned long selected;
+
             unsigned long rightmost = 0;
             for (unsigned long i = 0; i < SENSOR_COUNT; i++)
                 if (!detection[i] && i > rightmost)
@@ -64,8 +70,6 @@ namespace jlb
                 if (!detection[i] && std::abs(static_cast<int>(i - (rightmost + leftmost) / 2)) < std::abs(static_cast<int>(center - (rightmost + leftmost) / 2)))
                     center = i;
 
-            unsigned long selected;
-
             if (direction == Direction::LEFT || direction == Direction::REVERSE_LEFT)
                 selected = leftmost;
             if (direction == Direction::RIGHT || direction == Direction::REVERSE_RIGHT)
@@ -75,6 +79,85 @@ namespace jlb
 
             return selected;
         }
+
+        // float select_control_point(std::vector<float> line_positions, float prev_line_position)
+        // {
+        //     // sort by ascending order
+        //     std::sort(line_positions.begin(), line_positions.end());
+
+        //     if (line_positions.size() == 1)
+        //     {
+        //         return line_positions[0];
+        //     }
+        //     else if (line_positions.size() == 2)
+        //     {
+        //         switch (direction)
+        //         {
+        //         case Direction::STRAIGHT:
+        //         {
+        //             return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position) ? line_positions[0] : line_positions[1];
+        //         }
+        //         case Direction::LEFT:
+        //         {
+        //             return line_positions[0];
+        //         }
+        //         case Direction::RIGHT:
+        //         {
+        //             return line_positions[1];
+        //         }
+        //         default:
+        //             return 0.0f;
+        //         }
+        //     }
+        //     else if (line_positions.size() == 3)
+        //     {
+        //         switch (direction)
+        //         {
+        //         case Direction::STRAIGHT:
+        //         {
+        //             // return the middle one
+        //             return line_positions[1];
+        //         }
+        //         case Direction::LEFT:
+        //         {
+        //             return line_positions[0];
+        //         }
+        //         case Direction::RIGHT:
+        //         {
+        //             return line_positions[2];
+        //         }
+        //         default:
+        //             return 0.0f;
+        //         }
+        //     }
+        //     else if (line_positions.size() == 4)
+        //     {
+        //         switch (direction)
+        //         {
+        //         case Direction::STRAIGHT:
+        //         {
+        //             // return the middle one
+        //             return line_positions[1] + line_positions[2] / 2.0f;
+        //         }
+        //         case Direction::LEFT:
+        //         {
+        //             return line_positions[0];
+        //         }
+        //         case Direction::RIGHT:
+        //         {
+        //             return line_positions[3];
+        //         }
+        //         default:
+        //             return 0.0f;
+        //         }
+        //     }
+        //     else
+        //     {
+        //         // this should never happen
+
+        //         return 0.0f;
+        //     }
+        // }
 
         void lateral_control()
         {
@@ -90,6 +173,11 @@ namespace jlb
                 return;
             }
 
+            // if (line_positions_front.size() == 0 || line_positions_rear.size() == 0 || line_positions_front.size() > 4 || line_positions_rear.size() > 4)
+            // {
+            //     return;
+            // }
+
 #ifdef STM32
             // TODO: add timestamp
 #else
@@ -97,21 +185,33 @@ namespace jlb
             [[maybe_unused]] float dt = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
             prev_control_timestamp_ = control_timestamp_;
 #endif
+            float sensor_rate = SENSOR_WIDTH / SENSOR_COUNT;
 
             unsigned long sensor_center = SENSOR_COUNT / 2.0f;
             selected_front = select_control_point(detection_front);
             selected_rear = select_control_point(detection_rear);
+            line_position_front = (static_cast<float>(selected_front) - static_cast<float>(sensor_center) + 1) * sensor_rate;
+            line_position_rear = (static_cast<float>(selected_rear) - static_cast<float>(sensor_center) + 1) * sensor_rate;
 
-            float sensor_rate = SENSOR_WIDTH / SENSOR_COUNT;
-            float sensor_center_m = static_cast<float>(sensor_center) * sensor_rate;
-            float selected_front_m = static_cast<float>(selected_front) * sensor_rate;
-            float selected_rear_m = static_cast<float>(selected_rear) * sensor_rate;
+            // line_position_front = select_control_point(line_positions_front, prev_line_position_front);
+            // line_position_rear = select_control_point(line_positions_rear, prev_line_position_rear);
+            // prev_line_position_front = line_position_front;
+            // prev_line_position_rear = line_position_rear;
 
-            [[maybe_unused]] float heading_error = std::atan2(selected_front_m - selected_rear_m, SENSOR_BASE);
+            // selected_front = static_cast<unsigned long>(std::round(line_position_front / sensor_rate) + SENSOR_COUNT / 2.0f - 1);
+            // selected_rear = static_cast<unsigned long>(std::round(line_position_rear / sensor_rate) + SENSOR_COUNT / 2.0f - 1);
 
-            float cross_track_error = (selected_front_m - sensor_center_m + sensor_rate) / sensor_center_m;
-            // target_angle = PID(cross_track_error, dt);
-            target_angle = stanley(cross_track_error, heading_error);
+            float heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
+            float cross_track_error = line_position_front;
+
+            if (USE_STANLEY)
+            {
+                target_angle = stanley(cross_track_error, heading_error);
+            }
+            else
+            {
+                target_angle = PID(cross_track_error, dt);
+            }
 
             if (target_angle > MAX_WHEEL_ANGLE)
                 target_angle = MAX_WHEEL_ANGLE;
