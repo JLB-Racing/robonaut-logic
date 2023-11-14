@@ -173,7 +173,7 @@ namespace jlb
     PARAM float kDamp = 0.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED = px_to_m(5.0f);          // m/s
+    PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = px_to_m(20.0f); // m/s
     PARAM float FAST_SPEED = px_to_m(80.0f);              // m/s
     PARAM float FAST_SPEED_TURN = px_to_m(40.0f);         // m/s

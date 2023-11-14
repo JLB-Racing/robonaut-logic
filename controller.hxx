@@ -80,84 +80,84 @@ namespace jlb
             return selected;
         }
 
-        // float select_control_point(std::vector<float> line_positions, float prev_line_position)
-        // {
-        //     // sort by ascending order
-        //     std::sort(line_positions.begin(), line_positions.end());
+        float select_control_point(std::vector<float> line_positions, float prev_line_position)
+        {
+            // sort by ascending order
+            std::sort(line_positions.begin(), line_positions.end());
 
-        //     if (line_positions.size() == 1)
-        //     {
-        //         return line_positions[0];
-        //     }
-        //     else if (line_positions.size() == 2)
-        //     {
-        //         switch (direction)
-        //         {
-        //         case Direction::STRAIGHT:
-        //         {
-        //             return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position) ? line_positions[0] : line_positions[1];
-        //         }
-        //         case Direction::LEFT:
-        //         {
-        //             return line_positions[0];
-        //         }
-        //         case Direction::RIGHT:
-        //         {
-        //             return line_positions[1];
-        //         }
-        //         default:
-        //             return 0.0f;
-        //         }
-        //     }
-        //     else if (line_positions.size() == 3)
-        //     {
-        //         switch (direction)
-        //         {
-        //         case Direction::STRAIGHT:
-        //         {
-        //             // return the middle one
-        //             return line_positions[1];
-        //         }
-        //         case Direction::LEFT:
-        //         {
-        //             return line_positions[0];
-        //         }
-        //         case Direction::RIGHT:
-        //         {
-        //             return line_positions[2];
-        //         }
-        //         default:
-        //             return 0.0f;
-        //         }
-        //     }
-        //     else if (line_positions.size() == 4)
-        //     {
-        //         switch (direction)
-        //         {
-        //         case Direction::STRAIGHT:
-        //         {
-        //             // return the middle one
-        //             return line_positions[1] + line_positions[2] / 2.0f;
-        //         }
-        //         case Direction::LEFT:
-        //         {
-        //             return line_positions[0];
-        //         }
-        //         case Direction::RIGHT:
-        //         {
-        //             return line_positions[3];
-        //         }
-        //         default:
-        //             return 0.0f;
-        //         }
-        //     }
-        //     else
-        //     {
-        //         // this should never happen
+            if (line_positions.size() == 1)
+            {
+                return line_positions[0];
+            }
+            else if (line_positions.size() == 2)
+            {
+                switch (direction)
+                {
+                case Direction::STRAIGHT:
+                {
+                    return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position) ? line_positions[0] : line_positions[1];
+                }
+                case Direction::LEFT:
+                {
+                    return line_positions[0];
+                }
+                case Direction::RIGHT:
+                {
+                    return line_positions[1];
+                }
+                default:
+                    return 0.0f;
+                }
+            }
+            else if (line_positions.size() == 3)
+            {
+                switch (direction)
+                {
+                case Direction::STRAIGHT:
+                {
+                    // return the middle one
+                    return line_positions[1];
+                }
+                case Direction::LEFT:
+                {
+                    return line_positions[0];
+                }
+                case Direction::RIGHT:
+                {
+                    return line_positions[2];
+                }
+                default:
+                    return 0.0f;
+                }
+            }
+            else if (line_positions.size() == 4)
+            {
+                switch (direction)
+                {
+                case Direction::STRAIGHT:
+                {
+                    // return the middle one
+                    return line_positions[1] + line_positions[2] / 2.0f;
+                }
+                case Direction::LEFT:
+                {
+                    return line_positions[0];
+                }
+                case Direction::RIGHT:
+                {
+                    return line_positions[3];
+                }
+                default:
+                    return 0.0f;
+                }
+            }
+            else
+            {
+                // this should never happen
 
-        //         return 0.0f;
-        //     }
-        // }
+                return 0.0f;
+            }
+        }
 
         void lateral_control()
         {
@@ -173,10 +173,10 @@ namespace jlb
                 return;
             }
 
-            // if (line_positions_front.size() == 0 || line_positions_rear.size() == 0 || line_positions_front.size() > 4 || line_positions_rear.size() > 4)
-            // {
-            //     return;
-            // }
+            if (line_positions_front.size() == 0 || line_positions_rear.size() == 0 || line_positions_front.size() > 4 || line_positions_rear.size() > 4)
+            {
+                return;
+            }
 
 #ifdef STM32
             // TODO: add timestamp
@@ -188,21 +188,19 @@ namespace jlb
             float sensor_rate = SENSOR_WIDTH / SENSOR_COUNT;
 
             unsigned long sensor_center = SENSOR_COUNT / 2.0f;
-            selected_front = select_control_point(detection_front);
-            selected_rear = select_control_point(detection_rear);
-            line_position_front = (static_cast<float>(selected_front) - static_cast<float>(sensor_center) + 1) * sensor_rate;
-            line_position_rear = (static_cast<float>(selected_rear) - static_cast<float>(sensor_center) + 1) * sensor_rate;
 
-            // line_position_front = select_control_point(line_positions_front, prev_line_position_front);
-            // line_position_rear = select_control_point(line_positions_rear, prev_line_position_rear);
-            // prev_line_position_front = line_position_front;
-            // prev_line_position_rear = line_position_rear;
+            line_position_front = select_control_point(line_positions_front, prev_line_position_front);
+            line_position_rear = select_control_point(line_positions_rear, prev_line_position_rear);
+            prev_line_position_front = line_position_front;
+            prev_line_position_rear = line_position_rear;
 
-            // selected_front = static_cast<unsigned long>(std::round(line_position_front / sensor_rate) + SENSOR_COUNT / 2.0f - 1);
-            // selected_rear = static_cast<unsigned long>(std::round(line_position_rear / sensor_rate) + SENSOR_COUNT / 2.0f - 1);
+            // selected_front = select_control_point(detection_front);
+            // selected_rear = select_control_point(detection_rear);
+            // line_position_front = (static_cast<float>(selected_front) - static_cast<float>(sensor_center) + 1) * sensor_rate;
+            // line_position_rear = (static_cast<float>(selected_rear) - static_cast<float>(sensor_center) + 1) * sensor_rate;
 
-            float heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
-            float cross_track_error = line_position_front;
+            float cross_track_error = line_position_front / (static_cast<float>(sensor_center) * sensor_rate);
+            [[maybe_unused]] float heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
             if (USE_STANLEY)
             {
