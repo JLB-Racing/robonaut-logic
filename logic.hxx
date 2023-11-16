@@ -6,6 +6,7 @@
 #include "as_state.hxx"
 #include "common.hxx"
 #include "signals.hxx"
+#include <stdexcept>
 
 namespace jlb
 {
@@ -168,12 +169,12 @@ namespace jlb
 
         Node &operator[](char name)
         {
+#ifndef STM32
             if (nodes.empty())
                 throw std::runtime_error("Graph is empty");
-
             if (name < 'A' || name > 'X')
                 throw std::runtime_error("Invalid node name");
-
+#endif
             return nodes[static_cast<int>(name - 'A')];
         }
     };
@@ -227,7 +228,7 @@ namespace jlb
                             break;
                         }
                     }
-
+#ifndef STM32
                     switch (controller.direction)
                     {
                     case Direction::LEFT:
@@ -242,6 +243,7 @@ namespace jlb
                     default:
                         break;
                     }
+#endif
                 }
             }
 

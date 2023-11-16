@@ -9,8 +9,8 @@
 
 #ifdef STM32
 // TODO: check if this is necessary
-#include "FreeRTOS.h"
-#include "task.h"
+#include <numeric>
+
 #else
 #include <thread>
 #include <mutex>
@@ -91,6 +91,7 @@ namespace jlb
         {
 #ifdef STM32
             // TODO: add timestamp and dt
+        	float dt = 5.0f;
 #else
             if (first_update_)
             {
@@ -113,9 +114,9 @@ namespace jlb
                 y_t += (vx_t * std::sin(theta_t) + vy_t * std::cos(theta_t)) * dt;
                 theta_t = normalize_angle(theta_t + w_t * dt);
             }
-
+#ifndef STM32
             odom_timestamp_ = update_timestamp > odom_timestamp_ ? update_timestamp : odom_timestamp_;
-
+#endif
             return {vx_t, x_t, y_t, theta_t};
         }
 
@@ -142,6 +143,7 @@ namespace jlb
 
 #ifdef STM32
         // TODO: add timestamp
+
 #else
         std::chrono::time_point<std::chrono::steady_clock> odom_timestamp_;
 #endif

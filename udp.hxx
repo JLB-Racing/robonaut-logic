@@ -1,6 +1,9 @@
 #ifndef UDP_HXX
 #define UDP_HXX
 
+#include "JLB/common.hxx"
+
+#ifndef STM32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -341,4 +344,5 @@ namespace jlb
 
 } // namespace jlb
 
+#endif
 #endif // UDP_HXX
