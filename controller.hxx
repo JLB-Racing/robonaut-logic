@@ -185,10 +185,6 @@ namespace jlb
             [[maybe_unused]] float dt = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
             prev_control_timestamp_ = control_timestamp_;
 #endif
-            float sensor_rate = SENSOR_WIDTH / SENSOR_COUNT;
-
-            unsigned long sensor_center = SENSOR_COUNT / 2.0f;
-
             line_position_front = select_control_point(line_positions_front, prev_line_position_front);
             line_position_rear = select_control_point(line_positions_rear, prev_line_position_rear);
             prev_line_position_front = line_position_front;
@@ -196,10 +192,10 @@ namespace jlb
 
             // selected_front = select_control_point(detection_front);
             // selected_rear = select_control_point(detection_rear);
-            // line_position_front = (static_cast<float>(selected_front) - static_cast<float>(sensor_center) + 1) * sensor_rate;
-            // line_position_rear = (static_cast<float>(selected_rear) - static_cast<float>(sensor_center) + 1) * sensor_rate;
+            // line_position_front = (static_cast<float>(selected_front) - static_cast<float>(SENSOR_COUNT / 2.0f) + 1) * (SENSOR_WIDTH / SENSOR_COUNT);
+            // line_position_rear = (static_cast<float>(selected_rear) - static_cast<float>(SENSOR_COUNT / 2.0f) + 1) * (SENSOR_WIDTH / SENSOR_COUNT);
 
-            float cross_track_error = line_position_front / (static_cast<float>(sensor_center) * sensor_rate);
+            float cross_track_error = line_position_front;
             [[maybe_unused]] float heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
             if (USE_STANLEY)

@@ -118,8 +118,8 @@ namespace jlb
     PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(3 / 2) * 1.0f;
 
     /* ALGORITHM PARAMETERS */
-    PARAM int VELOCITY_BUFFER_SIZE = 10;
-    PARAM int IMU_BUFFER_SIZE = 10;
+    PARAM int VELOCITY_BUFFER_SIZE = 5;
+    PARAM int IMU_BUFFER_SIZE = 5;
 #endif
 
     //
@@ -167,8 +167,8 @@ namespace jlb
     PARAM float Kd = 0.1f;
 
     /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 0.5;
-    PARAM float kDist = 1.0f;
+    PARAM float kAng = 0.35;
+    PARAM float kDist = 15.0f;
     PARAM float kSoft = 1.0f;
     PARAM float kDamp = 0.0f;
 

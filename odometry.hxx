@@ -133,6 +133,40 @@ namespace jlb
         {
             x_t = x_t_ - (SENSOR_BASE / 4.0f * std::cos(theta_t));
             y_t = y_t_ - (SENSOR_BASE / 4.0f * std::sin(theta_t));
+
+            // clamp theta to certain values whichever is closer
+            // the values are 0, 90, 180, 270, 360
+
+            float theta_0 = std::fabs(theta_t);
+            float theta_90 = std::fabs(theta_t - M_PI / 2.0f);
+            float theta_180 = std::fabs(theta_t - M_PI);
+            float theta_270 = std::fabs(theta_t - 3.0f * M_PI / 2.0f);
+            float theta_360 = std::fabs(theta_t - 2.0f * M_PI);
+
+            float min_theta = std::min({theta_0, theta_90, theta_180, theta_270, theta_360});
+
+            if (min_theta == theta_0)
+            {
+                theta_t = (theta_t + 0.0f) / 2.0f;
+            }
+            else if (min_theta == theta_90)
+            {
+                theta_t = (theta_t + M_PI / 2.0f) / 2.0f;
+            }
+            else if (min_theta == theta_180)
+            {
+                theta_t = (theta_t + M_PI) / 2.0f;
+            }
+            else if (min_theta == theta_270)
+            {
+                theta_t = (theta_t + 3.0f * M_PI / 2.0f) / 2.0f;
+            }
+            else if (min_theta == theta_360)
+            {
+                theta_t = (theta_t + 2.0f * M_PI) / 2.0f;
+            }
+
+            theta_t = normalize_angle(theta_t);
         }
 
     private:
