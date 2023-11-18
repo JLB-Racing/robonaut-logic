@@ -159,6 +159,11 @@ namespace jlb
             prev_line_position_front = line_position_front;
             prev_line_position_rear = line_position_rear;
 
+            float sensor_rate = SENSOR_WIDTH / SENSOR_COUNT;
+            float sensor_center = SENSOR_COUNT / 2.0f;
+            selected_front = static_cast<unsigned long>(line_position_front / sensor_rate + sensor_center);
+            selected_rear = static_cast<unsigned long>(line_position_rear / sensor_rate + sensor_center);
+
             cross_track_error = line_position_front;
             heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 

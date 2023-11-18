@@ -132,8 +132,8 @@ namespace jlb
 
         void correction([[maybe_unused]] float x_t_, [[maybe_unused]] float y_t_)
         {
-            x_t = x_t_ - (SENSOR_BASE / 4.0f * std::cos(theta_t));
-            y_t = y_t_ - (SENSOR_BASE / 4.0f * std::sin(theta_t));
+            x_t = x_t_ - (SENSOR_BASE / 2.0f * std::cos(theta_t));
+            y_t = y_t_ - (SENSOR_BASE / 2.0f * std::sin(theta_t));
 
             // clamp theta to certain values whichever is closer
             // the values are 0, 90, 180, 270, 360

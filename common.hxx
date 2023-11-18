@@ -176,8 +176,8 @@ namespace jlb
     PARAM float FOLLOW_DISTANCE = 0.25f;
 
     /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 25.0;
-    PARAM float kDist = 1500.0f;
+    PARAM float kAng = 0.5f;
+    PARAM float kDist = 10.0f;
     PARAM float kSoft = 1.0f;
     PARAM float kDamp = 0.1f;
 
