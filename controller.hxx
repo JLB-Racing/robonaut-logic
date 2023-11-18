@@ -28,6 +28,8 @@ namespace jlb
 
         float target_angle = 0.0f;
         float target_speed = 0.0f;
+        float cross_track_error = 0.0f;
+        float heading_error = 0.0f;
 
         float object_range = 100.0f;
         bool detection_front[SENSOR_COUNT];
@@ -157,8 +159,8 @@ namespace jlb
             prev_line_position_front = line_position_front;
             prev_line_position_rear = line_position_rear;
 
-            float cross_track_error = line_position_front;
-            [[maybe_unused]] float heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
+            cross_track_error = line_position_front;
+            heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
             target_angle = stanley(cross_track_error, heading_error);
 

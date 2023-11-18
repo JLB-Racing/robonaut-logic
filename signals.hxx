@@ -7,6 +7,7 @@
 #include "odometry.hxx"
 #include "controller.hxx"
 #include "as_state.hxx"
+#include "graph.hxx"
 #include "common.hxx"
 #include "udp.hxx"
 
@@ -21,14 +22,17 @@ namespace jlb
                 const Odometry &odometry;
                 const Controller &controller;
                 const ASState &as_state;
+                const Graph &graph;
+
+                std::vector<char> telemetry_data;
 
 #ifdef STM32
                 // TODO: initialize UDPClient for STM32
-                SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_) : odometry(odometry_), controller(controller_), as_state(as_state_)
+                SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_) : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_)
                 {
                 }
 #else
-                SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_) : odometry(odometry_), controller(controller_), as_state(as_state_), client(SERVER_ADDRESS, SERVER_PORT)
+                SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_) : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), client(SERVER_ADDRESS, SERVER_PORT)
                 {
                 }
 #endif
@@ -39,6 +43,8 @@ namespace jlb
 
                 void send_telemetry()
                 {
+                        telemetry_data.clear();
+
                         measurements_1();
                         measurements_2();
                         measurements_3();
@@ -47,6 +53,9 @@ namespace jlb
                         odometry_1();
                         odometry_2();
                         logic_1();
+                        logic_2();
+
+                        send(telemetry_data.data(), telemetry_data.size());
                 }
 
         private:
@@ -109,7 +118,7 @@ namespace jlb
                         data[0] = measurements_1_CANID;
                         data[1] = measurements_1_DLC;
                         Pack_measurements_1_jlb(&jlb_rx.measurements_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, measurements_1_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + measurements_1_DLC + 2);
                 }
 
                 void measurements_2()
@@ -163,7 +172,7 @@ namespace jlb
                         data[0] = measurements_2_CANID;
                         data[1] = measurements_2_DLC;
                         Pack_measurements_2_jlb(&jlb_rx.measurements_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, measurements_2_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + measurements_2_DLC + 2);
                 }
 
                 void measurements_3()
@@ -178,7 +187,7 @@ namespace jlb
                         data[0] = measurements_3_CANID;
                         data[1] = measurements_3_DLC;
                         Pack_measurements_3_jlb(&jlb_rx.measurements_3, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, measurements_3_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + measurements_3_DLC + 2);
                 }
 
                 void measurements_4()
@@ -193,12 +202,13 @@ namespace jlb
                         data[0] = measurements_4_CANID;
                         data[1] = measurements_4_DLC;
                         Pack_measurements_4_jlb(&jlb_rx.measurements_4, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, measurements_4_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + measurements_4_DLC + 2);
                 }
 
                 void measurements_5()
                 {
                         jlb_rx.measurements_5.motor_rpm_phys = odometry.meas_motor_rpm;
+                        jlb_rx.measurements_5.object_range_phys = controller.object_range;
 
                         char data[measurements_4_DLC + 2] = {0};
                         uint8_t ide = measurements_5_IDE;
@@ -206,7 +216,7 @@ namespace jlb
                         data[0] = measurements_5_CANID;
                         data[1] = measurements_5_DLC;
                         Pack_measurements_5_jlb(&jlb_rx.measurements_5, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, measurements_5_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + measurements_5_DLC + 2);
                 }
 
                 void odometry_1()
@@ -221,7 +231,7 @@ namespace jlb
                         data[0] = odometry_1_CANID;
                         data[1] = odometry_1_DLC;
                         Pack_odometry_1_jlb(&jlb_rx.odometry_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, odometry_1_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + odometry_1_DLC + 2);
                 }
 
                 void odometry_2()
@@ -235,13 +245,15 @@ namespace jlb
                         data[0] = odometry_2_CANID;
                         data[1] = odometry_2_DLC;
                         Pack_odometry_2_jlb(&jlb_rx.odometry_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, odometry_2_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + odometry_2_DLC + 2);
                 }
 
                 void logic_1()
                 {
                         jlb_rx.logic_1.target_angle_phys = controller.target_angle;
                         jlb_rx.logic_1.target_speed_phys = controller.target_speed;
+                        jlb_rx.logic_1.cross_track_error_phys = controller.cross_track_error;
+                        jlb_rx.logic_1.heading_error_phys = controller.heading_error;
 
                         char data[logic_1_DLC + 2] = {0};
                         uint8_t ide = logic_1_IDE;
@@ -249,7 +261,25 @@ namespace jlb
                         data[0] = logic_1_CANID;
                         data[1] = logic_1_DLC;
                         Pack_logic_1_jlb(&jlb_rx.logic_1, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
-                        send(data, logic_1_DLC + 2);
+                        telemetry_data.insert(telemetry_data.end(), data, data + logic_1_DLC + 2);
+                }
+
+                void logic_2()
+                {
+                        jlb_rx.logic_2.state = static_cast<uint8_t>(controller.mission);
+                        jlb_rx.logic_2.direction = static_cast<uint8_t>(controller.direction);
+                        jlb_rx.logic_2.under_gate = as_state.under_gate;
+                        jlb_rx.logic_2.at_cross_section = as_state.at_cross_section;
+                        jlb_rx.logic_2.previous_node = as_state.previous_node;
+                        jlb_rx.logic_2.next_node = as_state.next_node;
+
+                        char data[logic_2_DLC + 2] = {0};
+                        uint8_t ide = logic_2_IDE;
+                        uint8_t dlc = logic_2_DLC;
+                        data[0] = logic_2_CANID;
+                        data[1] = logic_2_DLC;
+                        Pack_logic_2_jlb(&jlb_rx.logic_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
+                        telemetry_data.insert(telemetry_data.end(), data, data + logic_2_DLC + 2);
                 }
         };
 
