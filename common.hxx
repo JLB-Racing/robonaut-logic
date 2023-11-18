@@ -8,8 +8,8 @@
 //      DEFINES
 //
 
-//#define SIMULATION
-#define STM32
+#define SIMULATION
+// #define STM32
 
 #define PARAM static constexpr
 #ifndef px_to_m
