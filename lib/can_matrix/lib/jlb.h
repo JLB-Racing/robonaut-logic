@@ -484,6 +484,10 @@ typedef struct
 #define JLB_motor_rpm_ro_CovFactor (0.05)
 #define JLB_motor_rpm_ro_toS(x) ( (uint16_t) (((x) - (-1638.375)) / (0.05)) )
 #define JLB_motor_rpm_ro_fromS(x) ( (((x) * (0.05)) + (-1638.375)) )
+// signal: @object_range_ro
+#define JLB_object_range_ro_CovFactor (0.0001)
+#define JLB_object_range_ro_toS(x) ( (uint16_t) (((x) - (0.0)) / (0.0001)) )
+#define JLB_object_range_ro_fromS(x) ( (((x) * (0.0001)) + (0.0)) )
 
 typedef struct
 {
@@ -495,12 +499,24 @@ typedef struct
   sigfloat_t motor_rpm_phys;
 #endif // JLB_USE_SIGFLOAT
 
+  uint16_t object_range_ro;                  //      Bits=16 Factor= 0.0001          Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t object_range_phys;
+#endif // JLB_USE_SIGFLOAT
+
 #else
 
   uint16_t motor_rpm_ro;                     //      Bits=16 Offset= -1638.375          Factor= 0.05            Unit:'RPM'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t motor_rpm_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t object_range_ro;                  //      Bits=16 Factor= 0.0001          Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t object_range_phys;
 #endif // JLB_USE_SIGFLOAT
 
 #endif // JLB_USE_BITS_SIGNAL
@@ -643,6 +659,14 @@ typedef struct
 #define JLB_target_speed_ro_CovFactor (0.0005)
 #define JLB_target_speed_ro_toS(x) ( (uint16_t) (((x) - (-16.38375)) / (0.0005)) )
 #define JLB_target_speed_ro_fromS(x) ( (((x) * (0.0005)) + (-16.38375)) )
+// signal: @cross_track_error_ro
+#define JLB_cross_track_error_ro_CovFactor (0.0001)
+#define JLB_cross_track_error_ro_toS(x) ( (uint16_t) (((x) - (-3.27675)) / (0.0001)) )
+#define JLB_cross_track_error_ro_fromS(x) ( (((x) * (0.0001)) + (-3.27675)) )
+// signal: @heading_error_ro
+#define JLB_heading_error_ro_CovFactor (0.00005)
+#define JLB_heading_error_ro_toS(x) ( (uint16_t) (((x) - (-1.638375)) / (0.00005)) )
+#define JLB_heading_error_ro_fromS(x) ( (((x) * (0.00005)) + (-1.638375)) )
 
 typedef struct
 {
@@ -660,6 +684,18 @@ typedef struct
   sigfloat_t target_speed_phys;
 #endif // JLB_USE_SIGFLOAT
 
+  uint16_t cross_track_error_ro;             //      Bits=16 Offset= -3.27675           Factor= 0.0001          Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t cross_track_error_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t heading_error_ro;                 //      Bits=16 Offset= -1.638375          Factor= 0.00005         Unit:'rad'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t heading_error_phys;
+#endif // JLB_USE_SIGFLOAT
+
 #else
 
   uint16_t target_angle_ro;                  //      Bits=16 Offset= -3.27675           Factor= 0.0001          Unit:'rad'
@@ -674,6 +710,18 @@ typedef struct
   sigfloat_t target_speed_phys;
 #endif // JLB_USE_SIGFLOAT
 
+  uint16_t cross_track_error_ro;             //      Bits=16 Offset= -3.27675           Factor= 0.0001          Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t cross_track_error_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t heading_error_ro;                 //      Bits=16 Offset= -1.638375          Factor= 0.00005         Unit:'rad'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t heading_error_phys;
+#endif // JLB_USE_SIGFLOAT
+
 #endif // JLB_USE_BITS_SIGNAL
 
 #ifdef JLB_USE_DIAG_MONITORS
@@ -683,6 +731,51 @@ typedef struct
 #endif // JLB_USE_DIAG_MONITORS
 
 } logic_1_t;
+
+// def @logic_2 CAN Message (34   0x22)
+#define logic_2_IDE (0U)
+#define logic_2_DLC (8U)
+#define logic_2_CANID (0x22U)
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint8_t state;                             //      Bits= 8 Unit:'enum'
+
+  uint8_t direction;                         //      Bits= 8 Unit:'enum'
+
+  uint8_t previous_node;                     //      Bits= 8 Unit:'char'
+
+  uint8_t next_node;                         //      Bits= 8 Unit:'char'
+
+  uint8_t at_cross_section : 1;              //      Bits= 1
+
+  uint8_t under_gate : 1;                    //      Bits= 1
+
+#else
+
+  uint8_t state;                             //      Bits= 8 Unit:'enum'
+
+  uint8_t direction;                         //      Bits= 8 Unit:'enum'
+
+  uint8_t previous_node;                     //      Bits= 8 Unit:'char'
+
+  uint8_t next_node;                         //      Bits= 8 Unit:'char'
+
+  uint8_t at_cross_section;                  //      Bits= 1
+
+  uint8_t under_gate;                        //      Bits= 1
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} logic_2_t;
 
 // Function signatures
 
@@ -740,6 +833,13 @@ uint32_t Unpack_logic_1_jlb(logic_1_t* _m, const uint8_t* _d, uint8_t dlc_);
 uint32_t Pack_logic_1_jlb(logic_1_t* _m, __CoderDbcCanFrame_t__* cframe);
 #else
 uint32_t Pack_logic_1_jlb(logic_1_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_logic_2_jlb(logic_2_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_logic_2_jlb(logic_2_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_logic_2_jlb(logic_2_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
 #endif // JLB_USE_CANSTRUCT
 
 #ifdef __cplusplus

@@ -38,8 +38,12 @@ uint32_t jlb_Receive(jlb_rx_t* _m, const uint8_t* _d, uint32_t _id, uint8_t dlc_
   } else {
    if (_id == 0x12U) {
     recid = Unpack_odometry_2_jlb(&(_m->odometry_2), _d, dlc_);
-   } else if (_id == 0x21U) {
-    recid = Unpack_logic_1_jlb(&(_m->logic_1), _d, dlc_);
+   } else {
+    if (_id == 0x21U) {
+     recid = Unpack_logic_1_jlb(&(_m->logic_1), _d, dlc_);
+    } else if (_id == 0x22U) {
+     recid = Unpack_logic_2_jlb(&(_m->logic_2), _d, dlc_);
+    }
    }
   }
  }
