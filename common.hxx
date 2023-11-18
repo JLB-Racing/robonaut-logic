@@ -121,8 +121,8 @@ namespace jlb
     PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(3 / 2) * 1.0f;
 
     /* ALGORITHM PARAMETERS */
-    PARAM int VELOCITY_BUFFER_SIZE = 5;
-    PARAM int IMU_BUFFER_SIZE = 5;
+    PARAM int VELOCITY_BUFFER_SIZE = 10;
+    PARAM int IMU_BUFFER_SIZE = 10;
 #endif
 
     //
@@ -136,15 +136,18 @@ namespace jlb
     //
 
 #ifndef SIMULATION
-    PARAM bool USE_STANLEY = true;
-
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
 
     /* PID CONTROLLER PARAMETERS */
-    PARAM float Kp = 0.6f;
-    PARAM float Ki = 0.01f;
-    PARAM float Kd = 0.4f;
+    PARAM float kP = 1.0f;
+    PARAM float kI = 0.0f;
+    PARAM float kD = 0.0f;
+    PARAM float TAU = 0.05f;
+    PARAM float T = 0.005f;
+    PARAM float LIM_MIN = 0.0f;
+    PARAM float LIM_MAX = 1.0f;
+    PARAM float FOLLOW_DISTANCE = 0.25f;
 
     /* STANLEY CONTROLLER PARAMETERS */
     PARAM float kAng = 0.5f;
@@ -159,21 +162,24 @@ namespace jlb
     PARAM float FAST_SPEED_TURN = 10.0f;        // m/s
     PARAM float FAST_SPEED_OVERTAKE = 20.0f;    // m/s
 #else
-    PARAM bool USE_STANLEY = true;
-
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
 
     /* PID CONTROLLER PARAMETERS */
-    PARAM float Kp = 0.6f;
-    PARAM float Ki = 0.001f;
-    PARAM float Kd = 0.1f;
+    PARAM float kP = 5.0f;
+    PARAM float kI = 0.0f;
+    PARAM float kD = 0.0f;
+    PARAM float TAU = 0.05f;
+    PARAM float T = 0.005f;
+    PARAM float LIM_MIN = 0.0f;
+    PARAM float LIM_MAX = 1.0f;
+    PARAM float FOLLOW_DISTANCE = 0.25f;
 
     /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 0.35;
-    PARAM float kDist = 15.0f;
+    PARAM float kAng = 25.0;
+    PARAM float kDist = 1500.0f;
     PARAM float kSoft = 1.0f;
-    PARAM float kDamp = 0.0f;
+    PARAM float kDamp = 0.1f;
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s

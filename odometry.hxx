@@ -91,7 +91,7 @@ namespace jlb
         {
 #ifdef STM32
             // TODO: add timestamp and dt
-            float dt = 5.0f;
+            float dt = 0.005f;
 #else
             if (first_update_)
             {
