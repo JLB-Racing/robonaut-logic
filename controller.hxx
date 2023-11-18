@@ -4,6 +4,7 @@
 #include "common.hxx"
 
 #include <chrono>
+#include <vector>
 
 namespace jlb
 {
@@ -180,6 +181,7 @@ namespace jlb
 
 #ifdef STM32
             // TODO: add timestamp
+            float dt = 5.0f;
 #else
             auto control_timestamp_ = std::chrono::steady_clock::now();
             [[maybe_unused]] float dt = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;

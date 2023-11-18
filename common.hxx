@@ -8,8 +8,8 @@
 //      DEFINES
 //
 
-#define SIMULATION
-// #define STM32
+//#define SIMULATION
+#define STM32
 
 #define PARAM static constexpr
 #ifndef px_to_m
@@ -60,6 +60,9 @@ namespace jlb
     //
 
 #ifndef SIMULATION
+    /* STATIC PARAMETERS OF THE TRACK */
+    PARAM float SQUARE_LENGTH = 0.6; // m
+    PARAM unsigned BITMAP_SIZE = 64; // px
 #else
     /* STATIC PARAMETERS OF THE TRACK */
     PARAM float SQUARE_LENGTH = 0.6; // m
