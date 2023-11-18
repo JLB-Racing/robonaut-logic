@@ -56,10 +56,11 @@ namespace jlb
                 UDPClient client;
 #endif
 
-                int send(char *msg, size_t max_size)
+                int send([[maybe_unused]] char *msg, [[maybe_unused]] size_t max_size)
                 {
 #ifdef STM32
                         // TODO: send UDP packet for STM32
+                        return 0;
 #else
                         return client.send(msg, max_size);
 #endif

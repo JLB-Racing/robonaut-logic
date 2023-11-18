@@ -91,7 +91,7 @@ namespace jlb
         {
 #ifdef STM32
             // TODO: add timestamp and dt
-        	float dt = 5.0f;
+            float dt = 5.0f;
 #else
             if (first_update_)
             {
@@ -173,7 +173,7 @@ namespace jlb
     private:
         std::deque<float> v_buffer_;
         std::deque<float> w_buffer_;
-        bool first_update_ = true;
+        [[maybe_unused]] bool first_update_ = true;
 
 #ifdef STM32
         // TODO: add timestamp
