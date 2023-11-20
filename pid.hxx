@@ -2,15 +2,13 @@
 #ifndef PID_HXX
 #define PID_HXX
 
-#include <iostream>
-
 class PID
 {
 public:
     PID() {}
     ~PID() {}
 
-    void init(double kp, double ki, double kd, double tau, double T, double minOutput, double maxOutput)
+    void init(float kp, float ki, float kd, float tau, float T, float minOutput, float maxOutput)
     {
         kp_ = kp;
         ki_ = ki;
@@ -23,9 +21,12 @@ public:
         integral_ = 0;
     }
 
-    double update(double setpoint, double processVariable, double dt)
+    float update(float setpoint, float processVariable, float dt)
     {
-        double error = setpoint - processVariable;
+        if (dt == 0)
+            return 0;
+
+        float error = setpoint - processVariable;
         integral_ += (error * dt);
 
         // Anti-windup: Limit the integral term
@@ -34,9 +35,9 @@ public:
         else if (integral_ < minOutput_)
             integral_ = minOutput_;
 
-        double derivative = (error - prevError_) / dt;
+        float derivative = (error - prevError_) / dt;
 
-        double output = kp_ * (1 + dt / (tau_ + T_)) * error + ki_ * (dt / T_) * integral_ - kd_ * derivative;
+        float output = kp_ * (1 + dt / (tau_ + T_)) * error + ki_ * (dt / T_) * integral_ - kd_ * derivative;
 
         // Output clamping: Limit the output within the specified range
         if (output > maxOutput_)
@@ -55,7 +56,7 @@ public:
         integral_ = 0;
     }
 
-    void set_gains(double kp, double ki, double kd)
+    void set_gains(float kp, float ki, float kd)
     {
         kp_ = kp;
         ki_ = ki;
@@ -63,15 +64,15 @@ public:
     }
 
 private:
-    double kp_;
-    double ki_;
-    double kd_;
-    double tau_;
-    double T_;
-    double minOutput_;
-    double maxOutput_;
-    double prevError_;
-    double integral_;
+    float kp_;
+    float ki_;
+    float kd_;
+    float tau_;
+    float T_;
+    float minOutput_;
+    float maxOutput_;
+    float prevError_;
+    float integral_;
 };
 
 #endif // PID_HXX

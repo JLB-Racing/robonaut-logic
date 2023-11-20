@@ -12,12 +12,13 @@
 // #define STM32
 
 #define PARAM static constexpr
-#ifndef px_to_m
-#define px_to_m(px) (px * jlb::SQUARE_LENGTH / jlb::BITMAP_SIZE)
-#endif
-#ifndef m_to_px
-#define m_to_px(m) (m * jlb::BITMAP_SIZE / jlb::SQUARE_LENGTH)
-#endif
+
+// #ifndef px_to_m
+// #define px_to_m(px) (px * jlb::SQUARE_LENGTH / jlb::BITMAP_SIZE)
+// #endif
+// #ifndef m_to_px
+// #define m_to_px(m) (m * jlb::BITMAP_SIZE / jlb::SQUARE_LENGTH)
+// #endif
 
 //
 //      END DEFINES
@@ -60,9 +61,7 @@ namespace jlb
     //
 
 #ifndef SIMULATION
-    /* STATIC PARAMETERS OF THE TRACK */
     PARAM float SQUARE_LENGTH = 0.6; // m
-    PARAM unsigned BITMAP_SIZE = 64; // px
 #else
     /* STATIC PARAMETERS OF THE TRACK */
     PARAM float SQUARE_LENGTH = 0.6; // m
@@ -173,13 +172,13 @@ namespace jlb
     PARAM float T = 0.005f;
     PARAM float LIM_MIN = 0.0f;
     PARAM float LIM_MAX = 1.0f;
-    PARAM float FOLLOW_DISTANCE = 0.25f;
+    PARAM float FOLLOW_DISTANCE = 0.35f;
 
     /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 0.5f;
-    PARAM float kDist = 10.0f;
+    PARAM float kAng = 0.75f;
+    PARAM float kDist = 15.0f;
     PARAM float kSoft = 1.0f;
-    PARAM float kDamp = 0.1f;
+    PARAM float kDamp = 0.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s

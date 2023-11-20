@@ -218,7 +218,6 @@ namespace jlb
             [[maybe_unused]] float dt = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
             prev_control_timestamp_ = control_timestamp_;
 #endif
-
             float object_rate = object_pid.update(FOLLOW_DISTANCE, object_range, dt);
             target_speed *= (1 - object_rate);
         }
