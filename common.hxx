@@ -8,18 +8,16 @@
 //      DEFINES
 //
 
-#define SIMULATION
+// #define SIMULATION
 // #define STM32
 
 #define PARAM static constexpr
 
-#ifdef SIMULATION
 #ifndef px_to_m
 #define px_to_m(px) (px * jlb::SQUARE_LENGTH / jlb::BITMAP_SIZE)
 #endif
 #ifndef m_to_px
 #define m_to_px(m) (m * jlb::BITMAP_SIZE / jlb::SQUARE_LENGTH)
-#endif
 #endif
 //
 //      END DEFINES
@@ -61,13 +59,9 @@ namespace jlb
     //      LOGIC
     //
 
-#ifndef SIMULATION
-    PARAM float SQUARE_LENGTH = 0.6; // m
-#else
     /* STATIC PARAMETERS OF THE TRACK */
     PARAM float SQUARE_LENGTH = 0.6; // m
     PARAM unsigned BITMAP_SIZE = 64; // px
-#endif
 
     //
     //      END LOGIC
@@ -200,10 +194,10 @@ namespace jlb
     //
 
 #ifndef SIMULATION
-    PARAM int SERVER_PORT = 5000;
+    PARAM int SERVER_PORT = 8998;
     PARAM const char *SERVER_ADDRESS = "localhost";
 #else
-    PARAM int SERVER_PORT = 5000;
+    PARAM int SERVER_PORT = 8998;
     PARAM const char *SERVER_ADDRESS = "localhost";
 #endif
 

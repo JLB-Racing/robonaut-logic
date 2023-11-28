@@ -212,6 +212,16 @@ namespace jlb
                 freeaddrinfo(f_addrinfo);
                 throw udp_client_server_runtime_error(("could not create UDP socket for: \"" + addr + ":" + decimal_port + "\"").c_str());
             }
+
+            // enable recieving broadcast messages
+            int enableBroadcast = 1;
+            if (setsockopt(f_socket, SOL_SOCKET, SO_BROADCAST, (void *)&enableBroadcast, sizeof(enableBroadcast)) < 0)
+            {
+                freeaddrinfo(f_addrinfo);
+                close(f_socket);
+                throw udp_client_server_runtime_error(("could not set broadcast permission for UDP socket with: \"" + addr + ":" + decimal_port + "\"").c_str());
+            }
+
             r = bind(f_socket, f_addrinfo->ai_addr, f_addrinfo->ai_addrlen);
             if (r != 0)
             {
