@@ -13,6 +13,11 @@
 
 #include "jlb-binutil.h"
 
+#ifdef STM32
+#include "main.h"
+extern UART_HandleTypeDef huart2;
+#endif
+
 namespace jlb
 {
         class SignalSender
@@ -68,7 +73,7 @@ namespace jlb
                 int send([[maybe_unused]] char *msg, [[maybe_unused]] size_t max_size)
                 {
 #ifdef STM32
-                        // TODO: send UDP packet for STM32
+                		HAL_UART_Transmit(&huart2, reinterpret_cast<uint8_t*>(msg), max_size, HAL_MAX_DELAY);
                         return 0;
 #else
                         return client.send(msg, max_size);
