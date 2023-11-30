@@ -6,15 +6,8 @@
 #include <deque>
 #include <chrono>
 #include <cmath>
-
-#ifdef SIMULATION
-// TODO: check if this is necessary
 #include <numeric>
 
-#else
-#include <thread>
-#include <mutex>
-#endif
 
 namespace jlb
 {

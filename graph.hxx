@@ -158,10 +158,9 @@ namespace jlb
         }
 
         ~Graph() {}
-
         Node &operator[](char name)
         {
-#ifndef STM32
+#ifdef SIMULATION
             if (nodes.empty())
                 throw std::runtime_error("Graph is empty");
             if (name < 'A' || name > 'X')

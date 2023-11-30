@@ -3,7 +3,7 @@
 
 #include "JLB/common.hxx"
 
-#ifndef STM32
+#ifdef SIMULATION
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>

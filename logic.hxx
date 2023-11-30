@@ -61,7 +61,7 @@ namespace jlb
                             break;
                         }
                     }
-#ifndef STM32
+#ifdef SIMULATION
                     switch (controller.direction)
                     {
                     case Direction::LEFT:
