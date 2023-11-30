@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-#define SIMULATION
+//#define SIMULATION
 
 #define PARAM static constexpr
 
@@ -130,7 +130,7 @@ namespace jlb
 
 #ifndef SIMULATION
     /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
+    PARAM float MAX_WHEEL_ANGLE = -0.375245789f; // rad
 
     /* PID CONTROLLER PARAMETERS */
     PARAM float kP = 1.0f;
@@ -149,11 +149,11 @@ namespace jlb
     PARAM float kDamp = 1.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED = 10.0f;        // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 5.0f; // m/s
-    PARAM float FAST_SPEED = 30.0f;             // m/s
-    PARAM float FAST_SPEED_TURN = 10.0f;        // m/s
-    PARAM float FAST_SPEED_OVERTAKE = 20.0f;    // m/s
+    PARAM float LABYRINTH_SPEED =  1.0f;        // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f; // m/s
+    PARAM float FAST_SPEED = 1.0f;              // m/s
+    PARAM float FAST_SPEED_TURN = 0.5f;         // m/s
+    PARAM float FAST_SPEED_OVERTAKE = 2.0f;     // m/s
 #else
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
