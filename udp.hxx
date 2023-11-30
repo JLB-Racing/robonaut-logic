@@ -68,6 +68,16 @@ namespace jlb
                 throw udp_client_server_runtime_error(("invalid address or port: \"" + addr + ":" + decimal_port + "\"").c_str());
             }
             f_socket = socket(f_addrinfo->ai_family, SOCK_DGRAM | SOCK_CLOEXEC, IPPROTO_UDP);
+
+            // enable broadcast
+            int enableBroadcast = 1;
+            if (setsockopt(f_socket, SOL_SOCKET, SO_BROADCAST, (void *)&enableBroadcast, sizeof(enableBroadcast)) < 0)
+            {
+                freeaddrinfo(f_addrinfo);
+                close(f_socket);
+                throw udp_client_server_runtime_error(("could not set broadcast permission for UDP socket with: \"" + addr + ":" + decimal_port + "\"").c_str());
+            }
+
             if (f_socket == -1)
             {
                 freeaddrinfo(f_addrinfo);
