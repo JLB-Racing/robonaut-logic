@@ -13,7 +13,7 @@
 
 #include "jlb-binutil.h"
 
-#ifdef STM32
+#ifndef SIMULATION
 #include "main.h"
 extern UART_HandleTypeDef huart2;
 #endif
@@ -31,13 +31,13 @@ namespace jlb
 
                 std::vector<char> telemetry_data;
 
-#ifdef STM32
+#ifndef SIMULATION
                 // TODO: initialize UDPClient for STM32
                 SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_) : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_)
                 {
                 }
 #else
-                SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_) : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), client(SERVER_ADDRESS, SERVER_PORT)
+                SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_) : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), client(SENDER_ADDRESS, SENDER_PORT)
                 {
                 }
 #endif
@@ -64,7 +64,7 @@ namespace jlb
                 }
 
         private:
-#ifdef STM32
+#ifndef SIMULATION
                 // TODO: add UDPClient for STM32
 #else
                 UDPClient client;
@@ -72,7 +72,7 @@ namespace jlb
 
                 int send([[maybe_unused]] char *msg, [[maybe_unused]] size_t max_size)
                 {
-#ifdef STM32
+#ifndef SIMULATION
                         HAL_UART_Transmit(&huart2, reinterpret_cast<uint8_t *>(msg), max_size, HAL_MAX_DELAY);
                         return 0;
 #else

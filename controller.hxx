@@ -210,7 +210,7 @@ namespace jlb
                 break;
             }
 
-#ifdef STM32
+#ifdef SIMULATION
             // TODO: add timestamp
             float dt = 0.005f;
 #else
@@ -269,7 +269,7 @@ namespace jlb
         float current_velocity = 0.0f;
         PID object_pid;
 
-#ifdef STM32
+#ifdef SIMULATION
         // TODO: add timestamp
 #else
         std::chrono::time_point<std::chrono::steady_clock>

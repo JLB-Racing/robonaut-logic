@@ -8,8 +8,7 @@
 //      DEFINES
 //
 
-// #define SIMULATION
-// #define STM32
+#define SIMULATION
 
 #define PARAM static constexpr
 
@@ -194,11 +193,13 @@ namespace jlb
     //
 
 #ifndef SIMULATION
-    PARAM int SERVER_PORT = 8998;
-    PARAM const char *SERVER_ADDRESS = "localhost";
+    PARAM int RECEIVER_PORT = 8998;
+    PARAM const char *RECEIVER_ADDRESS = "localhost";
 #else
-    PARAM int SERVER_PORT = 8998;
-    PARAM const char *SERVER_ADDRESS = "localhost";
+    PARAM int RECEIVER_PORT = 8998;
+    PARAM const char *RECEIVER_ADDRESS = "localhost";
+    PARAM int SENDER_PORT = 8998;
+    PARAM const char *SENDER_ADDRESS = "localhost";
 #endif
 
     //
