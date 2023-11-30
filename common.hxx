@@ -194,12 +194,12 @@ namespace jlb
 
 #ifndef SIMULATION
     PARAM int RECEIVER_PORT = 8998;
-    PARAM const char *RECEIVER_ADDRESS = "localhost";
+    PARAM const char *RECEIVER_ADDRESS = "0.0.0.0";
 #else
     PARAM int RECEIVER_PORT = 8998;
-    PARAM const char *RECEIVER_ADDRESS = "localhost";
+    PARAM const char *RECEIVER_ADDRESS = "0.0.0.0";
     PARAM int SENDER_PORT = 8998;
-    PARAM const char *SENDER_ADDRESS = "localhost";
+    PARAM const char *SENDER_ADDRESS = "255.255.255.255";
 #endif
 
     //
