@@ -95,8 +95,8 @@ namespace jlb
     PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(SPUR_GEAR_TOOTH_COUNT) / static_cast<float>(PINION_GEAR_TOOTH_COUNT) * INTERNAL_GEAR_RATIO;
 
     /* ALGORITHM PARAMETERS */
-    PARAM int VELOCITY_BUFFER_SIZE = 3;
-    PARAM int IMU_BUFFER_SIZE = 3;
+    PARAM int VELOCITY_BUFFER_SIZE = 1;
+    PARAM int IMU_BUFFER_SIZE = 10;
 #else
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float WHEEL_DIAMETER = px_to_m(1.0f);       // m
@@ -130,7 +130,7 @@ namespace jlb
 
 #ifndef SIMULATION
     /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_WHEEL_ANGLE = -0.375245789f; // rad
+    PARAM float MAX_WHEEL_ANGLE = 0.375245789f; // rad
 
     /* PID CONTROLLER PARAMETERS */
     PARAM float kP = 1.0f;
@@ -144,14 +144,14 @@ namespace jlb
 
     /* STANLEY CONTROLLER PARAMETERS */
     PARAM float kAng = 0.5f;
-    PARAM float kDist = 0.5f;
-    PARAM float kSoft = 1.0f;
-    PARAM float kDamp = 1.0f;
+    PARAM float kDist = 1.0f;
+    PARAM float kSoft = 0.5f;
+    PARAM float kDamp = 0.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED =  1.0f;        // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f; // m/s
-    PARAM float FAST_SPEED = 1.0f;              // m/s
+    PARAM float FAST_SPEED = 5.0f;              // m/s
     PARAM float FAST_SPEED_TURN = 0.5f;         // m/s
     PARAM float FAST_SPEED_OVERTAKE = 2.0f;     // m/s
 #else

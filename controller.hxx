@@ -49,7 +49,7 @@ namespace jlb
 
         float stanley(const float cross_track_error, const float heading_error)
         {
-            return kAng * heading_error + atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
+            return kAng * heading_error + std::atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
         }
 
         float select_control_point(std::vector<float> line_positions, float prev_line_position)
