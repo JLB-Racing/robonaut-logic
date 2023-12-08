@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-//#define SIMULATION
+#define SIMULATION
 
 #define PARAM static constexpr
 
@@ -18,6 +18,14 @@
 #ifndef m_to_px
 #define m_to_px(m) (m * jlb::BITMAP_SIZE / jlb::SQUARE_LENGTH)
 #endif
+
+#ifndef rad2deg
+#define rad2deg(rad) (rad * 180.0f / static_cast<float>(M_PI))
+#endif
+#ifndef deg2rad
+#define deg2rad(deg) (deg * static_cast<float>(M_PI) / 180.0f)
+#endif
+
 //
 //      END DEFINES
 //
@@ -74,14 +82,15 @@ namespace jlb
 
 #ifndef SIMULATION
     /* STATIC PARAMETERS OF THE VEHICLE */
-    [[maybe_unused]] PARAM float WHEEL_RADIUS_UNLOADED = 0.0525f; // m
-    PARAM float WHEEL_DIAMETER = 2.0f * WHEEL_RADIUS_UNLOADED;    // m
-    [[maybe_unused]] PARAM float WHEEL_WIDTH = 0.05f;             // m
-    [[maybe_unused]] PARAM float TRACK = 0.26f;                   // m
-    [[maybe_unused]] PARAM float WHEELBASE = 0.275f;              // m
-    PARAM int SENSOR_COUNT = 32;                                  // -
-    PARAM float SENSOR_BASE = 0.5f;                               // m
-    PARAM float SENSOR_WIDTH = 0.2f;                              // m
+    PARAM float WHEEL_RADIUS_UNLOADED = 0.0525f;               // m
+    PARAM float WHEEL_DIAMETER = 2.0f * WHEEL_RADIUS_UNLOADED; // m
+    PARAM int SENSOR_COUNT = 32;                               // -
+    PARAM float SENSOR_BASE = 0.5f;                            // m
+    PARAM float SENSOR_WIDTH = 0.2f;                           // m
+    PARAM float MAX_WHEEL_ANGLE = 21.5f;                       // deg
+    PARAM float WHEEL_WIDTH = 0.05f;                           // m
+    PARAM float TRACK = 0.26f;                                 // m
+    PARAM float WHEELBASE = 0.275f;                            // m
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_VELOCITY = 12.5f;       // m/s
@@ -100,10 +109,11 @@ namespace jlb
 #else
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float WHEEL_DIAMETER = px_to_m(1.0f);       // m
-    PARAM float WHEELBASE = px_to_m(16.0f);           // m
     PARAM int SENSOR_COUNT = 16;                      // -
     PARAM float SENSOR_BASE = px_to_m(16);            // m
     PARAM float SENSOR_WIDTH = px_to_m(SENSOR_COUNT); // m
+    PARAM float MAX_WHEEL_ANGLE = 30.0f;              // deg
+    PARAM float WHEELBASE = px_to_m(16.0f);           // m
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
     PARAM float MAX_VELOCITY = px_to_m(500.0f); // m/s
@@ -129,9 +139,6 @@ namespace jlb
     //
 
 #ifndef SIMULATION
-    /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_WHEEL_ANGLE = 0.375245789f; // rad
-
     /* PID CONTROLLER PARAMETERS */
     PARAM float kP = 1.0f;
     PARAM float kI = 0.0f;
@@ -147,17 +154,17 @@ namespace jlb
     PARAM float kDist = 1.0f;
     PARAM float kSoft = 0.5f;
     PARAM float kDamp = 0.0f;
+    PARAM float DIST_ERROR_MAX = 0.5;  // m
+    PARAM float ANG_ERROR_MAX = 60.0f; // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED =  1.0f;        // m/s
+    PARAM float LABYRINTH_SPEED = 1.0f;         // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f; // m/s
     PARAM float FAST_SPEED = 5.0f;              // m/s
     PARAM float FAST_SPEED_TURN = 0.5f;         // m/s
     PARAM float FAST_SPEED_OVERTAKE = 2.0f;     // m/s
+    PARAM float MIN_SPEED = 1.0f;               // m/s
 #else
-    /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_WHEEL_ANGLE = 1.0f; // rad
-
     /* PID CONTROLLER PARAMETERS */
     PARAM float kP = 5.0f;
     PARAM float kI = 0.0f;
@@ -173,6 +180,8 @@ namespace jlb
     PARAM float kDist = 15.0f;
     PARAM float kSoft = 1.0f;
     PARAM float kDamp = 0.0f;
+    PARAM float DIST_ERROR_MAX = px_to_m(32.0f); // m
+    PARAM float ANG_ERROR_MAX = 60.0f;           // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s
@@ -180,6 +189,7 @@ namespace jlb
     PARAM float FAST_SPEED = px_to_m(80.0f);              // m/s
     PARAM float FAST_SPEED_TURN = px_to_m(40.0f);         // m/s
     PARAM float FAST_SPEED_OVERTAKE = px_to_m(60.0f);     // m/s
+    PARAM float MIN_SPEED = px_to_m(10.0f);               // m/s
 #endif
 
     //

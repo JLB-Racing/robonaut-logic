@@ -135,7 +135,7 @@ namespace jlb
             }
         }
 
-        void lateral_control()
+        void lateral_control([[maybe_unused]] const float dt)
         {
             if (std::all_of(std::begin(detection_front), std::end(detection_front), [](bool b)
                             { return b; }))
@@ -169,10 +169,10 @@ namespace jlb
 
             target_angle = stanley(cross_track_error, heading_error);
 
-            if (target_angle > MAX_WHEEL_ANGLE)
-                target_angle = MAX_WHEEL_ANGLE;
-            if (target_angle < -MAX_WHEEL_ANGLE)
-                target_angle = -MAX_WHEEL_ANGLE;
+            if (target_angle > deg2rad(MAX_WHEEL_ANGLE))
+                target_angle = deg2rad(MAX_WHEEL_ANGLE);
+            if (target_angle < -deg2rad(MAX_WHEEL_ANGLE))
+                target_angle = -deg2rad(MAX_WHEEL_ANGLE);
 
             if (direction == Direction::REVERSE_LEFT || direction == Direction::REVERSE_RIGHT || direction == Direction::REVERSE_STRAIGHT)
             {
@@ -180,7 +180,7 @@ namespace jlb
             }
         }
 
-        void longitudinal_control()
+        void longitudinal_control([[maybe_unused]] const float dt)
         {
             switch (mission)
             {
@@ -210,6 +210,25 @@ namespace jlb
                 break;
             }
 
+            float dist_error = std::min(std::abs(cross_track_error), DIST_ERROR_MAX);
+            float ang_error = std::min(std::abs(heading_error), deg2rad(ANG_ERROR_MAX));
+
+            float dist_error_norm = dist_error / DIST_ERROR_MAX;
+            float ang_error_norm = ang_error / deg2rad(ANG_ERROR_MAX);
+
+            float x = std::max(dist_error_norm, ang_error_norm);
+            target_speed = std::min(target_speed, target_speed * (1.0f - (0.1666667f * x) - (0.8333333f * x * x)));
+
+            if (target_speed < MIN_SPEED)
+                target_speed = MIN_SPEED;
+
+            float object_rate = object_pid.update(FOLLOW_DISTANCE, object_range, dt);
+            target_speed *= (1 - object_rate);
+        }
+
+        ControlSignal update()
+        {
+
 #ifndef SIMULATION
             // TODO: add timestamp
             float dt = 0.005f;
@@ -218,14 +237,9 @@ namespace jlb
             [[maybe_unused]] float dt = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
             prev_control_timestamp_ = control_timestamp_;
 #endif
-            float object_rate = object_pid.update(FOLLOW_DISTANCE, object_range, dt);
-            target_speed *= (1 - object_rate);
-        }
 
-        ControlSignal update()
-        {
-            lateral_control();
-            longitudinal_control();
+            lateral_control(dt);
+            longitudinal_control(dt);
 
             return {target_angle, target_speed};
         }
