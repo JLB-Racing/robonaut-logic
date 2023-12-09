@@ -4,12 +4,13 @@
 #include "JLB/common.hxx"
 
 #ifdef SIMULATION
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netdb.h>
-#include <stdexcept>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
+
+#include <stdexcept>
 
 namespace jlb
 {
@@ -51,22 +52,18 @@ namespace jlb
          * \param[in] addr  The address to convert to a numeric IP.
          * \param[in] port  The port number.
          */
-        UDPClient(const std::string &addr, int port)
-            : f_port(port), f_addr(addr)
+        UDPClient(const std::string &addr, int port) : f_port(port), f_addr(addr)
         {
             char decimal_port[16];
             snprintf(decimal_port, sizeof(decimal_port), "%d", f_port);
             decimal_port[sizeof(decimal_port) / sizeof(decimal_port[0]) - 1] = '\0';
             struct addrinfo hints;
             memset(&hints, 0, sizeof(hints));
-            hints.ai_family = AF_UNSPEC;
+            hints.ai_family   = AF_UNSPEC;
             hints.ai_socktype = SOCK_DGRAM;
             hints.ai_protocol = IPPROTO_UDP;
             int r(getaddrinfo(addr.c_str(), decimal_port, &hints, &f_addrinfo));
-            if (r != 0 || f_addrinfo == NULL)
-            {
-                throw udp_client_server_runtime_error(("invalid address or port: \"" + addr + ":" + decimal_port + "\"").c_str());
-            }
+            if (r != 0 || f_addrinfo == NULL) { throw udp_client_server_runtime_error(("invalid address or port: \"" + addr + ":" + decimal_port + "\"").c_str()); }
             f_socket = socket(f_addrinfo->ai_family, SOCK_DGRAM | SOCK_CLOEXEC, IPPROTO_UDP);
 
             // enable broadcast
@@ -103,10 +100,7 @@ namespace jlb
          *
          * \return The socket used by this UDP client.
          */
-        int get_socket() const
-        {
-            return f_socket;
-        }
+        int get_socket() const { return f_socket; }
 
         /** \brief Retrieve the port used by this UDP client.
          *
@@ -115,10 +109,7 @@ namespace jlb
          *
          * \return The port as expected in a host integer.
          */
-        int get_port() const
-        {
-            return f_port;
-        }
+        int get_port() const { return f_port; }
 
         /** \brief Retrieve a copy of the address.
          *
@@ -130,10 +121,7 @@ namespace jlb
          *
          * \return A string with a copy of the constructor input address.
          */
-        std::string get_addr() const
-        {
-            return f_addr;
-        }
+        std::string get_addr() const { return f_addr; }
 
         /** \brief Send a message through this UDP client.
          *
@@ -159,9 +147,9 @@ namespace jlb
         }
 
     private:
-        int f_socket;
-        int f_port;
-        std::string f_addr;
+        int              f_socket;
+        int              f_port;
+        std::string      f_addr;
         struct addrinfo *f_addrinfo;
     };
 
@@ -200,22 +188,18 @@ namespace jlb
          * \param[in] addr  The address we receive on.
          * \param[in] port  The port we receive from.
          */
-        UDPServer(const std::string &addr, int port)
-            : f_port(port), f_addr(addr)
+        UDPServer(const std::string &addr, int port) : f_port(port), f_addr(addr)
         {
             char decimal_port[16];
             snprintf(decimal_port, sizeof(decimal_port), "%d", f_port);
             decimal_port[sizeof(decimal_port) / sizeof(decimal_port[0]) - 1] = '\0';
             struct addrinfo hints;
             memset(&hints, 0, sizeof(hints));
-            hints.ai_family = AF_UNSPEC;
+            hints.ai_family   = AF_UNSPEC;
             hints.ai_socktype = SOCK_DGRAM;
             hints.ai_protocol = IPPROTO_UDP;
             int r(getaddrinfo(addr.c_str(), decimal_port, &hints, &f_addrinfo));
-            if (r != 0 || f_addrinfo == NULL)
-            {
-                throw udp_client_server_runtime_error(("invalid address or port for UDP socket: \"" + addr + ":" + decimal_port + "\"").c_str());
-            }
+            if (r != 0 || f_addrinfo == NULL) { throw udp_client_server_runtime_error(("invalid address or port for UDP socket: \"" + addr + ":" + decimal_port + "\"").c_str()); }
             f_socket = socket(f_addrinfo->ai_family, SOCK_DGRAM | SOCK_CLOEXEC, IPPROTO_UDP);
             if (f_socket == -1)
             {
@@ -258,10 +242,7 @@ namespace jlb
          *
          * \return The socket of this UDP server.
          */
-        int get_socket() const
-        {
-            return f_socket;
-        }
+        int get_socket() const { return f_socket; }
 
         /** \brief The port used by this UDP server.
          *
@@ -270,10 +251,7 @@ namespace jlb
          *
          * \return The port of the UDP server.
          */
-        int get_port() const
-        {
-            return f_port;
-        }
+        int get_port() const { return f_port; }
 
         /** \brief Return the address of this UDP server.
          *
@@ -283,10 +261,7 @@ namespace jlb
          *
          * \return The address as passed to the constructor.
          */
-        std::string get_addr() const
-        {
-            return f_addr;
-        }
+        std::string get_addr() const { return f_addr; }
 
         /** \brief Wait on a message.
          *
@@ -306,10 +281,7 @@ namespace jlb
          *
          * \return The number of bytes read or -1 if an error occurs.
          */
-        int recv(char *msg, size_t max_size)
-        {
-            return ::recv(f_socket, msg, max_size, 0);
-        }
+        int recv(char *msg, size_t max_size) { return ::recv(f_socket, msg, max_size, 0); }
 
         /** \brief Wait for data to come in.
          *
@@ -336,9 +308,9 @@ namespace jlb
             FD_ZERO(&s);
             FD_SET(f_socket, &s);
             struct timeval timeout;
-            timeout.tv_sec = max_wait_ms / 1000;
+            timeout.tv_sec  = max_wait_ms / 1000;
             timeout.tv_usec = (max_wait_ms % 1000) * 1000;
-            int retval = select(f_socket + 1, &s, &s, &s, &timeout);
+            int retval      = select(f_socket + 1, &s, &s, &s, &timeout);
             if (retval == -1)
             {
                 // select() set errno accordingly
@@ -356,13 +328,13 @@ namespace jlb
         }
 
     private:
-        int f_socket;
-        int f_port;
-        std::string f_addr;
+        int              f_socket;
+        int              f_port;
+        std::string      f_addr;
         struct addrinfo *f_addrinfo;
     };
 
-} // namespace jlb
+}  // namespace jlb
 
 #endif
-#endif // UDP_HXX
+#endif  // UDP_HXX

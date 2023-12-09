@@ -5,27 +5,24 @@ namespace jlb
 {
     struct Edge
     {
-        char node;
-        Direction direction;
+        char              node;
+        Direction         direction;
         std::vector<char> prev_nodes;
-        float weight;
+        float             weight;
     };
 
     class Node
     {
     public:
-        char name;
-        float x;
-        float y;
+        char              name;
+        float             x;
+        float             y;
         std::vector<Edge> edges;
 
         Node(char name_, float x_, float y_) : name{name_}, x(x_), y(y_) {}
         ~Node() {}
 
-        void add_edge(char name_, Direction direction_, std::vector<char> prev_nodes_, float weight_ = 0.0f)
-        {
-            edges.push_back(Edge{name_, direction_, prev_nodes_, weight_});
-        }
+        void add_edge(char name_, Direction direction_, std::vector<char> prev_nodes_, float weight_ = 0.0f) { edges.push_back(Edge{name_, direction_, prev_nodes_, weight_}); }
     };
 
     class Graph
@@ -60,7 +57,7 @@ namespace jlb
             nodes.push_back(Node{static_cast<char>('W'), px_to_m(256), px_to_m(576)});
             nodes.push_back(Node{static_cast<char>('X'), px_to_m(96), px_to_m(448)});
 
-            const auto UNIT = SQUARE_LENGTH;
+            const auto UNIT           = SQUARE_LENGTH;
             const auto QUARTER_CIRCLE = 2 * UNIT * M_PI / 4.0f;
 
             this->operator[]('A').add_edge('C', Direction::LEFT, {'B', 'D'}, QUARTER_CIRCLE);
@@ -161,14 +158,12 @@ namespace jlb
         Node &operator[](char name)
         {
 #ifdef SIMULATION
-            if (nodes.empty())
-                throw std::runtime_error("Graph is empty");
-            if (name < 'A' || name > 'X')
-                throw std::runtime_error("Invalid node name");
+            if (nodes.empty()) throw std::runtime_error("Graph is empty");
+            if (name < 'A' || name > 'X') throw std::runtime_error("Invalid node name");
 #endif
             return nodes[static_cast<int>(name - 'A')];
         }
     };
-} // namespace jlb
+}  // namespace jlb
 
-#endif // GRAPH_HXX
+#endif  // GRAPH_HXX

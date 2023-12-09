@@ -1,65 +1,18 @@
 #ifndef COMMON_HXX
 #define COMMON_HXX
 
-#include <cmath>
+#include "types.hxx"
 
 ///////////////////////////////////////////////////////////////////////////
 //
 //      DEFINES
 //
 
- #define SIMULATION
-
-#define PARAM static constexpr
-
-#ifndef px_to_m
-#define px_to_m(px) (px * jlb::SQUARE_LENGTH / jlb::BITMAP_SIZE)
-#endif
-#ifndef m_to_px
-#define m_to_px(m) (m * jlb::BITMAP_SIZE / jlb::SQUARE_LENGTH)
-#endif
-
-#ifndef rad2deg
-#define rad2deg(rad) (rad * 180.0f / static_cast<float>(M_PI))
-#endif
-#ifndef deg2rad
-#define deg2rad(deg) (deg * static_cast<float>(M_PI) / 180.0f)
-#endif
-
-//
-//      END DEFINES
-//
-///////////////////////////////////////////////////////////////////////////
+#define SIMULATION
 
 namespace jlb
 {
-    ///////////////////////////////////////////////////////////////////////////
-    //
-    //      ENUMS
-    //
-
-    enum class Direction
-    {
-        LEFT,
-        RIGHT,
-        STRAIGHT,
-        REVERSE_LEFT,
-        REVERSE_RIGHT,
-        REVERSE_STRAIGHT
-    };
-
-    enum class Mission
-    {
-        LABYRINTH,
-        FAST,
-        FAST_TURN,
-        FAST_OVERTAKE
-    };
-
-    //
-    //      END ENUMS
-    //
-    ///////////////////////////////////////////////////////////////////////////
+#ifndef SIMULATION
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -67,157 +20,170 @@ namespace jlb
     //
 
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float SQUARE_LENGTH = 0.6; // m
-    PARAM unsigned BITMAP_SIZE = 64; // px
+    PARAM float    SQUARE_LENGTH = 0.6;  // m
+    PARAM unsigned BITMAP_SIZE   = 64;   // px
 
-    //
-    //      END LOGIC
-    //
-    ///////////////////////////////////////////////////////////////////////////
+    /* AS STATE MACHINE*/
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.05f;
+    PARAM float STATE_MIN_TIME              = 0.25f;
 
     ///////////////////////////////////////////////////////////////////////////
     //
     //      ODOMETRY
     //
 
-#ifndef SIMULATION
     /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float WHEEL_RADIUS_UNLOADED = 0.0525f;               // m
-    PARAM float WHEEL_DIAMETER = 2.0f * WHEEL_RADIUS_UNLOADED; // m
-    PARAM int SENSOR_COUNT = 32;                               // -
-    PARAM float SENSOR_BASE = 0.5f;                            // m
-    PARAM float SENSOR_WIDTH = 0.2f;                           // m
-    PARAM float MAX_WHEEL_ANGLE = 21.5f;                       // deg
-    PARAM float WHEEL_WIDTH = 0.05f;                           // m
-    PARAM float TRACK = 0.26f;                                 // m
-    PARAM float WHEELBASE = 0.275f;                            // m
+    PARAM float WHEEL_RADIUS_UNLOADED = 0.0525f;                       // m
+    PARAM float WHEEL_DIAMETER        = 2.0f * WHEEL_RADIUS_UNLOADED;  // m
+    PARAM int   SENSOR_COUNT          = 32;                            // -
+    PARAM float SENSOR_BASE           = 0.5f;                          // m
+    PARAM float SENSOR_WIDTH          = 0.2f;                          // m
+    PARAM float MAX_WHEEL_ANGLE       = 21.5f;                         // deg
+    PARAM float WHEEL_WIDTH           = 0.05f;                         // m
+    PARAM float TRACK                 = 0.26f;                         // m
+    PARAM float WHEELBASE             = 0.275f;                        // m
 
     /* DYNAMIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_VELOCITY = 12.5f;       // m/s
-    PARAM float MAX_YAW_RATE = 1.5f * M_PI; // rad/s
+    PARAM float MAX_VELOCITY = 12.5f;        // m/s
+    PARAM float MAX_YAW_RATE = 1.5f * M_PI;  // rad/s
 
     /* GEAR RATIOS */
-    PARAM int MAX_MOTOR_RPM = 10000;
-    PARAM int SPUR_GEAR_TOOTH_COUNT = 48;
-    PARAM int PINION_GEAR_TOOTH_COUNT = 13;
-    PARAM float INTERNAL_GEAR_RATIO = 1.0f;
+    PARAM int   MAX_MOTOR_RPM             = 10000;
+    PARAM int   SPUR_GEAR_TOOTH_COUNT     = 48;
+    PARAM int   PINION_GEAR_TOOTH_COUNT   = 13;
+    PARAM float INTERNAL_GEAR_RATIO       = 1.0f;
     PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(SPUR_GEAR_TOOTH_COUNT) / static_cast<float>(PINION_GEAR_TOOTH_COUNT) * INTERNAL_GEAR_RATIO;
 
     /* ALGORITHM PARAMETERS */
     PARAM int VELOCITY_BUFFER_SIZE = 1;
-    PARAM int IMU_BUFFER_SIZE = 10;
-#else
-    /* STATIC PARAMETERS OF THE VEHICLE */
-    PARAM float WHEEL_DIAMETER = px_to_m(1.0f);       // m
-    PARAM int SENSOR_COUNT = 16;                      // -
-    PARAM float SENSOR_BASE = px_to_m(16);            // m
-    PARAM float SENSOR_WIDTH = px_to_m(SENSOR_COUNT); // m
-    PARAM float MAX_WHEEL_ANGLE = 30.0f;              // deg
-    PARAM float WHEELBASE = px_to_m(16.0f);           // m
-
-    /* DYNAMIC PARAMETERS OF THE VEHICLE */
-    PARAM float MAX_VELOCITY = px_to_m(500.0f); // m/s
-    PARAM float MAX_YAW_RATE = 1.5f * M_PI;     // rad/s
-
-    /* GEAR RATIOS */
-    PARAM int MAX_MOTOR_RPM = 10000;
-    PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(3 / 2) * 1.0f;
-
-    /* ALGORITHM PARAMETERS */
-    PARAM int VELOCITY_BUFFER_SIZE = 10;
-    PARAM int IMU_BUFFER_SIZE = 10;
-#endif
-
-    //
-    //      END ODOMETRY
-    //
-    ///////////////////////////////////////////////////////////////////////////
+    PARAM int IMU_BUFFER_SIZE      = 10;
 
     ///////////////////////////////////////////////////////////////////////////
     //
     //      CONTROLLER
     //
 
-#ifndef SIMULATION
     /* PID CONTROLLER PARAMETERS */
-    PARAM float kP = 4.20f;
-    PARAM float kI = 0.69f;
-    PARAM float kD = 0.0f;
-    PARAM float TAU = 0.05f;
-    PARAM float T = 0.005f;
-    PARAM float LIM_MIN = 0.0f;
-    PARAM float LIM_MAX = 1.0f;
-    PARAM float DEADBAND = 0.00f;
+    PARAM float kP              = 4.20f;
+    PARAM float kI              = 0.69f;
+    PARAM float kD              = 0.0f;
+    PARAM float TAU             = 0.05f;
+    PARAM float T               = 0.005f;
+    PARAM float LIM_MIN         = 0.0f;
+    PARAM float LIM_MAX         = 1.0f;
+    PARAM float DEADBAND        = 0.00f;
     PARAM float FOLLOW_DISTANCE = 0.60f;
 
     /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 1.0f;
-    PARAM float kDist = 1.75f;
-    PARAM float kSoft = 0.5f;
-    PARAM float kDamp = 0.0f;
-    PARAM float DIST_ERROR_MAX = 1.0f;  // m
-    PARAM float ANG_ERROR_MAX = 90.0f; // deg
+    PARAM float kAng           = 1.0f;
+    PARAM float kDist          = 1.75f;
+    PARAM float kSoft          = 0.5f;
+    PARAM float kDamp          = 0.0f;
+    PARAM float DIST_ERROR_MAX = 1.0f;   // m
+    PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED = 1.0f;         // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f; // m/s
-    PARAM float FAST_SPEED = 6.9f;              // m/s
-    PARAM float FAST_SPEED_TURN = 0.5f;         // m/s
-    PARAM float FAST_SPEED_OVERTAKE = 2.0f;     // m/s
-    PARAM float MIN_SPEED = 1.0f;               // m/s
-#else
-    /* PID CONTROLLER PARAMETERS */
-    PARAM float kP = 5.0f;
-    PARAM float kI = 0.0f;
-    PARAM float kD = 0.0f;
-    PARAM float TAU = 0.05f;
-    PARAM float T = 0.005f;
-    PARAM float LIM_MIN = 0.0f;
-    PARAM float LIM_MAX = 1.0f;
-    PARAM float FOLLOW_DISTANCE = 0.35f;
-
-    /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 0.75f;
-    PARAM float kDist = 15.0f;
-    PARAM float kSoft = 1.0f;
-    PARAM float kDamp = 0.0f;
-    PARAM float DIST_ERROR_MAX = px_to_m(32.0f); // m
-    PARAM float ANG_ERROR_MAX = 60.0f;           // deg
-
-    /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED = px_to_m(40.0f);         // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = px_to_m(20.0f); // m/s
-    PARAM float FAST_SPEED = px_to_m(80.0f);              // m/s
-    PARAM float FAST_SPEED_TURN = px_to_m(40.0f);         // m/s
-    PARAM float FAST_SPEED_OVERTAKE = px_to_m(60.0f);     // m/s
-    PARAM float MIN_SPEED = px_to_m(10.0f);               // m/s
-#endif
-
-    //
-    //      END CONTROLLER
-    //
-    ///////////////////////////////////////////////////////////////////////////
+    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
+    PARAM float FAST_SPEED              = 6.9f;   // m/s
+    PARAM float FAST_SPEED_TURN         = 4.20f;  // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 5.0f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 3.0f;   // m/s
+    PARAM float MIN_SPEED               = 1.0f;   // m/s
 
     ///////////////////////////////////////////////////////////////////////////
     //
     //      SIGNALS
     //
 
-#ifndef SIMULATION
-    PARAM int RECEIVER_PORT = 9750;
+    PARAM int         RECEIVER_PORT    = 9750;
     PARAM const char *RECEIVER_ADDRESS = "0.0.0.0";
+
 #else
-    PARAM int RECEIVER_PORT = 9750;
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    //      LOGIC
+    //
+
+    /* STATIC PARAMETERS OF THE TRACK */
+    PARAM float    SQUARE_LENGTH = 0.6;  // m
+    PARAM unsigned BITMAP_SIZE   = 64;   // px
+
+    /* AS STATE MACHINE*/
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.05f;
+    PARAM float STATE_MIN_TIME              = 0.25f;
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    //      ODOMETRY
+    //
+
+    /* STATIC PARAMETERS OF THE VEHICLE */
+    PARAM float WHEEL_DIAMETER  = px_to_m(1.0f);          // m
+    PARAM int   SENSOR_COUNT    = 16;                     // -
+    PARAM float SENSOR_BASE     = px_to_m(16);            // m
+    PARAM float SENSOR_WIDTH    = px_to_m(SENSOR_COUNT);  // m
+    PARAM float MAX_WHEEL_ANGLE = 30.0f;                  // deg
+    PARAM float WHEELBASE       = px_to_m(16.0f);         // m
+
+    /* DYNAMIC PARAMETERS OF THE VEHICLE */
+    PARAM float MAX_VELOCITY = 10.0f;        // m/s
+    PARAM float MAX_YAW_RATE = 1.5f * M_PI;  // rad/s
+
+    /* GEAR RATIOS */
+    PARAM int   MAX_MOTOR_RPM             = 10000;
+    PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(3 / 2) * 1.0f;
+
+    /* ALGORITHM PARAMETERS */
+    PARAM int VELOCITY_BUFFER_SIZE = 10;
+    PARAM int IMU_BUFFER_SIZE      = 10;
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    //      CONTROLLER
+    //
+
+    /* PID CONTROLLER PARAMETERS */
+    PARAM float kP              = 4.20f;
+    PARAM float kI              = 0.69f;
+    PARAM float kD              = 0.0f;
+    PARAM float TAU             = 0.05f;
+    PARAM float T               = 0.005f;
+    PARAM float LIM_MIN         = 0.0f;
+    PARAM float LIM_MAX         = 1.0f;
+    PARAM float DEADBAND        = 0.00f;
+    PARAM float FOLLOW_DISTANCE = 0.3f;
+
+    /* STANLEY CONTROLLER PARAMETERS */
+    PARAM float kAng           = 0.75f;
+    PARAM float kDist          = 10.0f;
+    PARAM float kSoft          = 1.0f;
+    PARAM float kDamp          = 0.0f;
+    PARAM float DIST_ERROR_MAX = 1.0f;   // m
+    PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
+
+    /* LATERAL CONTROLLER PARAMETERS */
+    PARAM float LABYRINTH_SPEED         = 0.4f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.2f;  // m/s
+    PARAM float FAST_SPEED              = 1.2f;  // m/s
+    PARAM float FAST_SPEED_TURN         = 0.6f;  // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 0.6f;  // m/s
+    PARAM float MIN_SPEED               = 0.1f;  // m/s
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    //      SIGNALS
+    //
+
+    PARAM int         RECEIVER_PORT    = 9750;
     PARAM const char *RECEIVER_ADDRESS = "0.0.0.0";
-    PARAM int SENDER_PORT = 9750;
-    PARAM const char *SENDER_ADDRESS = "255.255.255.255";
+    PARAM int         SENDER_PORT      = 9750;
+    PARAM const char *SENDER_ADDRESS   = "255.255.255.255";
+
 #endif
 
-    //
-    //      END SIGNALS
-    //
-    ///////////////////////////////////////////////////////////////////////////
+}  // namespace jlb
 
-} // namespace jlb
-
-#endif // COMMON_HXX
+#endif  // COMMON_HXX

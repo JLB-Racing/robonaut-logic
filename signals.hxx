@@ -271,7 +271,7 @@ namespace jlb
 
                 void logic_2()
                 {
-                        jlb_rx.logic_2.state = static_cast<uint8_t>(controller.mission);
+                        jlb_rx.logic_2.state = static_cast<uint8_t>(as_state.mission);
                         jlb_rx.logic_2.direction = static_cast<uint8_t>(controller.direction);
                         jlb_rx.logic_2.under_gate = as_state.under_gate;
                         jlb_rx.logic_2.at_cross_section = as_state.at_cross_section;
