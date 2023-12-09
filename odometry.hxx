@@ -8,7 +8,6 @@
 #include <cmath>
 #include <numeric>
 
-
 namespace jlb
 {
     struct Odom
@@ -27,6 +26,7 @@ namespace jlb
         float x_t = 0.0f;     // x position
         float y_t = 0.0f;     // y position
         float theta_t = 0.0f; // orientation
+        float distance_traveled_since_checkpoint = 0.0f;
 
         float meas_motor_rpm = 0.0f;
         float meas_ang_vel_x = 0.0f;
@@ -106,6 +106,8 @@ namespace jlb
                 x_t += (vx_t * std::cos(theta_t) - vy_t * std::sin(theta_t)) * dt;
                 y_t += (vx_t * std::sin(theta_t) + vy_t * std::cos(theta_t)) * dt;
                 theta_t = normalize_angle(theta_t + w_t * dt);
+
+                distance_traveled_since_checkpoint += vx_t * dt;
             }
 #ifdef SIMULATION
             odom_timestamp_ = update_timestamp > odom_timestamp_ ? update_timestamp : odom_timestamp_;
@@ -161,6 +163,11 @@ namespace jlb
             }
 
             theta_t = normalize_angle(theta_t);
+        }
+
+        void checkpoint()
+        {
+            distance_traveled_since_checkpoint = 0.0f;
         }
 
     private:
