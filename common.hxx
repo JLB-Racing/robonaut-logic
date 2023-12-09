@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-//#define SIMULATION
+ #define SIMULATION
 
 #define PARAM static constexpr
 
@@ -149,7 +149,7 @@ namespace jlb
     PARAM float kDamp = 0.0f;
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED =  1.0f;        // m/s
+    PARAM float LABYRINTH_SPEED = 1.0f;         // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f; // m/s
     PARAM float FAST_SPEED = 5.0f;              // m/s
     PARAM float FAST_SPEED_TURN = 0.5f;         // m/s
@@ -193,12 +193,12 @@ namespace jlb
     //
 
 #ifndef SIMULATION
-    PARAM int RECEIVER_PORT = 8998;
+    PARAM int RECEIVER_PORT = 9750;
     PARAM const char *RECEIVER_ADDRESS = "0.0.0.0";
 #else
-    PARAM int RECEIVER_PORT = 8998;
+    PARAM int RECEIVER_PORT = 9750;
     PARAM const char *RECEIVER_ADDRESS = "0.0.0.0";
-    PARAM int SENDER_PORT = 8998;
+    PARAM int SENDER_PORT = 9750;
     PARAM const char *SENDER_ADDRESS = "255.255.255.255";
 #endif
 
