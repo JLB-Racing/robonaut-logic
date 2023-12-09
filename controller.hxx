@@ -43,7 +43,7 @@ namespace jlb
 
         Controller(Direction direction_ = Direction::STRAIGHT) : direction{direction_}
         {
-            object_pid.init(kP, kI, kD, TAU, T, LIM_MIN, LIM_MAX);
+            object_pid.init(kP, kI, kD, TAU, T, LIM_MIN, LIM_MAX, DEADBAND);
         }
         ~Controller() {}
 

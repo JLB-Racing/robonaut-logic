@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-#define SIMULATION
+//#define SIMULATION
 
 #define PARAM static constexpr
 
@@ -140,27 +140,28 @@ namespace jlb
 
 #ifndef SIMULATION
     /* PID CONTROLLER PARAMETERS */
-    PARAM float kP = 1.0f;
-    PARAM float kI = 0.0f;
+    PARAM float kP = 4.20f;
+    PARAM float kI = 0.69f;
     PARAM float kD = 0.0f;
     PARAM float TAU = 0.05f;
     PARAM float T = 0.005f;
     PARAM float LIM_MIN = 0.0f;
     PARAM float LIM_MAX = 1.0f;
-    PARAM float FOLLOW_DISTANCE = 0.25f;
+    PARAM float DEADBAND = 0.00f;
+    PARAM float FOLLOW_DISTANCE = 0.60f;
 
     /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng = 0.5f;
-    PARAM float kDist = 1.0f;
+    PARAM float kAng = 1.0f;
+    PARAM float kDist = 1.75f;
     PARAM float kSoft = 0.5f;
     PARAM float kDamp = 0.0f;
-    PARAM float DIST_ERROR_MAX = 0.5;  // m
-    PARAM float ANG_ERROR_MAX = 60.0f; // deg
+    PARAM float DIST_ERROR_MAX = 1.0f;  // m
+    PARAM float ANG_ERROR_MAX = 90.0f; // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED = 1.0f;         // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f; // m/s
-    PARAM float FAST_SPEED = 5.0f;              // m/s
+    PARAM float FAST_SPEED = 6.9f;              // m/s
     PARAM float FAST_SPEED_TURN = 0.5f;         // m/s
     PARAM float FAST_SPEED_OVERTAKE = 2.0f;     // m/s
     PARAM float MIN_SPEED = 1.0f;               // m/s

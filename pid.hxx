@@ -2,13 +2,15 @@
 #ifndef PID_HXX
 #define PID_HXX
 
+#include <cmath>
+
 class PID
 {
 public:
     PID() {}
     ~PID() {}
 
-    void init(float kp, float ki, float kd, float tau, float T, float minOutput, float maxOutput)
+    void init(float kp, float ki, float kd, float tau, float T, float minOutput, float maxOutput, float deadband)
     {
         kp_ = kp;
         ki_ = ki;
@@ -17,23 +19,38 @@ public:
         T_ = T;
         minOutput_ = minOutput;
         maxOutput_ = maxOutput;
-        prevError_ = 0;
-        integral_ = 0;
+        deadband_ = deadband;
+        prevError_ = 0.0f;
+        integral_ = 0.0f;
     }
 
     float update(float setpoint, float processVariable, float dt)
     {
-        if (dt == 0)
-            return 0;
+        if (dt == 0.0f)
+            return 0.0f;
 
         float error = setpoint - processVariable;
+
+
+
         integral_ += (error * dt);
+
+        if(std::isnan(integral_))
+        {
+        	integral_ = 0.0f;
+        }
 
         // Anti-windup: Limit the integral term
         if (integral_ > maxOutput_)
             integral_ = maxOutput_;
         else if (integral_ < minOutput_)
             integral_ = minOutput_;
+
+        // Deadband: If the error is within the deadband, set the output to zero
+        if(std::abs(error) < deadband_)
+        {
+        	integral_ = 0.0f; // Reset integral term within the deadband
+        }
 
         float derivative = (error - prevError_) / dt;
 
@@ -52,8 +69,8 @@ public:
 
     void reset()
     {
-        prevError_ = 0;
-        integral_ = 0;
+        prevError_ = 0.0f;
+        integral_ = 0.0f;
     }
 
     void set_gains(float kp, float ki, float kd)
@@ -71,6 +88,7 @@ private:
     float T_;
     float minOutput_;
     float maxOutput_;
+    float deadband_;
     float prevError_;
     float integral_;
 };
