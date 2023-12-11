@@ -228,7 +228,8 @@ namespace jlb
                 {
                         jlb_rx.odometry_1.position_x_phys = odometry.x_t;
                         jlb_rx.odometry_1.position_y_phys = odometry.y_t;
-                        jlb_rx.odometry_1.orientation_phys = odometry.theta_t;
+                        jlb_rx.odometry_1.orientation_phys = controller.kAng;
+                        //jlb_rx.odometry_1.orientation_phys = odometry.theta_t;
 
                         char data[odometry_1_DLC + 2] = {0};
                         uint8_t ide = odometry_1_IDE;
@@ -271,7 +272,7 @@ namespace jlb
 
                 void logic_2()
                 {
-                        jlb_rx.logic_2.state = static_cast<uint8_t>(as_state.mission);
+                        jlb_rx.logic_2.state = static_cast<uint8_t>(as_state.fast_state);
                         jlb_rx.logic_2.direction = static_cast<uint8_t>(controller.direction);
                         jlb_rx.logic_2.under_gate = as_state.under_gate;
                         jlb_rx.logic_2.at_cross_section = as_state.at_cross_section;

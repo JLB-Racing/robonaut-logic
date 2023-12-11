@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-#define SIMULATION
+//#define SIMULATION
 
 namespace jlb
 {
@@ -24,7 +24,7 @@ namespace jlb
     PARAM unsigned BITMAP_SIZE   = 64;   // px
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.05f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.25f;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -74,19 +74,28 @@ namespace jlb
     PARAM float DEADBAND        = 0.00f;
     PARAM float FOLLOW_DISTANCE = 0.60f;
 
-    /* STANLEY CONTROLLER PARAMETERS */
-    PARAM float kAng           = 1.0f;
-    PARAM float kDist          = 1.75f;
-    PARAM float kSoft          = 0.5f;
-    PARAM float kDamp          = 0.0f;
+    /* STANLEY CONTROLLER PARAMETERS - FAST_SPEED */
+    PARAM float kANG_FS  = 0.15f;
+    PARAM float kDIST_FS = 1.0f;
+    PARAM float kSOFT_FS = 0.35f;
+    PARAM float kDAMP_FS = 0.0025f;
+
+    /* STANLEY CONTROLLER PARAMETERS - FAST_SPEED_TURN */
+    PARAM float kANG_FST  = 1.5f;
+    PARAM float kDIST_FST = 1.0f;
+    PARAM float kSOFT_FST = 0.15f;
+    PARAM float kDAMP_FST = 0.0f;
+
+    PARAM float PARAM_TRANSITION_TIME_ACCEL = 0.1f; //s
+    PARAM float PARAM_TRANSITION_TIME_DECEL = 0.5f; //s
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
-    PARAM float FAST_SPEED              = 6.9f;   // m/s
-    PARAM float FAST_SPEED_TURN         = 4.20f;  // m/s
+    PARAM float FAST_SPEED              = 8.0f;   // m/s
+    PARAM float FAST_SPEED_TURN         = 5.0f;  // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 5.0f;   // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 3.0f;   // m/s
     PARAM float MIN_SPEED               = 1.0f;   // m/s

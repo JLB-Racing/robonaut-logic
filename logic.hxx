@@ -39,6 +39,7 @@ namespace jlb
         void set_at_cross_section(const bool at_cross_section_) { as_state.at_cross_section = at_cross_section_; }
         void imu_callback(const float yaw_rate_) { odometry.imu_callback(yaw_rate_); }
         void rpm_callback(const float motor_rpm_) { odometry.rpm_callback(motor_rpm_); }
+        void set_object_range(const float object_range_) { controller.set_object_range(object_range_); }
         void set_states(const CompositeState state_) { as_state.set_states(state_); }
         void send_telemetry() { signal_sender.send_telemetry(); }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
