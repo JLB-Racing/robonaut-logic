@@ -30,7 +30,6 @@ namespace jlb
         float target_speed      = 0.0f;
         float cross_track_error = 0.0f;
         float heading_error     = 0.0f;
-        float kAng              = kANG_FS;
 
         float              object_range = 100.0f;
         bool               detection_front[SENSOR_COUNT];
@@ -41,50 +40,9 @@ namespace jlb
         Direction direction      = Direction::STRAIGHT;
         Direction prev_direction = Direction::STRAIGHT;
 
-        Controller(Direction direction_ = Direction::STRAIGHT) : direction{direction_}, object_pid{kP, kI, kD, TAU, T, LIM_MIN, LIM_MAX, DEADBAND, DERIVATIVE_FILTER_ALPHA} {}
+        Controller(Direction direction_ = Direction::STRAIGHT) : direction{direction_} {}
 
         ~Controller() {}
-
-        float stanley(const float cross_track_error, const float heading_error, const float dt)
-        {
-            if (reference_speed == FAST_SPEED && (kANG_FS + 0.05 < kAng || kAng < kANG_FS - 0.05) && !started_param_transition_accel && !started_param_transition_decel)
-            {
-                kAng_modifier                  = (kANG_FS - kAng) / (PARAM_TRANSITION_TIME_ACCEL / dt);
-                kDist_modifier                 = (kDIST_FS - kDist) / (PARAM_TRANSITION_TIME_ACCEL / dt);
-                kSoft_modifier                 = (kSOFT_FS - kSoft) / (PARAM_TRANSITION_TIME_ACCEL / dt);
-                kDamp_modifier                 = (kDAMP_FS - kDamp) / (PARAM_TRANSITION_TIME_ACCEL / dt);
-                started_param_transition_accel = true;
-            }
-            else if (reference_speed == FAST_SPEED_TURN && (kANG_FST + 0.05 < kAng || kAng < kANG_FST - 0.05) && !started_param_transition_accel && !started_param_transition_decel)
-            {
-                kAng_modifier                  = (kANG_FST - kAng) / (PARAM_TRANSITION_TIME_DECEL / dt);
-                kDist_modifier                 = (kDIST_FST - kDist) / (PARAM_TRANSITION_TIME_DECEL / dt);
-                kSoft_modifier                 = (kSOFT_FST - kSoft) / (PARAM_TRANSITION_TIME_DECEL / dt);
-                kDamp_modifier                 = (kDAMP_FST - kDamp) / (PARAM_TRANSITION_TIME_DECEL / dt);
-                started_param_transition_decel = true;
-            }
-            else if (started_param_transition_accel && transition_cycle_count == static_cast<int>(PARAM_TRANSITION_TIME_ACCEL / dt))
-            {
-                started_param_transition_accel = false;
-                transition_cycle_count         = 0;
-            }
-            else if (started_param_transition_decel && transition_cycle_count == static_cast<int>(PARAM_TRANSITION_TIME_DECEL / dt))
-            {
-                started_param_transition_decel = false;
-                transition_cycle_count         = 0;
-            }
-
-            if (started_param_transition_accel || started_param_transition_decel)
-            {
-                kAng += kAng_modifier;
-                kDist += kDist_modifier;
-                kSoft += kSoft_modifier;
-                kDamp += kDamp_modifier;
-                transition_cycle_count++;
-            }
-
-            return kAng * heading_error + std::atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity);
-        }
 
         float select_control_point(std::vector<float> line_positions, float prev_line_position)
         {
@@ -184,7 +142,7 @@ namespace jlb
             cross_track_error = line_position_front;
             heading_error     = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
-            target_angle = stanley(cross_track_error, heading_error, dt);
+            target_angle = -lateral_pid.update(0, cross_track_error, dt);
 
             if (target_angle > deg2rad(MAX_WHEEL_ANGLE)) target_angle = deg2rad(MAX_WHEEL_ANGLE);
             if (target_angle < -deg2rad(MAX_WHEEL_ANGLE)) target_angle = -deg2rad(MAX_WHEEL_ANGLE);
@@ -203,7 +161,7 @@ namespace jlb
 
             if (target_speed < MIN_SPEED) target_speed = MIN_SPEED;
 
-            float object_rate = object_pid.update(FOLLOW_DISTANCE, object_range, dt);
+            float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
             target_speed *= std::pow((1 - object_rate), 2);
         }
 
@@ -249,21 +207,11 @@ namespace jlb
         void set_reference_speed(const float reference_speed_) { reference_speed = reference_speed_; }
 
     private:
-        bool started_param_transition_accel = false;
-        bool started_param_transition_decel = false;
-        int  transition_cycle_count         = 0;
-        // float kAng = kANG_FS;
-        float kDist          = kDIST_FS;
-        float kSoft          = kSOFT_FS;
-        float kDamp          = kDAMP_FS;
-        float kAng_modifier  = 0.0f;
-        float kDist_modifier = 0.0f;
-        float kSoft_modifier = 0.0f;
-        float kDamp_modifier = 0.0f;
-
         float reference_speed  = 0.0f;
         float current_velocity = 0.0f;
-        PID   object_pid;
+
+        PID object_pid{obj::kP, obj::kI, obj::kD, obj::TAU, obj::T, obj::LIM_MIN, obj::LIM_MAX, obj::DEADBAND, obj::DERIVATIVE_FILTER_ALPHA};
+        PID lateral_pid{lat::kP, lat::kI, lat::kD, lat::TAU, lat::T, lat::LIM_MIN, lat::LIM_MAX, lat::DEADBAND, lat::DERIVATIVE_FILTER_ALPHA};
 
 #ifndef SIMULATION
         // TODO: add timestamp
