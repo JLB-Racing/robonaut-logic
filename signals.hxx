@@ -9,6 +9,7 @@
 #include "controller.hxx"
 #include "graph.hxx"
 #include "jlb-binutil.h"
+#include "measurements.hxx"
 #include "odometry.hxx"
 #include "udp.hxx"
 
@@ -22,23 +23,24 @@ namespace jlb
     class SignalSender
     {
     public:
-        jlb_rx_t          jlb_rx;
-        const Odometry   &odometry;
-        const Controller &controller;
-        const ASState    &as_state;
-        const Graph      &graph;
+        jlb_rx_t            jlb_rx;
+        const Odometry     &odometry;
+        const Controller   &controller;
+        const ASState      &as_state;
+        const Graph        &graph;
+        const Measurements &measurements;
 
         std::vector<char> telemetry_data;
 
 #ifndef SIMULATION
         // TODO: initialize UDPClient for STM32
-        SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_)
-            : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_)
+        SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_, const Measurements &measurements_)
+            : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), measurements(measurements_)
         {
         }
 #else
-        SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_)
-            : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), client(SENDER_ADDRESS, SENDER_PORT)
+        SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_, const Measurements &measurements_)
+            : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), measurements(measurements_) , client(SENDER_ADDRESS, SENDER_PORT)
         {
         }
 #endif
@@ -58,6 +60,7 @@ namespace jlb
             odometry_2();
             logic_1();
             logic_2();
+            logic3();
 
             send(telemetry_data.data(), telemetry_data.size());
         }
@@ -211,8 +214,10 @@ namespace jlb
 
         void measurements_5()
         {
-            jlb_rx.measurements_5.motor_rpm_phys    = odometry.meas_motor_rpm;
-            jlb_rx.measurements_5.object_range_phys = controller.object_range;
+            jlb_rx.measurements_5.duty_cycle_phys    = measurements.duty_cycle;
+            jlb_rx.measurements_5.motor_current_phys = measurements.motor_current;
+            jlb_rx.measurements_5.object_range_phys  = measurements.object_range;
+            jlb_rx.measurements_5.wheel_rpm_phys     = measurements.wheel_rpm;
 
             char    data[measurements_4_DLC + 2] = {0};
             uint8_t ide                          = measurements_5_IDE;
@@ -270,12 +275,13 @@ namespace jlb
 
         void logic_2()
         {
-            jlb_rx.logic_2.state            = static_cast<uint8_t>(as_state.fast_state);
-            jlb_rx.logic_2.direction        = static_cast<uint8_t>(controller.direction);
-            jlb_rx.logic_2.under_gate       = as_state.under_gate;
-            jlb_rx.logic_2.at_cross_section = as_state.at_cross_section;
-            jlb_rx.logic_2.previous_node    = as_state.previous_node;
-            jlb_rx.logic_2.next_node        = as_state.next_node;
+            jlb_rx.logic_2.distance_traveled_phys = odometry.distance_traveled_since_checkpoint;
+            jlb_rx.logic_2.labyrinth_state        = static_cast<uint8_t>(as_state.labyrinth_state);
+            jlb_rx.logic_2.fast_state             = static_cast<uint8_t>(as_state.fast_state);
+            jlb_rx.logic_2.next_node              = as_state.next_node;
+            jlb_rx.logic_2.previous_node          = as_state.previous_node;
+            jlb_rx.logic_2.direction              = static_cast<uint8_t>(controller.direction);
+            jlb_rx.logic_2.mission                = static_cast<uint8_t>(as_state.mission);
 
             char    data[logic_2_DLC + 2] = {0};
             uint8_t ide                   = logic_2_IDE;
@@ -284,6 +290,24 @@ namespace jlb
             data[1]                       = logic_2_DLC;
             Pack_logic_2_jlb(&jlb_rx.logic_2, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             telemetry_data.insert(telemetry_data.end(), data, data + logic_2_DLC + 2);
+        }
+
+        void logic3()
+        {
+            jlb_rx.logic_3.ang_error_norm_phys      = controller.ang_error_norm;
+            jlb_rx.logic_3.dist_error_norm_phys     = controller.dist_error_norm;
+            jlb_rx.logic_3.line_position_rear_phys  = controller.line_position_rear;
+            jlb_rx.logic_3.line_position_front_phys = controller.line_position_front;
+            jlb_rx.logic_3.at_cross_section         = as_state.at_cross_section;
+            jlb_rx.logic_3.under_gate               = as_state.under_gate;
+
+            char    data[logic_3_DLC + 2] = {0};
+            uint8_t ide                   = logic_3_IDE;
+            uint8_t dlc                   = logic_3_DLC;
+            data[0]                       = logic_3_CANID;
+            data[1]                       = logic_3_DLC;
+            Pack_logic_3_jlb(&jlb_rx.logic_3, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
+            telemetry_data.insert(telemetry_data.end(), data, data + logic_3_DLC + 2);
         }
     };
 

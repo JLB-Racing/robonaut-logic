@@ -30,6 +30,8 @@ namespace jlb
         float target_speed      = 0.0f;
         float cross_track_error = 0.0f;
         float heading_error     = 0.0f;
+        float dist_error_norm   = 0.0f;
+        float ang_error_norm    = 0.0f;
 
         float              object_range = 100.0f;
         bool               detection_front[SENSOR_COUNT];
@@ -153,8 +155,8 @@ namespace jlb
             float dist_error = std::min(std::abs(cross_track_error), DIST_ERROR_MAX);
             float ang_error  = std::min(std::abs(heading_error), deg2rad(ANG_ERROR_MAX));
 
-            float dist_error_norm = dist_error / DIST_ERROR_MAX;
-            float ang_error_norm  = ang_error / deg2rad(ANG_ERROR_MAX);
+            dist_error_norm = dist_error / DIST_ERROR_MAX;
+            ang_error_norm  = ang_error / deg2rad(ANG_ERROR_MAX);
 
             float x      = std::max(dist_error_norm, ang_error_norm);
             target_speed = std::min(reference_speed, reference_speed * (1.0f - (0.1666667f * x) - (0.8333333f * x * x)));

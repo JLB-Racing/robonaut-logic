@@ -7,6 +7,7 @@
 #include "common.hxx"
 #include "controller.hxx"
 #include "graph.hxx"
+#include "measurements.hxx"
 #include "odometry.hxx"
 #include "signals.hxx"
 
@@ -42,14 +43,16 @@ namespace jlb
         void set_object_range(const float object_range_) { controller.set_object_range(object_range_); }
         void set_states(const CompositeState state_) { as_state.set_states(state_); }
         void send_telemetry() { signal_sender.send_telemetry(); }
+        void set_measurements(const Measurements &measurements_) { measurements = measurements_; }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
 
     private:
         Odometry     odometry;
         Controller   controller;
         Graph        graph;
+        Measurements measurements;
         ASState      as_state      = ASState(odometry, controller, graph);
-        SignalSender signal_sender = SignalSender(odometry, controller, as_state, graph);
+        SignalSender signal_sender = SignalSender(odometry, controller, as_state, graph, measurements);
     };
 
 }  // namespace jlb
