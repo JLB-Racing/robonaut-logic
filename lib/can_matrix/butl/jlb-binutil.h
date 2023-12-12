@@ -19,6 +19,7 @@ typedef struct
   odometry_2_t odometry_2;
   logic_1_t logic_1;
   logic_2_t logic_2;
+  logic_3_t logic_3;
 } jlb_rx_t;
 
 // There is no any TX mapped massage.

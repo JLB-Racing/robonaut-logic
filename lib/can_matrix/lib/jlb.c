@@ -387,14 +387,24 @@ uint32_t Pack_measurements_4_jlb(measurements_4_t* _m, uint8_t* _d, uint8_t* _le
 uint32_t Unpack_measurements_5_jlb(measurements_5_t* _m, const uint8_t* _d, uint8_t dlc_)
 {
   (void)dlc_;
-  _m->motor_rpm_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
+  _m->wheel_rpm_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
 #ifdef JLB_USE_SIGFLOAT
-  _m->motor_rpm_phys = (sigfloat_t)(JLB_motor_rpm_ro_fromS(_m->motor_rpm_ro));
+  _m->wheel_rpm_phys = (sigfloat_t)(JLB_wheel_rpm_ro_fromS(_m->wheel_rpm_ro));
 #endif // JLB_USE_SIGFLOAT
 
   _m->object_range_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
 #ifdef JLB_USE_SIGFLOAT
   _m->object_range_phys = (sigfloat_t)(JLB_object_range_ro_fromS(_m->object_range_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->motor_current_ro = (uint16_t) ( ((_d[5] & (0xFFU)) << 8U) | (_d[4] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->motor_current_phys = (sigfloat_t)(JLB_motor_current_ro_fromS(_m->motor_current_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->duty_cycle_ro = (uint16_t) ( ((_d[7] & (0xFFU)) << 8U) | (_d[6] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->duty_cycle_phys = (sigfloat_t)(JLB_duty_cycle_ro_fromS(_m->duty_cycle_ro));
 #endif // JLB_USE_SIGFLOAT
 
 #ifdef JLB_USE_DIAG_MONITORS
@@ -415,14 +425,20 @@ uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, __CoderDbcCanFrame_t__* c
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_5_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
 
 #ifdef JLB_USE_SIGFLOAT
-  _m->motor_rpm_ro = (uint16_t) JLB_motor_rpm_ro_toS(_m->motor_rpm_phys);
+  _m->wheel_rpm_ro = (uint16_t) JLB_wheel_rpm_ro_toS(_m->wheel_rpm_phys);
   _m->object_range_ro = (uint16_t) JLB_object_range_ro_toS(_m->object_range_phys);
+  _m->motor_current_ro = (uint16_t) JLB_motor_current_ro_toS(_m->motor_current_phys);
+  _m->duty_cycle_ro = (uint16_t) JLB_duty_cycle_ro_toS(_m->duty_cycle_phys);
 #endif // JLB_USE_SIGFLOAT
 
-  cframe->Data[0] |= (uint8_t) ( (_m->motor_rpm_ro & (0xFFU)) );
-  cframe->Data[1] |= (uint8_t) ( ((_m->motor_rpm_ro >> 8U) & (0xFFU)) );
+  cframe->Data[0] |= (uint8_t) ( (_m->wheel_rpm_ro & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( ((_m->wheel_rpm_ro >> 8U) & (0xFFU)) );
   cframe->Data[2] |= (uint8_t) ( (_m->object_range_ro & (0xFFU)) );
   cframe->Data[3] |= (uint8_t) ( ((_m->object_range_ro >> 8U) & (0xFFU)) );
+  cframe->Data[4] |= (uint8_t) ( (_m->motor_current_ro & (0xFFU)) );
+  cframe->Data[5] |= (uint8_t) ( ((_m->motor_current_ro >> 8U) & (0xFFU)) );
+  cframe->Data[6] |= (uint8_t) ( (_m->duty_cycle_ro & (0xFFU)) );
+  cframe->Data[7] |= (uint8_t) ( ((_m->duty_cycle_ro >> 8U) & (0xFFU)) );
 
   cframe->MsgId = (uint32_t) measurements_5_CANID;
   cframe->DLC = (uint8_t) measurements_5_DLC;
@@ -437,14 +453,20 @@ uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, uint8_t* _d, uint8_t* _le
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_5_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
 
 #ifdef JLB_USE_SIGFLOAT
-  _m->motor_rpm_ro = (uint16_t) JLB_motor_rpm_ro_toS(_m->motor_rpm_phys);
+  _m->wheel_rpm_ro = (uint16_t) JLB_wheel_rpm_ro_toS(_m->wheel_rpm_phys);
   _m->object_range_ro = (uint16_t) JLB_object_range_ro_toS(_m->object_range_phys);
+  _m->motor_current_ro = (uint16_t) JLB_motor_current_ro_toS(_m->motor_current_phys);
+  _m->duty_cycle_ro = (uint16_t) JLB_duty_cycle_ro_toS(_m->duty_cycle_phys);
 #endif // JLB_USE_SIGFLOAT
 
-  _d[0] |= (uint8_t) ( (_m->motor_rpm_ro & (0xFFU)) );
-  _d[1] |= (uint8_t) ( ((_m->motor_rpm_ro >> 8U) & (0xFFU)) );
+  _d[0] |= (uint8_t) ( (_m->wheel_rpm_ro & (0xFFU)) );
+  _d[1] |= (uint8_t) ( ((_m->wheel_rpm_ro >> 8U) & (0xFFU)) );
   _d[2] |= (uint8_t) ( (_m->object_range_ro & (0xFFU)) );
   _d[3] |= (uint8_t) ( ((_m->object_range_ro >> 8U) & (0xFFU)) );
+  _d[4] |= (uint8_t) ( (_m->motor_current_ro & (0xFFU)) );
+  _d[5] |= (uint8_t) ( ((_m->motor_current_ro >> 8U) & (0xFFU)) );
+  _d[6] |= (uint8_t) ( (_m->duty_cycle_ro & (0xFFU)) );
+  _d[7] |= (uint8_t) ( ((_m->duty_cycle_ro >> 8U) & (0xFFU)) );
 
   *_len = (uint8_t) measurements_5_DLC;
   *_ide = (uint8_t) measurements_5_IDE;
@@ -696,12 +718,16 @@ uint32_t Pack_logic_1_jlb(logic_1_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _i
 uint32_t Unpack_logic_2_jlb(logic_2_t* _m, const uint8_t* _d, uint8_t dlc_)
 {
   (void)dlc_;
-  _m->state = (uint8_t) ( (_d[0] & (0xFFU)) );
-  _m->direction = (uint8_t) ( (_d[1] & (0xFFU)) );
-  _m->previous_node = (uint8_t) ( (_d[2] & (0xFFU)) );
-  _m->next_node = (uint8_t) ( (_d[3] & (0xFFU)) );
-  _m->at_cross_section = (uint8_t) ( (_d[4] & (0x01U)) );
-  _m->under_gate = (uint8_t) ( ((_d[4] >> 1U) & (0x01U)) );
+  _m->direction = (uint8_t) ( (_d[0] & (0xFFU)) );
+  _m->mission = (uint8_t) ( (_d[1] & (0xFFU)) );
+  _m->fast_state = (uint8_t) ( (_d[2] & (0xFFU)) );
+  _m->labyrinth_state = (uint8_t) ( (_d[3] & (0xFFU)) );
+  _m->next_node = (uint8_t) ( (_d[4] & (0xFFU)) );
+  _m->previous_node = (uint8_t) ( (_d[5] & (0xFFU)) );
+  _m->distance_traveled_ro = (uint16_t) ( ((_d[7] & (0xFFU)) << 8U) | (_d[6] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->distance_traveled_phys = (sigfloat_t)(JLB_distance_traveled_ro_fromS(_m->distance_traveled_ro));
+#endif // JLB_USE_SIGFLOAT
 
 #ifdef JLB_USE_DIAG_MONITORS
   _m->mon1.dlc_error = (dlc_ < logic_2_DLC);
@@ -720,11 +746,18 @@ uint32_t Pack_logic_2_jlb(logic_2_t* _m, __CoderDbcCanFrame_t__* cframe)
 {
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_2_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
 
-  cframe->Data[0] |= (uint8_t) ( (_m->state & (0xFFU)) );
-  cframe->Data[1] |= (uint8_t) ( (_m->direction & (0xFFU)) );
-  cframe->Data[2] |= (uint8_t) ( (_m->previous_node & (0xFFU)) );
-  cframe->Data[3] |= (uint8_t) ( (_m->next_node & (0xFFU)) );
-  cframe->Data[4] |= (uint8_t) ( (_m->at_cross_section & (0x01U)) | ((_m->under_gate & (0x01U)) << 1U) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->distance_traveled_ro = (uint16_t) JLB_distance_traveled_ro_toS(_m->distance_traveled_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  cframe->Data[0] |= (uint8_t) ( (_m->direction & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( (_m->mission & (0xFFU)) );
+  cframe->Data[2] |= (uint8_t) ( (_m->fast_state & (0xFFU)) );
+  cframe->Data[3] |= (uint8_t) ( (_m->labyrinth_state & (0xFFU)) );
+  cframe->Data[4] |= (uint8_t) ( (_m->next_node & (0xFFU)) );
+  cframe->Data[5] |= (uint8_t) ( (_m->previous_node & (0xFFU)) );
+  cframe->Data[6] |= (uint8_t) ( (_m->distance_traveled_ro & (0xFFU)) );
+  cframe->Data[7] |= (uint8_t) ( ((_m->distance_traveled_ro >> 8U) & (0xFFU)) );
 
   cframe->MsgId = (uint32_t) logic_2_CANID;
   cframe->DLC = (uint8_t) logic_2_DLC;
@@ -738,15 +771,114 @@ uint32_t Pack_logic_2_jlb(logic_2_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _i
 {
   uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_2_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
 
-  _d[0] |= (uint8_t) ( (_m->state & (0xFFU)) );
-  _d[1] |= (uint8_t) ( (_m->direction & (0xFFU)) );
-  _d[2] |= (uint8_t) ( (_m->previous_node & (0xFFU)) );
-  _d[3] |= (uint8_t) ( (_m->next_node & (0xFFU)) );
-  _d[4] |= (uint8_t) ( (_m->at_cross_section & (0x01U)) | ((_m->under_gate & (0x01U)) << 1U) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->distance_traveled_ro = (uint16_t) JLB_distance_traveled_ro_toS(_m->distance_traveled_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  _d[0] |= (uint8_t) ( (_m->direction & (0xFFU)) );
+  _d[1] |= (uint8_t) ( (_m->mission & (0xFFU)) );
+  _d[2] |= (uint8_t) ( (_m->fast_state & (0xFFU)) );
+  _d[3] |= (uint8_t) ( (_m->labyrinth_state & (0xFFU)) );
+  _d[4] |= (uint8_t) ( (_m->next_node & (0xFFU)) );
+  _d[5] |= (uint8_t) ( (_m->previous_node & (0xFFU)) );
+  _d[6] |= (uint8_t) ( (_m->distance_traveled_ro & (0xFFU)) );
+  _d[7] |= (uint8_t) ( ((_m->distance_traveled_ro >> 8U) & (0xFFU)) );
 
   *_len = (uint8_t) logic_2_DLC;
   *_ide = (uint8_t) logic_2_IDE;
   return logic_2_CANID;
+}
+
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_logic_3_jlb(logic_3_t* _m, const uint8_t* _d, uint8_t dlc_)
+{
+  (void)dlc_;
+  _m->ang_error_norm_ro = (uint8_t) ( (_d[0] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->ang_error_norm_phys = (sigfloat_t)(JLB_ang_error_norm_ro_fromS(_m->ang_error_norm_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->dist_error_norm_ro = (uint8_t) ( (_d[1] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->dist_error_norm_phys = (sigfloat_t)(JLB_dist_error_norm_ro_fromS(_m->dist_error_norm_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->line_position_front_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->line_position_front_phys = (sigfloat_t)(JLB_line_position_front_ro_fromS(_m->line_position_front_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->line_position_rear_ro = (uint16_t) ( ((_d[5] & (0xFFU)) << 8U) | (_d[4] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->line_position_rear_phys = (sigfloat_t)(JLB_line_position_rear_ro_fromS(_m->line_position_rear_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->at_cross_section = (uint8_t) ( (_d[6] & (0x01U)) );
+  _m->under_gate = (uint8_t) ( ((_d[6] >> 1U) & (0x01U)) );
+
+#ifdef JLB_USE_DIAG_MONITORS
+  _m->mon1.dlc_error = (dlc_ < logic_3_DLC);
+  _m->mon1.last_cycle = GetSystemTick();
+  _m->mon1.frame_cnt++;
+
+  FMon_logic_3_jlb(&_m->mon1, logic_3_CANID);
+#endif // JLB_USE_DIAG_MONITORS
+
+  return logic_3_CANID;
+}
+
+#ifdef JLB_USE_CANSTRUCT
+
+uint32_t Pack_logic_3_jlb(logic_3_t* _m, __CoderDbcCanFrame_t__* cframe)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_3_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
+  _m->ang_error_norm_ro = (uint8_t) JLB_ang_error_norm_ro_toS(_m->ang_error_norm_phys);
+  _m->dist_error_norm_ro = (uint8_t) JLB_dist_error_norm_ro_toS(_m->dist_error_norm_phys);
+  _m->line_position_front_ro = (uint16_t) JLB_line_position_front_ro_toS(_m->line_position_front_phys);
+  _m->line_position_rear_ro = (uint16_t) JLB_line_position_rear_ro_toS(_m->line_position_rear_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  cframe->Data[0] |= (uint8_t) ( (_m->ang_error_norm_ro & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( (_m->dist_error_norm_ro & (0xFFU)) );
+  cframe->Data[2] |= (uint8_t) ( (_m->line_position_front_ro & (0xFFU)) );
+  cframe->Data[3] |= (uint8_t) ( ((_m->line_position_front_ro >> 8U) & (0xFFU)) );
+  cframe->Data[4] |= (uint8_t) ( (_m->line_position_rear_ro & (0xFFU)) );
+  cframe->Data[5] |= (uint8_t) ( ((_m->line_position_rear_ro >> 8U) & (0xFFU)) );
+  cframe->Data[6] |= (uint8_t) ( (_m->at_cross_section & (0x01U)) | ((_m->under_gate & (0x01U)) << 1U) );
+
+  cframe->MsgId = (uint32_t) logic_3_CANID;
+  cframe->DLC = (uint8_t) logic_3_DLC;
+  cframe->IDE = (uint8_t) logic_3_IDE;
+  return logic_3_CANID;
+}
+
+#else
+
+uint32_t Pack_logic_3_jlb(logic_3_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_3_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
+  _m->ang_error_norm_ro = (uint8_t) JLB_ang_error_norm_ro_toS(_m->ang_error_norm_phys);
+  _m->dist_error_norm_ro = (uint8_t) JLB_dist_error_norm_ro_toS(_m->dist_error_norm_phys);
+  _m->line_position_front_ro = (uint16_t) JLB_line_position_front_ro_toS(_m->line_position_front_phys);
+  _m->line_position_rear_ro = (uint16_t) JLB_line_position_rear_ro_toS(_m->line_position_rear_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  _d[0] |= (uint8_t) ( (_m->ang_error_norm_ro & (0xFFU)) );
+  _d[1] |= (uint8_t) ( (_m->dist_error_norm_ro & (0xFFU)) );
+  _d[2] |= (uint8_t) ( (_m->line_position_front_ro & (0xFFU)) );
+  _d[3] |= (uint8_t) ( ((_m->line_position_front_ro >> 8U) & (0xFFU)) );
+  _d[4] |= (uint8_t) ( (_m->line_position_rear_ro & (0xFFU)) );
+  _d[5] |= (uint8_t) ( ((_m->line_position_rear_ro >> 8U) & (0xFFU)) );
+  _d[6] |= (uint8_t) ( (_m->at_cross_section & (0x01U)) | ((_m->under_gate & (0x01U)) << 1U) );
+
+  *_len = (uint8_t) logic_3_DLC;
+  *_ide = (uint8_t) logic_3_IDE;
+  return logic_3_CANID;
 }
 
 #endif // JLB_USE_CANSTRUCT
