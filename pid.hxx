@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 class PID
 {
@@ -28,6 +29,13 @@ public:
         prevError_             = 0.0f;
         integral_              = 0.0f;
         derivative_            = 0.0f;
+    }
+
+    void update_params(float kp, float ki, float kd)
+    {
+    	kp_                    = kp;
+		ki_                    = ki;
+		kd_                    = kd;
     }
 
     float update(float setpoint, float processVariable, float dt)

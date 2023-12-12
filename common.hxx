@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-#define SIMULATION
+//#define SIMULATION
 
 namespace jlb
 {
@@ -47,13 +47,6 @@ namespace jlb
     PARAM float MAX_VELOCITY = 12.5f;        // m/s
     PARAM float MAX_YAW_RATE = 1.5f * M_PI;  // rad/s
 
-    /* GEAR RATIOS */
-    PARAM int   MAX_MOTOR_RPM             = 10000;
-    PARAM int   SPUR_GEAR_TOOTH_COUNT     = 48;
-    PARAM int   PINION_GEAR_TOOTH_COUNT   = 13;
-    PARAM float INTERNAL_GEAR_RATIO       = 1.0f;
-    PARAM float GEAR_RATIO_MOTOR_TO_WHEEL = static_cast<float>(SPUR_GEAR_TOOTH_COUNT) / static_cast<float>(PINION_GEAR_TOOTH_COUNT) * INTERNAL_GEAR_RATIO;
-
     /* ALGORITHM PARAMETERS */
     PARAM int VELOCITY_BUFFER_SIZE = 1;
     PARAM int IMU_BUFFER_SIZE      = 10;
@@ -81,15 +74,15 @@ namespace jlb
     /* LATERAL PID CONTROLLER PARAMETERS */
     namespace lat
     {
-        PARAM float kP                      = 25.0f;
-        PARAM float kI                      = 5.0f;
-        PARAM float kD                      = 1.0f;
+        PARAM float kP                      = 6.9f;
+        PARAM float kI                      = 4.20f;
+        PARAM float kD                      = 0.0f;
         PARAM float TAU                     = 0.05f;
         PARAM float T                       = 0.005f;
         PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
         PARAM float LIM_MAX                 = MAX_WHEEL_ANGLE;
-        PARAM float DEADBAND                = 0.05f;
-        PARAM float DERIVATIVE_FILTER_ALPHA = 0.1f;
+        PARAM float DEADBAND                = 0.5f;
+        PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
     }  // namespace lat
 
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
@@ -98,11 +91,11 @@ namespace jlb
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.0f;  // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 8.0f;  // m/s
-    PARAM float FAST_SPEED_TURN         = 5.0f;  // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 5.0f;  // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 3.0f;  // m/s
-    PARAM float MIN_SPEED               = 1.0f;  // m/s
+    PARAM float FAST_SPEED              = 2.0f;  // m/s
+    PARAM float FAST_SPEED_TURN         = 2.0f;  // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
+    PARAM float MIN_SPEED               = 0.25f;  // m/s
 
     ///////////////////////////////////////////////////////////////////////////
     //

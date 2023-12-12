@@ -144,6 +144,7 @@ namespace jlb
             cross_track_error = line_position_front;
             heading_error     = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
+            //lateral_pid.update_params(lat::kP/current_velocity, lat::kI/current_velocity, lat::kD/current_velocity);
             target_angle = -lateral_pid.update(0, cross_track_error, dt);
 
             if (target_angle > deg2rad(MAX_WHEEL_ANGLE)) target_angle = deg2rad(MAX_WHEEL_ANGLE);
@@ -152,6 +153,7 @@ namespace jlb
 
         void longitudinal_control([[maybe_unused]] const float dt)
         {
+        	/*
             float dist_error = std::min(std::abs(cross_track_error), DIST_ERROR_MAX);
             float ang_error  = std::min(std::abs(heading_error), deg2rad(ANG_ERROR_MAX));
 
@@ -160,6 +162,8 @@ namespace jlb
 
             float x      = std::max(dist_error_norm, ang_error_norm);
             target_speed = std::min(reference_speed, reference_speed * (1.0f - (0.1666667f * x) - (0.8333333f * x * x)));
+			*/
+            target_speed = reference_speed;
 
             if (target_speed < MIN_SPEED) target_speed = MIN_SPEED;
 

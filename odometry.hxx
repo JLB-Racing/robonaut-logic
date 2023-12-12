@@ -28,7 +28,7 @@ namespace jlb
         float theta_t                            = 0.0f;  // orientation
         float distance_traveled_since_checkpoint = 0.0f;
 
-        float meas_motor_rpm = 0.0f;
+        float meas_wheel_rpm = 0.0f;
         float meas_ang_vel_x = 0.0f;
         float meas_ang_vel_y = 0.0f;
         float meas_ang_vel_z = 0.0f;
@@ -40,11 +40,9 @@ namespace jlb
 
         ~Odometry() {}
 
-        void rpm_callback(const float motor_rpm)
+        void rpm_callback(const float wheel_rpm)
         {
-            meas_motor_rpm = motor_rpm;
-
-            float wheel_rpm = motor_rpm * jlb::GEAR_RATIO_MOTOR_TO_WHEEL;
+            float meas_wheel_rpm = wheel_rpm;
             float velocity  = M_PI * jlb::WHEEL_DIAMETER * wheel_rpm / 60.0f;
 
             if (std::fabs(velocity) > jlb::MAX_VELOCITY) { return; }
