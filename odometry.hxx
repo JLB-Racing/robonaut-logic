@@ -42,8 +42,8 @@ namespace jlb
 
         void rpm_callback(const float wheel_rpm)
         {
-            float meas_wheel_rpm = wheel_rpm;
-            float velocity  = M_PI * jlb::WHEEL_DIAMETER * wheel_rpm / 60.0f;
+            meas_wheel_rpm = wheel_rpm;
+            float velocity = M_PI * jlb::WHEEL_DIAMETER * wheel_rpm / 60.0f;
 
             if (std::fabs(velocity) > jlb::MAX_VELOCITY) { return; }
 

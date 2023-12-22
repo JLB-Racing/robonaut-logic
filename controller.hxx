@@ -2,6 +2,7 @@
 #define CONTROLLER_HXX
 
 #include <chrono>
+#include <complex>
 #include <vector>
 
 #include "common.hxx"
@@ -14,6 +15,12 @@ namespace jlb
     {
         float target_angle;
         float target_speed;
+    };
+
+    struct ControlParams
+    {
+        float kP;
+        float kDelta;
     };
 
     class Controller
@@ -123,6 +130,23 @@ namespace jlb
             }
         }
 
+        ControlParams get_control_params()
+        {
+            float               d5  = OFFSET + SLOPE * current_velocity;
+            float               t5  = d5 / current_velocity;
+            float               T   = t5 / 3.0f * DAMPING;
+            float               wp  = (1.0f / T) * sqrt(1.0f - DAMPING * DAMPING);
+            float               phi = acosf(DAMPING);
+            float               x   = wp / tan(phi);
+            std::complex<float> s1  = std::complex<float>(x, wp);
+            std::complex<float> s2  = std::complex<float>(x, -wp);
+
+            std::complex<float> kP     = -SENSOR_BASE / (current_velocity * current_velocity) * s1 * s2;
+            std::complex<float> kDelta = -SENSOR_BASE / current_velocity * ((s1 + s2) - current_velocity * kP);
+
+            return {kP.real(), kDelta.real()};
+        }
+
         void lateral_control([[maybe_unused]] const float dt)
         {
             if (std::all_of(std::begin(detection_front), std::end(detection_front), [](bool b) { return b; })) { return; }
@@ -144,8 +168,11 @@ namespace jlb
             cross_track_error = line_position_front;
             heading_error     = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
-            //lateral_pid.update_params(lat::kP/current_velocity, lat::kI/current_velocity, lat::kD/current_velocity);
-            target_angle = -lateral_pid.update(0, cross_track_error, dt);
+            // lateral_pid.update_params(lat::kP/current_velocity, lat::kI/current_velocity, lat::kD/current_velocity);
+            // target_angle = -lateral_pid.update(0, cross_track_error, dt);
+
+            auto [kP, kDelta] = get_control_params();
+            target_angle      = -kP * cross_track_error - kDelta * heading_error;
 
             if (target_angle > deg2rad(MAX_WHEEL_ANGLE)) target_angle = deg2rad(MAX_WHEEL_ANGLE);
             if (target_angle < -deg2rad(MAX_WHEEL_ANGLE)) target_angle = -deg2rad(MAX_WHEEL_ANGLE);
@@ -153,7 +180,7 @@ namespace jlb
 
         void longitudinal_control([[maybe_unused]] const float dt)
         {
-        	/*
+            /*
             float dist_error = std::min(std::abs(cross_track_error), DIST_ERROR_MAX);
             float ang_error  = std::min(std::abs(heading_error), deg2rad(ANG_ERROR_MAX));
 
@@ -162,8 +189,11 @@ namespace jlb
 
             float x      = std::max(dist_error_norm, ang_error_norm);
             target_speed = std::min(reference_speed, reference_speed * (1.0f - (0.1666667f * x) - (0.8333333f * x * x)));
-			*/
-            target_speed = reference_speed;
+            */
+
+            if (reference_speed > target_speed + MAX_ACCELERATION * dt) { target_speed += MAX_ACCELERATION * dt; }
+            else if (reference_speed < target_speed - MAX_DECELERATION * dt) { target_speed -= MAX_DECELERATION * dt; }
+            else { target_speed = reference_speed; }
 
             if (target_speed < MIN_SPEED) target_speed = MIN_SPEED;
 

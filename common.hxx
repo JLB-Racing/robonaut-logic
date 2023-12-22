@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-//#define SIMULATION
+#define SIMULATION
 
 namespace jlb
 {
@@ -89,12 +89,12 @@ namespace jlb
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.0f;  // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 2.0f;  // m/s
-    PARAM float FAST_SPEED_TURN         = 2.0f;  // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
+    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
+    PARAM float FAST_SPEED              = 2.0f;   // m/s
+    PARAM float FAST_SPEED_TURN         = 2.0f;   // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
     PARAM float MIN_SPEED               = 0.25f;  // m/s
 
     ///////////////////////////////////////////////////////////////////////////
@@ -178,6 +178,13 @@ namespace jlb
         PARAM float DEADBAND                = 0.05f;
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.1f;
     }  // namespace lat
+
+    PARAM float OFFSET  = 0.4f;
+    PARAM float SLOPE   = 0.5f;
+    PARAM float DAMPING = 0.9f;
+
+    PARAM float MAX_ACCELERATION = 1.0f;  // m/s^2
+    PARAM float MAX_DECELERATION = 1.0f;  // m/s^2
 
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
