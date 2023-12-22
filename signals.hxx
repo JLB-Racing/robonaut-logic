@@ -15,6 +15,7 @@
 
 #ifndef SIMULATION
 #include "main.h"
+#include "stm32l5xx_hal.h"
 extern UART_HandleTypeDef huart2;
 #endif
 
@@ -59,7 +60,11 @@ namespace jlb
                         odometry_2();
                         logic_1();
                         logic_2();
-
+                        uint32_t timestamp = HAL_GetTick();
+                        telemetry_data.push_back((timestamp >> 24u) & 0xFF);
+                        telemetry_data.push_back((timestamp >> 16u) & 0xFF);
+                        telemetry_data.push_back((timestamp >> 8u) & 0xFF);
+                        telemetry_data.push_back(timestamp & 0xFF);
                         send(telemetry_data.data(), telemetry_data.size());
                 }
 
