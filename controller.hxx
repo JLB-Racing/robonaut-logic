@@ -49,6 +49,9 @@ namespace jlb
         Direction direction      = Direction::STRAIGHT;
         Direction prev_direction = Direction::STRAIGHT;
 
+        uint32_t tick_counter = 0u;
+        uint32_t tick_counter_prev = 0u;
+
         Controller(Direction direction_ = Direction::STRAIGHT) : direction{direction_} {}
 
         ~Controller() {}
@@ -133,6 +136,7 @@ namespace jlb
         ControlParams get_control_params()
         {
             float               d5  = OFFSET + SLOPE * current_velocity;
+            if (d5 < D5_MIN) d5 = D5_MIN;
             float               t5  = d5 / current_velocity;
             float               T   = t5 / 3.0f * DAMPING;
             float               wp  = (1.0f / T) * sqrt(1.0f - DAMPING * DAMPING);
@@ -197,15 +201,17 @@ namespace jlb
 
             if (target_speed < MIN_SPEED) target_speed = MIN_SPEED;
 
-            float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
-            target_speed *= std::pow((1 - object_rate), 2);
+            //float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
+            //target_speed *= std::pow((1 - object_rate), 2);
         }
 
         ControlSignal update()
         {
 #ifndef SIMULATION
             // TODO: add timestamp
-            float dt = 0.005f;
+        	tick_counter_prev = tick_counter;
+        	tick_counter = HAL_GetTick();
+            float dt = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
 #else
             auto                   control_timestamp_ = std::chrono::steady_clock::now();
             [[maybe_unused]] float dt                 = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;

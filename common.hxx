@@ -14,6 +14,8 @@ namespace jlb
 {
 #ifndef SIMULATION
 
+	#include "stm32l5xx_hal.h"
+
     ///////////////////////////////////////////////////////////////////////////
     //
     //      LOGIC
@@ -25,7 +27,7 @@ namespace jlb
 
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
-    PARAM float STATE_MIN_TIME              = 0.25f;
+    PARAM float STATE_MIN_TIME              = 0.5f;
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -38,7 +40,7 @@ namespace jlb
     PARAM int   SENSOR_COUNT          = 32;                            // -
     PARAM float SENSOR_BASE           = 0.5f;                          // m
     PARAM float SENSOR_WIDTH          = 0.2f;                          // m
-    PARAM float MAX_WHEEL_ANGLE       = 21.5f;                         // deg
+    PARAM float MAX_WHEEL_ANGLE       = 22.5f;                         // deg
     PARAM float WHEEL_WIDTH           = 0.05f;                         // m
     PARAM float TRACK                 = 0.26f;                         // m
     PARAM float WHEELBASE             = 0.275f;                        // m
@@ -85,12 +87,13 @@ namespace jlb
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
     }  // namespace lat
 
-    PARAM float OFFSET  = 0.4f;
-    PARAM float SLOPE   = 0.5f;
+    PARAM float OFFSET  = 0.25f;
+    PARAM float SLOPE   = 1.0f;
     PARAM float DAMPING = 0.9f;
+    PARAM float D5_MIN = 1.5f;
 
-    PARAM float MAX_ACCELERATION = 1.0f;  // m/s^2
-    PARAM float MAX_DECELERATION = 1.0f;  // m/s^2
+    PARAM float MAX_ACCELERATION = 3.0f;  // m/s^2
+    PARAM float MAX_DECELERATION = 4.0f;  // m/s^2
 
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
@@ -98,8 +101,8 @@ namespace jlb
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
-    PARAM float FAST_SPEED              = 2.0f;   // m/s
-    PARAM float FAST_SPEED_TURN         = 2.0f;   // m/s
+    PARAM float FAST_SPEED              = 4.5f;   // m/s
+    PARAM float FAST_SPEED_TURN         = 1.5f;   // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
     PARAM float MIN_SPEED               = 0.25f;  // m/s

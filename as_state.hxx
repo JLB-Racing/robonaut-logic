@@ -41,6 +41,8 @@ namespace jlb
         float   state_time               = 0.0f;
         float   state_transition_time    = 0.0f;
         bool    started_state_transition = false;
+        uint32_t tick_counter = 0u;
+        uint32_t tick_counter_prev = 0u;
 
         [[maybe_unused]] char previous_node = 'U';
         [[maybe_unused]] char next_node     = 'U';
@@ -58,7 +60,9 @@ namespace jlb
         {
 #ifndef SIMULATION
             // TODO: add timestamp
-            float dt = 0.005f;
+        	tick_counter_prev = tick_counter;
+        	tick_counter = HAL_GetTick();
+            float dt = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
 #else
             auto                   update_timestamp_ = std::chrono::steady_clock::now();
             [[maybe_unused]] float dt                = std::chrono::duration_cast<std::chrono::milliseconds>(update_timestamp_ - prev_update_timestamp_).count() / 1000.0f;
