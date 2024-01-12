@@ -34,19 +34,22 @@ namespace jlb
         FastState      fast_state      = FastState::FOLLOW_SAFETY_CAR;
         float          reference_speed = 0.0f;
 
-        bool    under_gate               = false;
-        bool    at_cross_section         = false;
-        bool    prev_at_decision_point   = false;
-        uint8_t current_number_of_lines  = 0u;
-        float   state_time               = 0.0f;
-        float   state_transition_time    = 0.0f;
-        bool    started_state_transition = false;
-        uint32_t tick_counter = 0u;
-        uint32_t tick_counter_prev = 0u;
+        bool     under_gate               = false;
+        bool     at_cross_section         = false;
+        bool     prev_at_decision_point   = false;
+        uint8_t  current_number_of_lines  = 0u;
+        float    state_time               = 0.0f;
+        float    state_transition_time    = 0.0f;
+        bool     started_state_transition = false;
+        uint32_t tick_counter             = 0u;
+        uint32_t tick_counter_prev        = 0u;
 
-        [[maybe_unused]] char          previous_node = 'U';
-        [[maybe_unused]] char          next_node     = 'U';
-        [[maybe_unused]] unsigned long selected_edge = 0u;
+        char                              previous_node = 'U';
+        char                              next_node     = 'U';
+        char                              goal_node     = 'U';
+        std::vector<std::pair<char, int>> goal_path;
+        int                               path_idx      = 0;
+        unsigned long                     selected_edge = 0u;
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
 
@@ -61,9 +64,9 @@ namespace jlb
         {
 #ifndef SIMULATION
             // TODO: add timestamp
-        	tick_counter_prev = tick_counter;
-        	tick_counter = HAL_GetTick();
-            float dt = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
+            tick_counter_prev = tick_counter;
+            tick_counter      = HAL_GetTick();
+            float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
 #else
             auto                   update_timestamp_ = std::chrono::steady_clock::now();
             [[maybe_unused]] float dt                = std::chrono::duration_cast<std::chrono::milliseconds>(update_timestamp_ - prev_update_timestamp_).count() / 1000.0f;
@@ -81,52 +84,95 @@ namespace jlb
 
                     if (!prev_at_decision_point && at_decision_point)
                     {
-                        auto distance = graph[previous_node].edges[selected_edge].weight;
+                        auto distance = graph[previous_node].edges[selected_edge].distance;
                         if (std::fabs(distance - odometry.distance_local) < LOCALIZATION_INACCURACY || labyrinth_state == LabyrinthState::START)
                         {
                             if (labyrinth_state == LabyrinthState::START) { labyrinth_state = LabyrinthState::EXPLORING; }
+
                             auto at_node = next_node;
 
-                            while (true)
+                            if (at_node == goal_node)
                             {
-                                unsigned long num_neighbors           = graph[at_node].edges.size();
-                                auto          selected_edge_candidate = rand() % num_neighbors;
+                                auto [node, path] = graph.Dijkstra(previous_node, at_node);
+                                goal_node         = node;
+                                goal_path         = path;
+                                next_node         = goal_path[1].first;
+                                selected_edge     = goal_path[1].second;
+                                path_idx          = 0;
+                                std::cout << next_node << std::endl;
+                                std::cout << selected_edge << std::endl;
+                                std::cout << static_cast<int>(graph[at_node].edges[selected_edge].direction) << std::endl;
+                            }
+                            else
+                            {
+                                next_node     = goal_path[++path_idx].first;
+                                selected_edge = goal_path[path_idx].second;
+                            }
 
-                                if (graph[at_node].edges[selected_edge_candidate].node == 'P' || graph[at_node].edges[selected_edge_candidate].node == 'U' ||
-                                    graph[at_node].edges[selected_edge_candidate].node == 'X')
-                                {
-                                    continue;
-                                }
-
-                                auto prev_nodes = graph[at_node].edges[selected_edge_candidate].prev_nodes;
-                                if (std::find(prev_nodes.begin(), prev_nodes.end(), previous_node) != prev_nodes.end())
-                                {
-                                    selected_edge = selected_edge_candidate;
-                                    next_node     = graph[at_node].edges[selected_edge].node;
-                                    previous_node = at_node;
-
-                                    controller.set_direction(graph[at_node].edges[selected_edge].direction);
-                                    odometry.correction(graph[previous_node].x, graph[previous_node].y);
+                            previous_node = at_node;
+                            controller.set_direction(graph[at_node].edges[selected_edge].direction);
+                            odometry.correction(graph[previous_node].x, graph[previous_node].y);
 
 #ifdef SIMULATION
-                                    switch (controller.direction)
-                                    {
-                                        case Direction::LEFT:
-                                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
-                                            break;
-                                        case Direction::RIGHT:
-                                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
-                                            break;
-                                        case Direction::STRAIGHT:
-                                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
-                                            break;
-                                        default:
-                                            break;
-                                    }
-#endif
+                            switch (controller.direction)
+                            {
+                                case Direction::LEFT:
+                                    std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
                                     break;
-                                }
+                                case Direction::RIGHT:
+                                    std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
+                                    break;
+                                case Direction::STRAIGHT:
+                                    std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
+                                    break;
+                                default:
+                                    break;
                             }
+#endif
+
+                            // while (true) continue;
+
+                            //                             while (true)
+                            //                             {
+                            //                                 unsigned long num_neighbors           = graph[at_node].edges.size();
+                            //                                 auto          selected_edge_candidate = rand() % num_neighbors;
+
+                            //                                 if (graph[at_node].edges[selected_edge_candidate].node == 'P' || graph[at_node].edges[selected_edge_candidate].node == 'U' ||
+                            //                                     graph[at_node].edges[selected_edge_candidate].node == 'X' || (at_node == 'R' && graph[at_node].edges[selected_edge_candidate].node ==
+                            //                                     'Q'))
+                            //                                 {
+                            //                                     continue;
+                            //                                 }
+
+                            //                                 auto prev_nodes = graph[at_node].edges[selected_edge_candidate].prev_nodes;
+                            //                                 if (std::find(prev_nodes.begin(), prev_nodes.end(), previous_node) != prev_nodes.end())
+                            //                                 {
+                            //                                     selected_edge = selected_edge_candidate;
+                            //                                     next_node     = graph[at_node].edges[selected_edge].node;
+                            //                                     previous_node = at_node;
+
+                            //                                     controller.set_direction(graph[at_node].edges[selected_edge].direction);
+                            //                                     odometry.correction(graph[previous_node].x, graph[previous_node].y);
+
+                            // #ifdef SIMULATION
+                            //                                     switch (controller.direction)
+                            //                                     {
+                            //                                         case Direction::LEFT:
+                            //                                             std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
+                            //                                             break;
+                            //                                         case Direction::RIGHT:
+                            //                                             std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
+                            //                                             break;
+                            //                                         case Direction::STRAIGHT:
+                            //                                             std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
+                            //                                             break;
+                            //                                         default:
+                            //                                             break;
+                            //                                     }
+                            // #endif
+                            //                                     break;
+                            //                                 }
+                            //                             }
                         }
                     }
 

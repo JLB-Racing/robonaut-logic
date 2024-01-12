@@ -1,14 +1,31 @@
 #ifndef GRAPH_HXX
 #define GRAPH_HXX
 
+#include <cstdio>
+#include <cstring>
+#include <map>
+#include <queue>
+#include <ranges>
+#include <vector>
+
 namespace jlb
 {
+    struct DijkstraResult
+    {
+        char                              node;
+        std::vector<std::pair<char, int>> path;
+    };
+
     struct Edge
     {
         char              node;
         Direction         direction;
         std::vector<char> prev_nodes;
-        float             weight;
+        float             distance;
+
+        Edge(char node_, Direction direction_, std::vector<char> prev_nodes_, float distance_) : node{node_}, direction{direction_}, prev_nodes{prev_nodes_}, distance{distance_} {}
+
+        float get_weight() const { return distance; }
     };
 
     class Node
@@ -22,13 +39,14 @@ namespace jlb
         Node(char name_, float x_, float y_) : name{name_}, x(x_), y(y_) {}
         ~Node() {}
 
-        void add_edge(char name_, Direction direction_, std::vector<char> prev_nodes_, float weight_ = 0.0f) { edges.push_back(Edge{name_, direction_, prev_nodes_, weight_}); }
+        void add_edge(char name_, Direction direction_, std::vector<char> prev_nodes_, float distance_) { edges.push_back(Edge{name_, direction_, prev_nodes_, distance_}); }
     };
 
     class Graph
     {
     public:
         std::vector<Node> nodes;
+        std::vector<char> collected_nodes;
 
         Graph()
         {
@@ -155,15 +173,105 @@ namespace jlb
         }
 
         ~Graph() {}
+
         Node &operator[](char name)
         {
 #ifdef SIMULATION
             if (nodes.empty()) throw std::runtime_error("Graph is empty");
             if (name < 'A' || name > 'X') throw std::runtime_error("Invalid node name");
+#else
+            if (nodes.empty() || name < 'A' || name > 'X') return Node{'@', 0.0f, 0.0f};
 #endif
             return nodes[static_cast<int>(name - 'A')];
         }
+
+        void print_dijkstra(const std::map<char, std::pair<float, std::vector<std::pair<char, int>>>> &map)
+        {
+            for (auto &v : map)
+            {
+                std::cout << v.first << "\t" << v.second.first << "\t\t";
+                for (auto &u : v.second.second) std::cout << u.first << " ";
+                std::cout << std::endl;
+            }
+        }
+
+        DijkstraResult Dijkstra(char previous_node, char current_node)
+        {
+            collected_nodes.push_back(current_node);
+
+            std::map<char, std::pair<float, std::vector<std::pair<char, int>>>>                                                    result;
+            std::priority_queue<std::pair<float, char>, std::vector<std::pair<float, char>>, std::greater<std::pair<float, char>>> queue;
+            const auto                                                                                                            &start_vertex = this->operator[](current_node);
+
+            for (auto &vertex : nodes)
+            {
+                if (vertex.name == start_vertex.name) { result[vertex.name] = std::make_pair(0, std::vector<std::pair<char, int>>{}); }
+                else { result[vertex.name] = std::make_pair(std::numeric_limits<float>::infinity(), std::vector<std::pair<char, int>>{}); }
+            }
+
+            queue.push(std::make_pair(0, start_vertex.name));
+
+            while (!queue.empty())
+            {
+                auto [distance, vertex_id] = queue.top();
+                queue.pop();
+
+                for (unsigned long index = 0; index < this->operator[](vertex_id).edges.size(); index++)
+                {
+                    auto &edge = this->operator[](vertex_id).edges[index];
+
+                    if (vertex_id == current_node && std::find(edge.prev_nodes.begin(), edge.prev_nodes.end(), previous_node) == edge.prev_nodes.end()) { continue; }
+
+                    char  neighbor = edge.node;
+                    float weight   = edge.get_weight();
+
+                    if (result[neighbor].first > distance + weight)
+                    {
+                        result[neighbor].first  = distance + weight;
+                        result[neighbor].second = result[vertex_id].second;
+                        result[neighbor].second.push_back(std::make_pair(vertex_id, static_cast<int>(index)));
+                        queue.push(std::make_pair(result[neighbor].first, neighbor));
+                    }
+                }
+            }
+
+            // for (auto &[vertex_id, pair] : result) { pair.second.push_back(std::make_pair(vertex_id, /*TODO*/)); }
+            for (auto &entry : result)
+            {
+                auto &vertex_id = entry.first;
+                auto &pair      = entry.second;
+                // find the index of the edge connecting the last node
+                if (pair.second.size() > 0)
+                {
+                    char  before_last_node = pair.second[pair.second.size() - 1].first;
+                    auto &edges            = this->operator[](before_last_node).edges;
+                    auto  it               = std::find_if(edges.begin(), edges.end(), [&vertex_id](const Edge &edge) { return edge.node == vertex_id; });
+                    int   index            = std::distance(edges.begin(), it);
+                    pair.second.push_back(std::make_pair(vertex_id, index));
+                }
+                else { pair.second.push_back(std::make_pair(vertex_id, 0)); }
+            }
+
+            // in the result find the node with the smallest distance which is not in collected_nodes
+            float min_distance = std::numeric_limits<float>::infinity();
+            char  min_node     = '@';
+            for (auto &[vertex_id, pair] : result)
+            {
+                if (pair.first != 0 && pair.first < min_distance && std::find(collected_nodes.begin(), collected_nodes.end(), vertex_id) == collected_nodes.end())
+                {
+                    min_distance = pair.first;
+                    min_node     = vertex_id;
+                }
+            }
+
+            std::cout << "path: ";
+            for (auto &pair : result[min_node].second) std::cout << pair.first << " ";
+            std::cout << std::endl;
+
+            return DijkstraResult{min_node, result[min_node].second};
+        }
     };
+
 }  // namespace jlb
 
 #endif  // GRAPH_HXX

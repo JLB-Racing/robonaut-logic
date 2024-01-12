@@ -44,6 +44,11 @@ namespace jlb
         void set_states(const CompositeState state_) { as_state.set_states(state_); }
         void send_telemetry() { signal_sender.send_telemetry(); }
         void set_measurements(const Measurements &measurements_) { measurements = measurements_; }
+        void set_flood(const bool flood_)
+        {
+            if (flood_ && as_state.labyrinth_state == LabyrinthState::EXPLORING) { as_state.labyrinth_state = LabyrinthState::FLOOD; }
+            else if (!flood_ && as_state.labyrinth_state == LabyrinthState::FLOOD) { as_state.labyrinth_state = LabyrinthState::EXPLORING; }
+        }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
 
     private:

@@ -45,6 +45,7 @@ namespace jlb
         // TODO: this is just placeholder
         START,
         EXPLORING,
+        FLOOD,
         END,
     };
 
