@@ -21,12 +21,15 @@ namespace jlb
     class Odometry
     {
     public:
-        float vx_t                               = 0.0f;  // linear velocity
-        float w_t                                = 0.0f;  // angular velocity
-        float x_t                                = 0.0f;  // x position
-        float y_t                                = 0.0f;  // y position
-        float theta_t                            = 0.0f;  // orientation
-        float distance_traveled_since_checkpoint = 0.0f;
+        float vx_t           = 0.0f;  // linear velocity
+        float w_t            = 0.0f;  // angular velocity
+        float x_t            = 0.0f;  // x position
+        float y_t            = 0.0f;  // y position
+        float theta_t        = 0.0f;  // orientation
+        float x_t_local      = 0.0f;  // local x position
+        float y_t_local      = 0.0f;  // local y position
+        float theta_t_local  = 0.0f;  // local orientation
+        float distance_local = 0.0f;  // distance traveled since last checkpoint
 
         float meas_wheel_rpm = 0.0f;
         float meas_ang_vel_x = 0.0f;
@@ -92,7 +95,10 @@ namespace jlb
                 y_t += (vx_t * std::sin(theta_t) + vy_t * std::cos(theta_t)) * dt;
                 theta_t = normalize_angle(theta_t + w_t * dt);
 
-                distance_traveled_since_checkpoint += vx_t * dt;
+                x_t_local += vx_t * std::cos(theta_t_local) * dt;
+                y_t_local += vx_t * std::sin(theta_t_local) * dt;
+                theta_t_local = normalize_angle(theta_t_local + w_t * dt);
+                distance_local += vx_t * dt;
             }
 #ifdef SIMULATION
             odom_timestamp_ = update_timestamp > odom_timestamp_ ? update_timestamp : odom_timestamp_;
@@ -130,9 +136,12 @@ namespace jlb
             else if (min_theta == theta_360) { theta_t = (theta_t + 2.0f * M_PI) / 2.0f; }
 
             theta_t = normalize_angle(theta_t);
-        }
 
-        void checkpoint() { distance_traveled_since_checkpoint = 0.0f; }
+            x_t_local      = 0.0f;
+            y_t_local      = 0.0f;
+            theta_t_local  = 0.0f;
+            distance_local = 0.0f;
+        }
 
     private:
         std::deque<float>     v_buffer_;

@@ -168,9 +168,6 @@ namespace jlb
             cross_track_error = line_position_front;
             heading_error     = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
-            // lateral_pid.update_params(lat::kP/current_velocity, lat::kI/current_velocity, lat::kD/current_velocity);
-            // target_angle = -lateral_pid.update(0, cross_track_error, dt);
-
             auto [kP, kDelta] = get_control_params();
             target_angle      = -kP * cross_track_error - kDelta * heading_error;
 
@@ -247,7 +244,6 @@ namespace jlb
         float current_velocity = 0.0f;
 
         PID object_pid{obj::kP, obj::kI, obj::kD, obj::TAU, obj::T, obj::LIM_MIN, obj::LIM_MAX, obj::DEADBAND, obj::DERIVATIVE_FILTER_ALPHA};
-        PID lateral_pid{lat::kP, lat::kI, lat::kD, lat::TAU, lat::T, lat::LIM_MIN, lat::LIM_MAX, lat::DEADBAND, lat::DERIVATIVE_FILTER_ALPHA};
 
 #ifndef SIMULATION
         // TODO: add timestamp

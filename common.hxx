@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-//#define SIMULATION
+#define SIMULATION
 
 namespace jlb
 {
@@ -24,8 +24,9 @@ namespace jlb
     PARAM unsigned BITMAP_SIZE   = 64;   // px
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
-    PARAM float STATE_MIN_TIME              = 0.25f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;   // s
+    PARAM float STATE_MIN_TIME              = 0.25f;  // s
+    PARAM float LOCALIZATION_INACCURACY     = 0.1f;   // m
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -71,20 +72,6 @@ namespace jlb
         PARAM float FOLLOW_DISTANCE         = 0.3f;
     }  // namespace obj
 
-    /* LATERAL PID CONTROLLER PARAMETERS */
-    namespace lat
-    {
-        PARAM float kP                      = 6.9f;
-        PARAM float kI                      = 4.20f;
-        PARAM float kD                      = 0.0f;
-        PARAM float TAU                     = 0.05f;
-        PARAM float T                       = 0.005f;
-        PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
-        PARAM float LIM_MAX                 = MAX_WHEEL_ANGLE;
-        PARAM float DEADBAND                = 0.5f;
-        PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
-    }  // namespace lat
-
     PARAM float OFFSET  = 0.4f;
     PARAM float SLOPE   = 0.5f;
     PARAM float DAMPING = 0.9f;
@@ -124,8 +111,9 @@ namespace jlb
     PARAM unsigned BITMAP_SIZE   = 64;   // px
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
-    PARAM float STATE_MIN_TIME              = 0.1f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;  // s
+    PARAM float STATE_MIN_TIME              = 0.1f;  // s
+    PARAM float LOCALIZATION_INACCURACY     = 0.1f;  // m
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -172,23 +160,9 @@ namespace jlb
         PARAM float FOLLOW_DISTANCE         = 0.3f;
     }  // namespace obj
 
-    /* LATERAL PID CONTROLLER PARAMETERS */
-    namespace lat
-    {
-        PARAM float kP                      = 25.0f;
-        PARAM float kI                      = 25.0f;
-        PARAM float kD                      = 1.0f;
-        PARAM float TAU                     = 0.05f;
-        PARAM float T                       = 0.005f;
-        PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
-        PARAM float LIM_MAX                 = MAX_WHEEL_ANGLE;
-        PARAM float DEADBAND                = 0.05f;
-        PARAM float DERIVATIVE_FILTER_ALPHA = 0.1f;
-    }  // namespace lat
-
     PARAM float OFFSET  = 0.4f;
     PARAM float SLOPE   = 0.5f;
-    PARAM float DAMPING = 0.9f;
+    PARAM float DAMPING = 0.5f;
 
     PARAM float MAX_ACCELERATION = 1.0f;  // m/s^2
     PARAM float MAX_DECELERATION = 1.0f;  // m/s^2

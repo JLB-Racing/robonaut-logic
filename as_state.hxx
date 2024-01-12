@@ -42,8 +42,9 @@ namespace jlb
         float   state_transition_time    = 0.0f;
         bool    started_state_transition = false;
 
-        [[maybe_unused]] char previous_node = 'U';
-        [[maybe_unused]] char next_node     = 'U';
+        [[maybe_unused]] char          previous_node = 'U';
+        [[maybe_unused]] char          next_node     = 'U';
+        [[maybe_unused]] unsigned long selected_edge = 0u;
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
 
@@ -76,27 +77,49 @@ namespace jlb
 
                     if (!prev_at_decision_point && at_decision_point)
                     {
-                        float inaccuracy = 0.25f;
-                        if (std::sqrt(std::pow(graph[next_node].x - odometry.x_t, 2) + std::pow(graph[next_node].y - odometry.y_t, 2)) < inaccuracy)
+                        auto distance = graph[previous_node].edges[selected_edge].weight;
+                        if (std::fabs(distance - odometry.distance_local) < LOCALIZATION_INACCURACY || labyrinth_state == LabyrinthState::START)
                         {
+                            if (labyrinth_state == LabyrinthState::START) { labyrinth_state = LabyrinthState::EXPLORING; }
                             auto at_node = next_node;
 
                             while (true)
                             {
-                                unsigned long num_neighbors = graph[at_node].edges.size();
-                                auto          selected_edge = rand() % num_neighbors;
+                                unsigned long num_neighbors           = graph[at_node].edges.size();
+                                auto          selected_edge_candidate = rand() % num_neighbors;
 
-                                if (graph[at_node].edges[selected_edge].node == 'P' || graph[at_node].edges[selected_edge].node == 'U' || graph[at_node].edges[selected_edge].node == 'X') { continue; }
+                                if (graph[at_node].edges[selected_edge_candidate].node == 'P' || graph[at_node].edges[selected_edge_candidate].node == 'U' ||
+                                    graph[at_node].edges[selected_edge_candidate].node == 'X')
+                                {
+                                    continue;
+                                }
 
-                                auto prev_nodes = graph[at_node].edges[selected_edge].prev_nodes;
+                                auto prev_nodes = graph[at_node].edges[selected_edge_candidate].prev_nodes;
                                 if (std::find(prev_nodes.begin(), prev_nodes.end(), previous_node) != prev_nodes.end())
                                 {
+                                    selected_edge = selected_edge_candidate;
                                     next_node     = graph[at_node].edges[selected_edge].node;
                                     previous_node = at_node;
 
                                     controller.set_direction(graph[at_node].edges[selected_edge].direction);
                                     odometry.correction(graph[previous_node].x, graph[previous_node].y);
 
+#ifdef SIMULATION
+                                    switch (controller.direction)
+                                    {
+                                        case Direction::LEFT:
+                                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
+                                            break;
+                                        case Direction::RIGHT:
+                                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
+                                            break;
+                                        case Direction::STRAIGHT:
+                                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+#endif
                                     break;
                                 }
                             }

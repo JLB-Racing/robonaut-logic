@@ -44,9 +44,7 @@ namespace jlb
     {
         // TODO: this is just placeholder
         START,
-        TURN_LEFT,
-        TURN_RIGHT,
-        STRAIGHT,
+        EXPLORING,
         END,
     };
 

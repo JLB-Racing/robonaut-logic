@@ -41,7 +41,7 @@ namespace jlb
         }
 #else
         SignalSender(const Odometry &odometry_, const Controller &controller_, const ASState &as_state_, const Graph &graph_, const Measurements &measurements_)
-            : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), measurements(measurements_) , client(SENDER_ADDRESS, SENDER_PORT)
+            : odometry(odometry_), controller(controller_), as_state(as_state_), graph(graph_), measurements(measurements_), client(SENDER_ADDRESS, SENDER_PORT)
         {
         }
 #endif
@@ -62,7 +62,11 @@ namespace jlb
             logic_2();
             logic3();
 
+#ifndef SIMULATION
             uint32_t timestamp = HAL_GetTick();
+#else
+            uint32_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - std::chrono::steady_clock::time_point::min()).count();
+#endif
             telemetry_data.push_back((timestamp >> 24u) & 0xFF);
             telemetry_data.push_back((timestamp >> 16u) & 0xFF);
             telemetry_data.push_back((timestamp >> 8u) & 0xFF);
@@ -280,7 +284,7 @@ namespace jlb
 
         void logic_2()
         {
-            jlb_rx.logic_2.distance_traveled_phys = odometry.distance_traveled_since_checkpoint;
+            jlb_rx.logic_2.distance_traveled_phys = odometry.distance_local;
             jlb_rx.logic_2.labyrinth_state        = static_cast<uint8_t>(as_state.labyrinth_state);
             jlb_rx.logic_2.fast_state             = static_cast<uint8_t>(as_state.fast_state);
             jlb_rx.logic_2.next_node              = as_state.next_node;
