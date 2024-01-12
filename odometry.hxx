@@ -39,6 +39,8 @@ namespace jlb
         float meas_lin_acc_y = 0.0f;
         float meas_lin_acc_z = 0.0f;
 
+        uint32_t tick_counter = 0u;
+        uint32_t tick_counter_prev = 0u;
         Odometry(const float x_t_ = 0.0f, const float y_t_ = 0.0f, const float theta_t_ = 0.0f) : x_t(x_t_), y_t(y_t_), theta_t(normalize_angle(theta_t_)) {}
 
         ~Odometry() {}
@@ -72,7 +74,10 @@ namespace jlb
         {
 #ifndef SIMULATION
             // TODO: add timestamp and dt
-            float dt = 0.005f;
+        	tick_counter_prev = tick_counter;
+        	tick_counter = HAL_GetTick();
+            float dt = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
+
 #else
             if (first_update_)
             {
