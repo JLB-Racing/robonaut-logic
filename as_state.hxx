@@ -18,8 +18,14 @@ namespace jlb
         FastState      fast_state;
         float          reference_speed = 0.0f;
 
-        CompositeState(FastState fast_state_) : mission{Mission::FAST}, labyrinth_state{LabyrinthState::START}, fast_state{fast_state_}, reference_speed{0.0f} {}
-        CompositeState(LabyrinthState labyrinth_state_) : mission{Mission::LABYRINTH}, labyrinth_state{labyrinth_state_}, fast_state{FastState::FOLLOW_SAFETY_CAR}, reference_speed{0.0f} {}
+        CompositeState(FastState fast_state_)
+            : mission{Mission::FAST}, labyrinth_state{LabyrinthState::START}, fast_state{fast_state_}, reference_speed{0.0f}
+        {
+        }
+        CompositeState(LabyrinthState labyrinth_state_)
+            : mission{Mission::LABYRINTH}, labyrinth_state{labyrinth_state_}, fast_state{FastState::FOLLOW_SAFETY_CAR}, reference_speed{0.0f}
+        {
+        }
         CompositeState(Mission mission_, LabyrinthState labyrinth_state_, FastState fast_state_, float reference_speed_)
             : mission{mission_}, labyrinth_state{labyrinth_state_}, fast_state{fast_state_}, reference_speed{reference_speed_}
         {
@@ -44,12 +50,17 @@ namespace jlb
         uint32_t tick_counter             = 0u;
         uint32_t tick_counter_prev        = 0u;
 
-        char                              previous_node = 'U';
-        char                              next_node     = 'U';
-        char                              goal_node     = 'U';
-        std::vector<std::pair<char, int>> goal_path;
-        int                               path_idx      = 0;
-        unsigned long                     selected_edge = 0u;
+        char              previous_node = 'U';
+        char              next_node     = 'U';
+        char              goal_node     = 'U';
+        std::vector<char> goal_path;
+        int               path_idx      = 0;
+        unsigned long     selected_edge = 0u;
+
+        char pirate_previous_node      = 'P';
+        char pirate_next_node          = 'M';
+        char pirate_after_next_node    = 'H';
+        int  pirate_section_percentage = 0;
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
 
@@ -58,6 +69,14 @@ namespace jlb
             mission         = state_.mission;
             labyrinth_state = state_.labyrinth_state;
             fast_state      = state_.fast_state;
+        }
+
+        void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)
+        {
+            pirate_previous_node      = prev_node_;
+            pirate_next_node          = next_node_;
+            pirate_after_next_node    = after_next_node_;
+            pirate_section_percentage = section_percentage_;
         }
 
         CompositeState update()
@@ -69,8 +88,9 @@ namespace jlb
             float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
 #else
             auto                   update_timestamp_ = std::chrono::steady_clock::now();
-            [[maybe_unused]] float dt                = std::chrono::duration_cast<std::chrono::milliseconds>(update_timestamp_ - prev_update_timestamp_).count() / 1000.0f;
-            prev_update_timestamp_                   = update_timestamp_;
+            [[maybe_unused]] float dt =
+                std::chrono::duration_cast<std::chrono::milliseconds>(update_timestamp_ - prev_update_timestamp_).count() / 1000.0f;
+            prev_update_timestamp_ = update_timestamp_;
 #endif
 
             state_transition_time += dt;
@@ -91,25 +111,66 @@ namespace jlb
 
                             auto at_node = next_node;
 
-                            if (at_node == goal_node)
+                            if (at_node == goal_node && labyrinth_state == LabyrinthState::EXPLORING)
                             {
+                                if (std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), at_node) != std::end(GATE_NAMES))
+                                {
+                                    graph.collected_nodes.push_back(at_node);
+                                }
+
                                 auto [node, path] = graph.Dijkstra(previous_node, at_node);
                                 goal_node         = node;
                                 goal_path         = path;
-                                next_node         = goal_path[1].first;
-                                selected_edge     = goal_path[1].second;
-                                path_idx          = 0;
-                                std::cout << next_node << std::endl;
-                                std::cout << selected_edge << std::endl;
-                                std::cout << static_cast<int>(graph[at_node].edges[selected_edge].direction) << std::endl;
+                                path_idx          = 1;
+                                next_node         = goal_path[path_idx];
+
+                                if (node == '@')
+                                {
+                                    if (graph.collected_nodes.size() == NUMBER_OF_GATES)
+                                    {
+                                        for (auto& node : graph.nodes)
+                                        {
+                                            if (node.name == MISSION_SWITCH_NODE_PREV || node.name == MISSION_SWITCH_NODE) { continue; }
+
+                                            // [[maybe_unused]] auto removed = node.remove_edge(MISSION_SWITCH_NODE);
+
+                                            // if (removed.node != '@') std::cout << node.name << "->" << removed.node << std::endl;
+                                        }
+
+                                        graph['S'].remove_edge('V');
+                                        graph['W'].remove_edge('V');
+
+                                        auto [node, path] = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
+                                        goal_node         = node;
+                                        goal_path         = path;
+                                        path_idx          = 1;
+                                        next_node         = goal_path[path_idx];
+                                        labyrinth_state   = LabyrinthState::FINISHED;
+                                    }
+                                    else
+                                    {
+                                        // TODO: there is no correct route but there are still gates to collect
+                                    }
+                                }
                             }
-                            else
+                            else if (at_node == goal_node && labyrinth_state == LabyrinthState::FINISHED)
                             {
-                                next_node     = goal_path[++path_idx].first;
-                                selected_edge = goal_path[path_idx].second;
+                                labyrinth_state = LabyrinthState::MISSION_SWITCH;
+                            }
+                            else { next_node = goal_path[++path_idx]; }
+                            previous_node = at_node;
+
+                            // find the selected edge, which is the index that connects the previous
+                            // node to the next node
+                            for (unsigned long i = 0; i < graph[at_node].edges.size(); i++)
+                            {
+                                if (graph[at_node].edges[i].node == next_node)
+                                {
+                                    selected_edge = i;
+                                    break;
+                                }
                             }
 
-                            previous_node = at_node;
                             controller.set_direction(graph[at_node].edges[selected_edge].direction);
                             odometry.correction(graph[previous_node].x, graph[previous_node].y);
 
@@ -129,50 +190,6 @@ namespace jlb
                                     break;
                             }
 #endif
-
-                            // while (true) continue;
-
-                            //                             while (true)
-                            //                             {
-                            //                                 unsigned long num_neighbors           = graph[at_node].edges.size();
-                            //                                 auto          selected_edge_candidate = rand() % num_neighbors;
-
-                            //                                 if (graph[at_node].edges[selected_edge_candidate].node == 'P' || graph[at_node].edges[selected_edge_candidate].node == 'U' ||
-                            //                                     graph[at_node].edges[selected_edge_candidate].node == 'X' || (at_node == 'R' && graph[at_node].edges[selected_edge_candidate].node ==
-                            //                                     'Q'))
-                            //                                 {
-                            //                                     continue;
-                            //                                 }
-
-                            //                                 auto prev_nodes = graph[at_node].edges[selected_edge_candidate].prev_nodes;
-                            //                                 if (std::find(prev_nodes.begin(), prev_nodes.end(), previous_node) != prev_nodes.end())
-                            //                                 {
-                            //                                     selected_edge = selected_edge_candidate;
-                            //                                     next_node     = graph[at_node].edges[selected_edge].node;
-                            //                                     previous_node = at_node;
-
-                            //                                     controller.set_direction(graph[at_node].edges[selected_edge].direction);
-                            //                                     odometry.correction(graph[previous_node].x, graph[previous_node].y);
-
-                            // #ifdef SIMULATION
-                            //                                     switch (controller.direction)
-                            //                                     {
-                            //                                         case Direction::LEFT:
-                            //                                             std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
-                            //                                             break;
-                            //                                         case Direction::RIGHT:
-                            //                                             std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
-                            //                                             break;
-                            //                                         case Direction::STRAIGHT:
-                            //                                             std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
-                            //                                             break;
-                            //                                         default:
-                            //                                             break;
-                            //                                     }
-                            // #endif
-                            //                                     break;
-                            //                                 }
-                            //                             }
                         }
                     }
 

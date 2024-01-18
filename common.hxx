@@ -22,8 +22,11 @@ namespace jlb
     //
 
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float    SQUARE_LENGTH = 0.6;  // m
-    PARAM unsigned BITMAP_SIZE   = 64;   // px
+    PARAM float    SQUARE_LENGTH               = 0.6;  // m
+    PARAM unsigned BITMAP_SIZE                 = 64;   // px
+    PARAM char     MISSION_SWITCH_NODE         = 'V';  // -
+    PARAM int      NUMBER_OF_GATES             = 17;   // -
+    PARAM char     GATE_NAMES[NUMBER_OF_GATES] = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
 
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
@@ -109,8 +112,12 @@ namespace jlb
     //
 
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float    SQUARE_LENGTH = 0.6;  // m
-    PARAM unsigned BITMAP_SIZE   = 64;   // px
+    PARAM float    SQUARE_LENGTH               = 0.6;  // m
+    PARAM unsigned BITMAP_SIZE                 = 64;   // px
+    PARAM char     MISSION_SWITCH_NODE         = 'V';  // -
+    PARAM char     MISSION_SWITCH_NODE_PREV    = 'Q';  // -
+    PARAM int      NUMBER_OF_GATES             = 17;   // -
+    PARAM char     GATE_NAMES[NUMBER_OF_GATES] = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
 
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;

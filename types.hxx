@@ -45,8 +45,11 @@ namespace jlb
         // TODO: this is just placeholder
         START,
         EXPLORING,
-        FLOOD,
-        END,
+        FLOOD_TO_BALANCER,
+        FLOOD_SOLVING,
+        FLOOD_TO_LABYRINTH,
+        FINISHED,
+        MISSION_SWITCH,
     };
 
     enum class FastState

@@ -12,8 +12,8 @@ namespace jlb
 {
     struct DijkstraResult
     {
-        char                              node;
-        std::vector<std::pair<char, int>> path;
+        char              node;
+        std::vector<char> path;
     };
 
     struct Edge
@@ -23,7 +23,10 @@ namespace jlb
         std::vector<char> prev_nodes;
         float             distance;
 
-        Edge(char node_, Direction direction_, std::vector<char> prev_nodes_, float distance_) : node{node_}, direction{direction_}, prev_nodes{prev_nodes_}, distance{distance_} {}
+        Edge(char node_, Direction direction_, std::vector<char> prev_nodes_, float distance_)
+            : node{node_}, direction{direction_}, prev_nodes{prev_nodes_}, distance{distance_}
+        {
+        }
 
         float get_weight() const { return distance; }
     };
@@ -36,10 +39,27 @@ namespace jlb
         float             y;
         std::vector<Edge> edges;
 
+        Edge invalid_edge = Edge{'@', Direction::STRAIGHT, {'@'}, 0.0f};
+
         Node(char name_, float x_, float y_) : name{name_}, x(x_), y(y_) {}
         ~Node() {}
 
-        void add_edge(char name_, Direction direction_, std::vector<char> prev_nodes_, float distance_) { edges.push_back(Edge{name_, direction_, prev_nodes_, distance_}); }
+        void add_edge(char name_, Direction direction_, std::vector<char> prev_nodes_, float distance_)
+        {
+            edges.push_back(Edge{name_, direction_, prev_nodes_, distance_});
+        }
+
+        void remove_edge(char name_)
+        {
+            for (auto it = edges.begin(); it != edges.end(); ++it)
+            {
+                if (it->node == name_)
+                {
+                    edges.erase(it);
+                    break;
+                }
+            }
+        }
     };
 
     class Graph
@@ -47,6 +67,8 @@ namespace jlb
     public:
         std::vector<Node> nodes;
         std::vector<char> collected_nodes;
+
+        Node invalid_node = Node{'@', 0.0f, 0.0f};
 
         Graph()
         {
@@ -130,7 +152,7 @@ namespace jlb
             this->operator[]('M').add_edge('K', Direction::RIGHT, {'P', 'Q', 'R'}, QUARTER_CIRCLE);
             this->operator[]('M').add_edge('R', Direction::LEFT, {'H', 'K'}, QUARTER_CIRCLE);
             this->operator[]('M').add_edge('Q', Direction::STRAIGHT, {'H', 'K'}, UNIT);
-            this->operator[]('M').add_edge('P', Direction::RIGHT, {'H', 'K'}, QUARTER_CIRCLE);
+            // this->operator[]('M').add_edge('P', Direction::RIGHT, {'H', 'K'}, QUARTER_CIRCLE);
             this->operator[]('N').add_edge('K', Direction::LEFT, {'R', 'S', 'T'}, QUARTER_CIRCLE);
             this->operator[]('N').add_edge('I', Direction::STRAIGHT, {'R', 'S', 'T'}, 2.0f * UNIT);
             this->operator[]('N').add_edge('L', Direction::RIGHT, {'R', 'S', 'T'}, QUARTER_CIRCLE);
@@ -141,14 +163,14 @@ namespace jlb
             this->operator[]('O').add_edge('U', Direction::LEFT, {'L'}, QUARTER_CIRCLE);
             this->operator[]('O').add_edge('W', Direction::STRAIGHT, {'L'}, UNIT + QUARTER_CIRCLE);
             this->operator[]('O').add_edge('T', Direction::RIGHT, {'L'}, QUARTER_CIRCLE);
-            this->operator[]('P').add_edge('M', Direction::LEFT, {'P'}, QUARTER_CIRCLE);
-            this->operator[]('P').add_edge('Q', Direction::STRAIGHT, {'P'}, UNIT);
-            this->operator[]('Q').add_edge('P', Direction::STRAIGHT, {'R'}, UNIT);
+            // this->operator[]('P').add_edge('M', Direction::LEFT, {'P'}, QUARTER_CIRCLE);
+            // this->operator[]('P').add_edge('Q', Direction::STRAIGHT, {'P'}, UNIT);
+            // this->operator[]('Q').add_edge('P', Direction::STRAIGHT, {'R'}, UNIT);
             this->operator[]('Q').add_edge('M', Direction::STRAIGHT, {'V', 'X'}, UNIT);
-            this->operator[]('Q').add_edge('R', Direction::STRAIGHT, {'P'}, UNIT);
+            // this->operator[]('Q').add_edge('R', Direction::STRAIGHT, {'P'}, UNIT);
             this->operator[]('Q').add_edge('V', Direction::LEFT, {'M'}, QUARTER_CIRCLE);
             this->operator[]('Q').add_edge('X', Direction::STRAIGHT, {'M'}, 2.5f * UNIT + QUARTER_CIRCLE);
-            this->operator[]('R').add_edge('Q', Direction::STRAIGHT, {'N', 'S'}, UNIT);
+            // this->operator[]('R').add_edge('Q', Direction::STRAIGHT, {'N', 'S'}, UNIT);
             this->operator[]('R').add_edge('M', Direction::RIGHT, {'N', 'S'}, QUARTER_CIRCLE);
             this->operator[]('R').add_edge('N', Direction::LEFT, {'M', 'Q'}, QUARTER_CIRCLE);
             this->operator[]('R').add_edge('S', Direction::STRAIGHT, {'M', 'Q'}, UNIT);
@@ -176,37 +198,32 @@ namespace jlb
 
         Node &operator[](char name)
         {
-#ifdef SIMULATION
-            if (nodes.empty()) throw std::runtime_error("Graph is empty");
-            if (name < 'A' || name > 'X') throw std::runtime_error("Invalid node name");
-#else
-            if (nodes.empty() || name < 'A' || name > 'X') return Node{'@', 0.0f, 0.0f};
-#endif
+            if (nodes.empty() || name < 'A' || name > 'X') { return invalid_node; }
             return nodes[static_cast<int>(name - 'A')];
         }
 
-        void print_dijkstra(const std::map<char, std::pair<float, std::vector<std::pair<char, int>>>> &map)
+        void print_dijkstra(const std::map<char, std::pair<float, std::vector<char>>> &map)
         {
+#ifdef SIMULATION
             for (auto &v : map)
             {
                 std::cout << v.first << "\t" << v.second.first << "\t\t";
-                for (auto &u : v.second.second) std::cout << u.first << " ";
+                for (auto &u : v.second.second) std::cout << u << " ";
                 std::cout << std::endl;
             }
+#endif
         }
 
-        DijkstraResult Dijkstra(char previous_node, char current_node)
+        DijkstraResult Dijkstra(char previous_node, char current_node, char end_node = '@')
         {
-            collected_nodes.push_back(current_node);
-
-            std::map<char, std::pair<float, std::vector<std::pair<char, int>>>>                                                    result;
+            std::map<char, std::pair<float, std::vector<char>>>                                                                    result;
             std::priority_queue<std::pair<float, char>, std::vector<std::pair<float, char>>, std::greater<std::pair<float, char>>> queue;
-            const auto                                                                                                            &start_vertex = this->operator[](current_node);
+            const auto &start_vertex = this->operator[](current_node);
 
             for (auto &vertex : nodes)
             {
-                if (vertex.name == start_vertex.name) { result[vertex.name] = std::make_pair(0, std::vector<std::pair<char, int>>{}); }
-                else { result[vertex.name] = std::make_pair(std::numeric_limits<float>::infinity(), std::vector<std::pair<char, int>>{}); }
+                if (vertex.name == start_vertex.name) { result[vertex.name] = std::make_pair(0, std::vector<char>{}); }
+                else { result[vertex.name] = std::make_pair(std::numeric_limits<float>::infinity(), std::vector<char>{}); }
             }
 
             queue.push(std::make_pair(0, start_vertex.name));
@@ -216,11 +233,24 @@ namespace jlb
                 auto [distance, vertex_id] = queue.top();
                 queue.pop();
 
-                for (unsigned long index = 0; index < this->operator[](vertex_id).edges.size(); index++)
+                // if (vertex_id == end_node) break;
+
+                for (unsigned long index = 0; index < this->operator[](vertex_id).edges.size(); ++index)
                 {
                     auto &edge = this->operator[](vertex_id).edges[index];
 
-                    if (vertex_id == current_node && std::find(edge.prev_nodes.begin(), edge.prev_nodes.end(), previous_node) == edge.prev_nodes.end()) { continue; }
+                    // if the checked vertex is the current node check if the previous node is in the list of previous nodes
+                    if (vertex_id == current_node &&
+                        std::find(edge.prev_nodes.begin(), edge.prev_nodes.end(), previous_node) == edge.prev_nodes.end())
+                    {
+                        continue;
+                    }
+                    // else if the checked vertex is not the current node check if it's predecessor along the path is in the list of previous nodes
+                    else if (vertex_id != current_node &&
+                             std::find(edge.prev_nodes.begin(), edge.prev_nodes.end(), result[vertex_id].second.back()) == edge.prev_nodes.end())
+                    {
+                        continue;
+                    }
 
                     char  neighbor = edge.node;
                     float weight   = edge.get_weight();
@@ -229,46 +259,34 @@ namespace jlb
                     {
                         result[neighbor].first  = distance + weight;
                         result[neighbor].second = result[vertex_id].second;
-                        result[neighbor].second.push_back(std::make_pair(vertex_id, static_cast<int>(index)));
+                        result[neighbor].second.push_back(vertex_id);
                         queue.push(std::make_pair(result[neighbor].first, neighbor));
                     }
                 }
             }
 
-            // for (auto &[vertex_id, pair] : result) { pair.second.push_back(std::make_pair(vertex_id, /*TODO*/)); }
-            for (auto &entry : result)
+            // insert starting to the back of vector the uuid of the specified vertex
+            for (auto &[vertex_id, pair] : result) { pair.second.push_back(vertex_id); }
+
+            if (end_node == '@')
             {
-                auto &vertex_id = entry.first;
-                auto &pair      = entry.second;
-                // find the index of the edge connecting the last node
-                if (pair.second.size() > 0)
+                // in the result find the node with the smallest distance which is not in collected_nodes
+                float min_distance = std::numeric_limits<float>::infinity();
+                char  min_node     = '@';
+                for (auto &[vertex_id, pair] : result)
                 {
-                    char  before_last_node = pair.second[pair.second.size() - 1].first;
-                    auto &edges            = this->operator[](before_last_node).edges;
-                    auto  it               = std::find_if(edges.begin(), edges.end(), [&vertex_id](const Edge &edge) { return edge.node == vertex_id; });
-                    int   index            = std::distance(edges.begin(), it);
-                    pair.second.push_back(std::make_pair(vertex_id, index));
+                    if (pair.first != 0 && pair.first < min_distance &&
+                        std::find(collected_nodes.begin(), collected_nodes.end(), vertex_id) == collected_nodes.end() &&
+                        std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), vertex_id) != std::end(GATE_NAMES))
+                    {
+                        min_distance = pair.first;
+                        min_node     = vertex_id;
+                    }
                 }
-                else { pair.second.push_back(std::make_pair(vertex_id, 0)); }
+
+                return DijkstraResult{min_node, result[min_node].second};
             }
-
-            // in the result find the node with the smallest distance which is not in collected_nodes
-            float min_distance = std::numeric_limits<float>::infinity();
-            char  min_node     = '@';
-            for (auto &[vertex_id, pair] : result)
-            {
-                if (pair.first != 0 && pair.first < min_distance && std::find(collected_nodes.begin(), collected_nodes.end(), vertex_id) == collected_nodes.end())
-                {
-                    min_distance = pair.first;
-                    min_node     = vertex_id;
-                }
-            }
-
-            std::cout << "path: ";
-            for (auto &pair : result[min_node].second) std::cout << pair.first << " ";
-            std::cout << std::endl;
-
-            return DijkstraResult{min_node, result[min_node].second};
+            else { return DijkstraResult{end_node, result[end_node].second}; }
         }
     };
 

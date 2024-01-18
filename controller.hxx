@@ -73,9 +73,16 @@ namespace jlb
                     {
                         if (direction == prev_direction)
                         {
-                            return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position) ? line_positions[0] : line_positions[1];
+                            return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position)
+                                       ? line_positions[0]
+                                       : line_positions[1];
                         }
-                        else { return std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position) ? line_positions[0] : line_positions[1]; }
+                        else
+                        {
+                            return std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position)
+                                       ? line_positions[0]
+                                       : line_positions[1];
+                        }
                     }
                     case Direction::RIGHT:
                     {
@@ -154,7 +161,8 @@ namespace jlb
         void lateral_control([[maybe_unused]] const float dt)
         {
             if (std::all_of(std::begin(detection_front), std::end(detection_front), [](bool b) { return b; }) ||
-                std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; }) || line_positions_front.size() == 0 || line_positions_rear.size() == 0)
+                std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; }) || line_positions_front.size() == 0 ||
+                line_positions_rear.size() == 0)
             {
                 if (target_angle < 0) { target_angle = -MAX_WHEEL_ANGLE; }
                 else if (target_angle == 0) { target_angle = 0; }
@@ -216,14 +224,34 @@ namespace jlb
             float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
 #else
             auto                   control_timestamp_ = std::chrono::steady_clock::now();
-            [[maybe_unused]] float dt                 = std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
-            prev_control_timestamp_                   = control_timestamp_;
+            [[maybe_unused]] float dt =
+                std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
+            prev_control_timestamp_ = control_timestamp_;
 #endif
 
             lateral_control(dt);
             longitudinal_control(dt);
 
             return {target_angle, target_speed};
+        }
+
+        ControlSignal update_mission_switch()
+        {
+#ifndef SIMULATION
+            // TODO: add timestamp
+            tick_counter_prev = tick_counter;
+            tick_counter      = HAL_GetTick();
+            float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
+#else
+            auto                   control_timestamp_ = std::chrono::steady_clock::now();
+            [[maybe_unused]] float dt =
+                std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
+            prev_control_timestamp_ = control_timestamp_;
+#endif
+
+            // TODO: mission switch
+
+            return {0, 0};
         }
 
         void set_object_range(const float object_range_) { object_range = object_range_; }
