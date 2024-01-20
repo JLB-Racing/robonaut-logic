@@ -10,6 +10,9 @@
 
 #define SIMULATION
 
+typedef std::pair<char, char> pcc;
+typedef std::pair<pcc, pcc>   cross;
+
 namespace jlb
 {
 #ifndef SIMULATION
@@ -22,11 +25,15 @@ namespace jlb
     //
 
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float    SQUARE_LENGTH               = 0.6;  // m
-    PARAM unsigned BITMAP_SIZE                 = 64;   // px
-    PARAM char     MISSION_SWITCH_NODE         = 'V';  // -
-    PARAM int      NUMBER_OF_GATES             = 17;   // -
+    PARAM float    SQUARE_LENGTH                                  = 0.6;    // m
+    PARAM unsigned BITMAP_SIZE                                    = 64;     // px
+    PARAM char     MISSION_SWITCH_NODE                            = 'V';    // -
+    PARAM int      NUMER_OF_PREV_GATES                            = 1;      // -
+    PARAM char     MISSION_SWITCH_PREV_NODES[NUMER_OF_PREV_GATES] = {'Q'};  // -
+    PARAM int      NUMBER_OF_GATES                                = 17;     // -
     PARAM char     GATE_NAMES[NUMBER_OF_GATES] = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
+    PARAM float    PIRATE_WEIGHT_PENALTY       = 1000.0f;
+    PARAM float    SAFETY_MARGIN               = 1.5f;
 
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
@@ -88,13 +95,12 @@ namespace jlb
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
-    PARAM float FAST_SPEED              = 4.5f;   // m/s
-    PARAM float FAST_SPEED_TURN         = 1.5f;   // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
-    PARAM float MIN_SPEED               = 0.25f;  // m/s
+    PARAM float LABYRINTH_SPEED         = 1.0f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
+    PARAM float FAST_SPEED              = 4.5f;  // m/s
+    PARAM float FAST_SPEED_TURN         = 1.5f;  // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -112,17 +118,23 @@ namespace jlb
     //
 
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float    SQUARE_LENGTH               = 0.6;  // m
-    PARAM unsigned BITMAP_SIZE                 = 64;   // px
-    PARAM char     MISSION_SWITCH_NODE         = 'V';  // -
-    PARAM char     MISSION_SWITCH_NODE_PREV    = 'Q';  // -
-    PARAM int      NUMBER_OF_GATES             = 17;   // -
-    PARAM char     GATE_NAMES[NUMBER_OF_GATES] = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
+    PARAM float    SQUARE_LENGTH                                  = 0.6;    // m
+    PARAM unsigned BITMAP_SIZE                                    = 64;     // px
+    PARAM char     MISSION_SWITCH_NODE                            = 'V';    // -
+    PARAM int      NUMER_OF_PREV_GATES                            = 1;      // -
+    PARAM char     MISSION_SWITCH_PREV_NODES[NUMER_OF_PREV_GATES] = {'Q'};  // -
+    PARAM int      NUMBER_OF_GATES                                = 17;     // -
+    PARAM char     GATE_NAMES[NUMBER_OF_GATES]              = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
+    PARAM float    PIRATE_WEIGHT_PENALTY                    = 1000.0f;
+    PARAM float    SAFETY_MARGIN                            = 1.0f;
+    PARAM int      NUMBER_OF_CROSS_SECTIONS                 = 3;
+    PARAM cross    CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
+        cross(pcc('K', 'L'), pcc('N', 'I')), cross(pcc('F', 'G'), pcc('I', 'D')), cross(pcc('T', 'U'), pcc('W', 'O'))};
 
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.25f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.1f;  // m
+    PARAM float LOCALIZATION_INACCURACY     = 0.25f;  // m
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -181,13 +193,12 @@ namespace jlb
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 0.4f;   // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.2f;   // m/s
+    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
     PARAM float FAST_SPEED              = 1.5f;   // m/s
     PARAM float FAST_SPEED_TURN         = 0.75f;  // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 0.6f;   // m/s
-    PARAM float MIN_SPEED               = 0.1f;   // m/s
 
     ///////////////////////////////////////////////////////////////////////////
     //

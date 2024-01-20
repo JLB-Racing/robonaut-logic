@@ -41,7 +41,10 @@ namespace jlb
 
         uint32_t tick_counter      = 0u;
         uint32_t tick_counter_prev = 0u;
-        Odometry(const float x_t_ = 0.0f, const float y_t_ = 0.0f, const float theta_t_ = 0.0f) : x_t(x_t_), y_t(y_t_), theta_t(normalize_angle(theta_t_)) {}
+        Odometry(const float x_t_ = 0.0f, const float y_t_ = 0.0f, const float theta_t_ = 0.0f)
+            : x_t(x_t_), y_t(y_t_), theta_t(normalize_angle(theta_t_))
+        {
+        }
 
         ~Odometry() {}
 
@@ -73,7 +76,6 @@ namespace jlb
         Odom update_odom()
         {
 #ifndef SIMULATION
-            // TODO: add timestamp and dt
             tick_counter_prev = tick_counter;
             tick_counter      = HAL_GetTick();
             float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
@@ -153,10 +155,7 @@ namespace jlb
         std::deque<float>     w_buffer_;
         [[maybe_unused]] bool first_update_ = true;
 
-#ifndef SIMULATION
-        // TODO: add timestamp
-
-#else
+#ifdef SIMULATION
         std::chrono::time_point<std::chrono::steady_clock> odom_timestamp_;
 #endif
     };

@@ -10,26 +10,95 @@
 
 namespace jlb
 {
+
     struct DijkstraResult
     {
         char              node;
         std::vector<char> path;
+        float             weight;
     };
 
     struct Edge
     {
-        char              node;
-        Direction         direction;
-        std::vector<char> prev_nodes;
-        float             distance;
+        char              from       = '@';
+        char              to         = '@';
+        Direction         direction  = Direction::STRAIGHT;
+        std::vector<char> prev_nodes = {'@'};
+        float             distance   = std::numeric_limits<float>::infinity();
 
-        Edge(char node_, Direction direction_, std::vector<char> prev_nodes_, float distance_)
-            : node{node_}, direction{direction_}, prev_nodes{prev_nodes_}, distance{distance_}
+        static char  pirate_previous_node;
+        static char  pirate_next_node;
+        static char  pirate_after_next_node;
+        static float pirate_section_percentage;
+        static int   stolen_gates[NUMBER_OF_GATES];
+        static bool  flood;
+
+        Edge(const char from_, const char to_, const Direction direction_, const std::vector<char> &prev_nodes_, const float distance_)
+            : from{from_}, to{to_}, direction{direction_}, prev_nodes{prev_nodes_}, distance{distance_}
         {
         }
 
-        float get_weight() const { return distance; }
+        Edge() {}
+
+        float get_weight() const
+        {
+            float weight = distance;
+
+            // PIRATE
+            if (from == pirate_next_node || to == pirate_next_node) { weight += 2.0f * PIRATE_WEIGHT_PENALTY; }
+            else if (from == pirate_previous_node || to == pirate_previous_node)
+            {
+                weight += 1.5f * PIRATE_WEIGHT_PENALTY * (1 - pirate_section_percentage);
+            }
+            else if (to == pirate_after_next_node) { weight += PIRATE_WEIGHT_PENALTY; }
+            else if (from == pirate_after_next_node) { weight += PIRATE_WEIGHT_PENALTY * pirate_section_percentage; }
+
+            // FLOOD
+            if (!flood && to == 'X') { weight = std::numeric_limits<float>::infinity(); }
+
+            // CROSS SECTION
+            for (int i = 0; i < NUMBER_OF_CROSS_SECTIONS; ++i)
+            {
+                const auto &cross = CROSS_SECTIONS[i];
+                const auto &v     = cross.first;
+                const auto &h     = cross.second;
+
+                if ((((from == v.first && to == v.second) || (to == v.first && from == v.second)) &&
+                     ((pirate_previous_node == h.first && pirate_next_node == h.second) ||
+                      (pirate_next_node == h.first && pirate_previous_node == h.second))) ||
+                    (((from == h.first && to == h.second) || (to == h.first && from == h.second)) &&
+                     ((pirate_previous_node == v.first && pirate_next_node == v.second) ||
+                      (pirate_next_node == v.first && pirate_previous_node == v.second))))
+                {
+                    weight += PIRATE_WEIGHT_PENALTY;
+                    break;
+                }
+                else if ((((from == v.first && to == v.second) || (to == v.first && from == v.second)) &&
+                          ((pirate_next_node == h.first && pirate_after_next_node == h.second) ||
+                           (pirate_after_next_node == h.first && pirate_next_node == h.second))) ||
+                         (((from == h.first && to == h.second) || (to == h.first && from == h.second)) &&
+                          ((pirate_next_node == v.first && pirate_after_next_node == v.second) ||
+                           (pirate_after_next_node == v.first && pirate_next_node == v.second))))
+                {
+                    weight += PIRATE_WEIGHT_PENALTY * pirate_section_percentage;
+                    break;
+                }
+            }
+
+            return weight;
+        }
+
+        static bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
+
+        static Edge invalid_edge;
     };
+
+    char  Edge::pirate_previous_node          = 'P';
+    char  Edge::pirate_next_node              = 'M';
+    char  Edge::pirate_after_next_node        = 'H';
+    float Edge::pirate_section_percentage     = 0.0f;
+    int   Edge::stolen_gates[NUMBER_OF_GATES] = {0};
+    bool  Edge::flood                         = false;
 
     class Node
     {
@@ -39,21 +108,19 @@ namespace jlb
         float             y;
         std::vector<Edge> edges;
 
-        Edge invalid_edge = Edge{'@', Direction::STRAIGHT, {'@'}, 0.0f};
-
         Node(char name_, float x_, float y_) : name{name_}, x(x_), y(y_) {}
         ~Node() {}
 
-        void add_edge(char name_, Direction direction_, std::vector<char> prev_nodes_, float distance_)
+        void add_edge(const char to_, const Direction direction_, const std::vector<char> &prev_nodes_, const float distance_)
         {
-            edges.push_back(Edge{name_, direction_, prev_nodes_, distance_});
+            edges.push_back(Edge{name, to_, direction_, prev_nodes_, distance_});
         }
 
         void remove_edge(char name_)
         {
             for (auto it = edges.begin(); it != edges.end(); ++it)
             {
-                if (it->node == name_)
+                if (it->to == name_)
                 {
                     edges.erase(it);
                     break;
@@ -160,7 +227,7 @@ namespace jlb
             this->operator[]('N').add_edge('S', Direction::STRAIGHT, {'K', 'I', 'L'}, UNIT);
             this->operator[]('N').add_edge('R', Direction::RIGHT, {'K', 'I', 'L'}, QUARTER_CIRCLE);
             this->operator[]('O').add_edge('L', Direction::LEFT, {'T', 'U', 'W'}, QUARTER_CIRCLE);
-            this->operator[]('O').add_edge('U', Direction::LEFT, {'L'}, QUARTER_CIRCLE);
+            // this->operator[]('O').add_edge('U', Direction::LEFT, {'L'}, QUARTER_CIRCLE);
             this->operator[]('O').add_edge('W', Direction::STRAIGHT, {'L'}, UNIT + QUARTER_CIRCLE);
             this->operator[]('O').add_edge('T', Direction::RIGHT, {'L'}, QUARTER_CIRCLE);
             // this->operator[]('P').add_edge('M', Direction::LEFT, {'P'}, QUARTER_CIRCLE);
@@ -182,7 +249,7 @@ namespace jlb
             this->operator[]('T').add_edge('S', Direction::STRAIGHT, {'O', 'U'}, UNIT);
             this->operator[]('T').add_edge('N', Direction::RIGHT, {'O', 'U'}, QUARTER_CIRCLE);
             this->operator[]('T').add_edge('O', Direction::LEFT, {'N', 'S'}, QUARTER_CIRCLE);
-            this->operator[]('T').add_edge('U', Direction::STRAIGHT, {'N', 'S'}, 2.0f * UNIT);
+            // this->operator[]('T').add_edge('U', Direction::STRAIGHT, {'N', 'S'}, 2.0f * UNIT);
             this->operator[]('U').add_edge('T', Direction::STRAIGHT, {'U'}, 2.0f * UNIT);
             this->operator[]('U').add_edge('O', Direction::RIGHT, {'U'}, QUARTER_CIRCLE);
             this->operator[]('V').add_edge('Q', Direction::RIGHT, {'S', 'W'}, QUARTER_CIRCLE);
@@ -202,6 +269,24 @@ namespace jlb
             return nodes[static_cast<int>(name - 'A')];
         }
 
+        const Node &operator[](char name) const
+        {
+            if (nodes.empty() || name < 'A' || name > 'X') { return invalid_node; }
+            return nodes[static_cast<int>(name - 'A')];
+        }
+
+        void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)
+        {
+            if (Edge::pirate_next_node == prev_node_) { Edge::stolen_gates[static_cast<int>(prev_node_ - 'A')] += 1; }
+
+            Edge::pirate_previous_node   = prev_node_;
+            Edge::pirate_next_node       = next_node_;
+            Edge::pirate_after_next_node = after_next_node_;
+            if (section_percentage_ > 100) { Edge::pirate_section_percentage = 1.0f; }
+            else if (section_percentage_ < 0) { Edge::pirate_section_percentage = 0.0f; }
+            else { Edge::pirate_section_percentage = section_percentage_ / 100.0f; }
+        }
+
         void print_dijkstra(const std::map<char, std::pair<float, std::vector<char>>> &map)
         {
 #ifdef SIMULATION
@@ -214,7 +299,7 @@ namespace jlb
 #endif
         }
 
-        DijkstraResult Dijkstra(char previous_node, char current_node, char end_node = '@')
+        DijkstraResult Dijkstra(char previous_node, char current_node, char end_node = '@', bool escape = false)
         {
             std::map<char, std::pair<float, std::vector<char>>>                                                                    result;
             std::priority_queue<std::pair<float, char>, std::vector<std::pair<float, char>>, std::greater<std::pair<float, char>>> queue;
@@ -233,8 +318,6 @@ namespace jlb
                 auto [distance, vertex_id] = queue.top();
                 queue.pop();
 
-                // if (vertex_id == end_node) break;
-
                 for (unsigned long index = 0; index < this->operator[](vertex_id).edges.size(); ++index)
                 {
                     auto &edge = this->operator[](vertex_id).edges[index];
@@ -245,14 +328,15 @@ namespace jlb
                     {
                         continue;
                     }
-                    // else if the checked vertex is not the current node check if it's predecessor along the path is in the list of previous nodes
+                    // else if the checked vertex is not the current node check if it's predecessor along the path is in the list of previous
+                    // nodes
                     else if (vertex_id != current_node &&
                              std::find(edge.prev_nodes.begin(), edge.prev_nodes.end(), result[vertex_id].second.back()) == edge.prev_nodes.end())
                     {
                         continue;
                     }
 
-                    char  neighbor = edge.node;
+                    char  neighbor = edge.to;
                     float weight   = edge.get_weight();
 
                     if (result[neighbor].first > distance + weight)
@@ -266,7 +350,12 @@ namespace jlb
             }
 
             // insert starting to the back of vector the uuid of the specified vertex
-            for (auto &[vertex_id, pair] : result) { pair.second.push_back(vertex_id); }
+            for (auto &[vertex_id, pair] : result)
+            {
+                if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 1 && pair.first != 0) { pair.first += PIRATE_WEIGHT_PENALTY / 4.0f; }
+                else if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 0 && pair.first != 0) { pair.first += PIRATE_WEIGHT_PENALTY / 8.0f; }
+                pair.second.push_back(vertex_id);
+            }
 
             if (end_node == '@')
             {
@@ -276,17 +365,19 @@ namespace jlb
                 for (auto &[vertex_id, pair] : result)
                 {
                     if (pair.first != 0 && pair.first < min_distance &&
-                        std::find(collected_nodes.begin(), collected_nodes.end(), vertex_id) == collected_nodes.end() &&
-                        std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), vertex_id) != std::end(GATE_NAMES))
+                        (escape || (std::find(collected_nodes.begin(), collected_nodes.end(), vertex_id) == collected_nodes.end() &&
+                                    std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), vertex_id) != std::end(GATE_NAMES))))
                     {
                         min_distance = pair.first;
                         min_node     = vertex_id;
                     }
                 }
 
-                return DijkstraResult{min_node, result[min_node].second};
+                print_dijkstra(result);
+
+                return DijkstraResult{min_node, result[min_node].second, min_distance};
             }
-            else { return DijkstraResult{end_node, result[end_node].second}; }
+            else { return DijkstraResult{end_node, result[end_node].second, result[end_node].first}; }
         }
     };
 

@@ -2,6 +2,7 @@
 #define AS_STATE_HXX
 
 #include <chrono>
+#include <iostream>
 
 #include "common.hxx"
 #include "controller.hxx"
@@ -35,10 +36,11 @@ namespace jlb
     class ASState
     {
     public:
-        Mission        mission         = Mission::LABYRINTH;
-        LabyrinthState labyrinth_state = LabyrinthState::START;
-        FastState      fast_state      = FastState::FOLLOW_SAFETY_CAR;
-        float          reference_speed = 0.0f;
+        Mission        mission              = Mission::LABYRINTH;
+        LabyrinthState labyrinth_state      = LabyrinthState::START;
+        LabyrinthState prev_labyrinth_state = LabyrinthState::START;
+        FastState      fast_state           = FastState::FOLLOW_SAFETY_CAR;
+        float          reference_speed      = 0.0f;
 
         bool     under_gate               = false;
         bool     at_cross_section         = false;
@@ -50,39 +52,285 @@ namespace jlb
         uint32_t tick_counter             = 0u;
         uint32_t tick_counter_prev        = 0u;
 
-        char              previous_node = 'U';
-        char              next_node     = 'U';
-        char              goal_node     = 'U';
-        std::vector<char> goal_path;
-        int               path_idx      = 0;
-        unsigned long     selected_edge = 0u;
-
-        char pirate_previous_node      = 'P';
-        char pirate_next_node          = 'M';
-        char pirate_after_next_node    = 'H';
-        int  pirate_section_percentage = 0;
+        char          at_node       = 'U';
+        char          previous_node = 'U';
+        char          next_node     = 'U';
+        char          goal_node     = 'U';
+        unsigned long selected_edge = 0u;
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
 
         void set_states(const CompositeState state_)
         {
-            mission         = state_.mission;
-            labyrinth_state = state_.labyrinth_state;
-            fast_state      = state_.fast_state;
+            mission              = state_.mission;
+            prev_labyrinth_state = labyrinth_state;
+            labyrinth_state      = state_.labyrinth_state;
+            fast_state           = state_.fast_state;
         }
 
         void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)
         {
-            pirate_previous_node      = prev_node_;
-            pirate_next_node          = next_node_;
-            pirate_after_next_node    = after_next_node_;
-            pirate_section_percentage = section_percentage_;
+            graph.pirate_callback(prev_node_, next_node_, after_next_node_, section_percentage_);
+        }
+
+        void apply_path(const DijkstraResult& result)
+        {
+            goal_node = result.node;
+            next_node = result.path[1];
+
+            std::cout << "path: ";
+            for (auto node : result.path) std::cout << node << " ";
+            std::cout << std::endl;
+            std::cout << "weight: " << result.weight << std::endl;
+
+            std::cout << Edge::pirate_previous_node << "->" << Edge::pirate_next_node << "->" << Edge::pirate_after_next_node << "\t"
+                      << Edge::pirate_section_percentage << std::endl;
+
+            for (unsigned long i = 0; i < graph[at_node].edges.size(); i++)
+                if (graph[at_node].edges[i].to == next_node) selected_edge = i;
+
+            controller.set_direction(graph[at_node].edges[selected_edge].direction);
+            odometry.correction(graph[at_node].x, graph[at_node].y);
+
+            previous_node = at_node;
+        }
+
+        void apply_path_reverse(const DijkstraResult& result)
+        {
+            goal_node = result.node;
+            next_node = result.path[1];
+
+            std::cout << "path: ";
+            for (auto node : result.path) std::cout << node << " ";
+            std::cout << std::endl;
+            std::cout << "weight: " << result.weight << std::endl;
+
+            std::cout << Edge::pirate_previous_node << "->" << Edge::pirate_next_node << "->" << Edge::pirate_after_next_node << "\t"
+                      << Edge::pirate_section_percentage << std::endl;
+
+            for (unsigned long i = 0; i < graph[at_node].edges.size(); i++)
+                if (graph[at_node].edges[i].to == next_node) selected_edge = i;
+
+            if (controller.target_speed < 0.0f)
+            {
+                const auto& dir = graph[at_node].edges[selected_edge].direction;
+                if (dir == Direction::LEFT) { controller.set_direction(Direction::RIGHT); }
+                else if (dir == Direction::RIGHT) { controller.set_direction(Direction::LEFT); }
+                else { controller.set_direction(Direction::STRAIGHT); }
+            }
+
+            // odometry.correction(graph[at_node].x, graph[at_node].y);
+
+            previous_node = at_node;
+        }
+
+        void exploring_callback()
+        {
+            std::cout << labyrinth_state << std::endl;
+
+            if (std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), at_node) != std::end(GATE_NAMES) &&
+                std::find(graph.collected_nodes.begin(), graph.collected_nodes.end(), at_node) == graph.collected_nodes.end())
+            {
+                graph.collected_nodes.push_back(at_node);
+            }
+
+            auto result = graph.Dijkstra(previous_node, at_node);
+
+            if (result.weight == std::numeric_limits<float>::infinity())
+            {
+                if (graph.collected_nodes.size() == NUMBER_OF_GATES)
+                {
+                    for (auto& node : graph.nodes)
+                    {
+                        if (node.name == MISSION_SWITCH_NODE ||
+                            std::find(std::begin(MISSION_SWITCH_PREV_NODES), std::end(MISSION_SWITCH_PREV_NODES), node.name) !=
+                                std::end(MISSION_SWITCH_PREV_NODES))
+                        {
+                            continue;
+                        }
+                        node.remove_edge(MISSION_SWITCH_NODE);
+                    }
+
+                    prev_labyrinth_state = labyrinth_state;
+                    labyrinth_state      = LabyrinthState::FINISHED;
+                    finished_callback();
+                }
+                else
+                {
+                    prev_labyrinth_state = labyrinth_state;
+                    labyrinth_state      = LabyrinthState::ESCAPE;
+                    escape_callback();
+                }
+            }
+            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
+            {
+                if (result.path.size() > 1)
+                {
+                    auto new_result = graph.Dijkstra(at_node, result.path[1]);
+                    if (std::fabs(result.weight - new_result.weight) < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    {
+                        apply_path(result);
+                        return;
+                    }
+                }
+
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::STANDBY;
+                standby_callback();
+            }
+            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
+            {
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::ESCAPE;
+                escape_callback();
+            }
+            else { apply_path(result); }
+        }
+
+        void finished_callback()
+        {
+            std::cout << labyrinth_state << std::endl;
+
+            auto result = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
+
+            if (result.weight == std::numeric_limits<float>::infinity())
+            {
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::ESCAPE;
+                escape_callback();
+            }
+            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
+            {
+                if (result.path.size() > 1)
+                {
+                    auto new_result = graph.Dijkstra(at_node, result.path[1], MISSION_SWITCH_NODE);
+                    if (std::fabs(result.weight - new_result.weight) < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    {
+                        apply_path(result);
+
+                        if (at_node == goal_node)
+                        {
+                            prev_labyrinth_state = labyrinth_state;
+                            labyrinth_state      = LabyrinthState::MISSION_SWITCH;
+                        }
+
+                        return;
+                    }
+                }
+
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::STANDBY;
+                standby_callback();
+            }
+            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
+            {
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::ESCAPE;
+                escape_callback();
+            }
+            else
+            {
+                apply_path(result);
+
+                if (at_node == goal_node)
+                {
+                    prev_labyrinth_state = labyrinth_state;
+                    labyrinth_state      = LabyrinthState::MISSION_SWITCH;
+                }
+            }
+        }
+
+        void error_callback() { std::cout << labyrinth_state << std::endl; }
+
+        void standby_callback()
+        {
+            std::cout << labyrinth_state << std::endl;
+
+            if (Edge::pirate_intersecting(at_node))
+            {
+                labyrinth_state = LabyrinthState::ESCAPE;
+                escape_callback();
+            }
+            else
+            {
+                if (prev_labyrinth_state == LabyrinthState::EXPLORING)
+                {
+                    auto result = graph.Dijkstra(previous_node, at_node);
+
+                    if (result.weight == std::numeric_limits<float>::infinity())
+                    {
+                        labyrinth_state = LabyrinthState::ESCAPE;
+                        escape_callback();
+                    }
+                    else if (result.weight < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    {
+                        prev_labyrinth_state = labyrinth_state;
+                        labyrinth_state      = LabyrinthState::EXPLORING;
+                        exploring_callback();
+                    }
+                    else { std::cout << previous_node << " " << at_node << " " << result.weight << std::endl; }
+                }
+                else if (prev_labyrinth_state == LabyrinthState::FINISHED)
+                {
+                    auto result = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
+
+                    if (result.weight == std::numeric_limits<float>::infinity())
+                    {
+                        labyrinth_state = LabyrinthState::ESCAPE;
+                        escape_callback();
+                    }
+                    else if (result.weight < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    {
+                        prev_labyrinth_state = labyrinth_state;
+                        labyrinth_state      = LabyrinthState::FINISHED;
+                        finished_callback();
+                    }
+                }
+            }
+        }
+
+        void escape_callback()
+        {
+            std::cout << labyrinth_state << std::endl;
+
+            auto result = graph.Dijkstra(previous_node, at_node, '@', true);
+
+            if (result.weight == std::numeric_limits<float>::infinity())
+            {
+                labyrinth_state = LabyrinthState::ERROR;
+                error_callback();
+            }
+            else
+            {
+                apply_path(result);
+                std::swap(prev_labyrinth_state, labyrinth_state);
+            }
+        }
+
+        void reverse_escape_callback()
+        {
+            std::cout << labyrinth_state << std::endl;
+
+            auto result = graph.Dijkstra(previous_node, at_node, '@', true);
+
+            if (result.weight == std::numeric_limits<float>::infinity())
+            {
+                labyrinth_state = LabyrinthState::ERROR;
+                error_callback();
+            }
+            else { apply_path_reverse(result); }
+        }
+
+        void mission_switch_callback()
+        {
+            std::cout << labyrinth_state << std::endl;
+
+            // TODO: this is a placeholder
         }
 
         CompositeState update()
         {
 #ifndef SIMULATION
-            // TODO: add timestamp
             tick_counter_prev = tick_counter;
             tick_counter      = HAL_GetTick();
             float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
@@ -105,74 +353,63 @@ namespace jlb
                     if (!prev_at_decision_point && at_decision_point)
                     {
                         auto distance = graph[previous_node].edges[selected_edge].distance;
-                        if (std::fabs(distance - odometry.distance_local) < LOCALIZATION_INACCURACY || labyrinth_state == LabyrinthState::START)
+
+                        if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE) { distance = graph[at_node].edges[selected_edge].distance; }
+
+                        if (std::fabs(distance - std::fabs(odometry.distance_local)) < LOCALIZATION_INACCURACY ||
+                            labyrinth_state == LabyrinthState::START)
                         {
-                            if (labyrinth_state == LabyrinthState::START) { labyrinth_state = LabyrinthState::EXPLORING; }
-
-                            auto at_node = next_node;
-
-                            if (at_node == goal_node && labyrinth_state == LabyrinthState::EXPLORING)
+                            if (labyrinth_state == LabyrinthState::START)
                             {
-                                if (std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), at_node) != std::end(GATE_NAMES))
-                                {
-                                    graph.collected_nodes.push_back(at_node);
-                                }
-
-                                auto [node, path] = graph.Dijkstra(previous_node, at_node);
-                                goal_node         = node;
-                                goal_path         = path;
-                                path_idx          = 1;
-                                next_node         = goal_path[path_idx];
-
-                                if (node == '@')
-                                {
-                                    if (graph.collected_nodes.size() == NUMBER_OF_GATES)
-                                    {
-                                        for (auto& node : graph.nodes)
-                                        {
-                                            if (node.name == MISSION_SWITCH_NODE_PREV || node.name == MISSION_SWITCH_NODE) { continue; }
-
-                                            // [[maybe_unused]] auto removed = node.remove_edge(MISSION_SWITCH_NODE);
-
-                                            // if (removed.node != '@') std::cout << node.name << "->" << removed.node << std::endl;
-                                        }
-
-                                        graph['S'].remove_edge('V');
-                                        graph['W'].remove_edge('V');
-
-                                        auto [node, path] = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
-                                        goal_node         = node;
-                                        goal_path         = path;
-                                        path_idx          = 1;
-                                        next_node         = goal_path[path_idx];
-                                        labyrinth_state   = LabyrinthState::FINISHED;
-                                    }
-                                    else
-                                    {
-                                        // TODO: there is no correct route but there are still gates to collect
-                                    }
-                                }
+                                prev_labyrinth_state = labyrinth_state;
+                                labyrinth_state      = LabyrinthState::EXPLORING;
                             }
-                            else if (at_node == goal_node && labyrinth_state == LabyrinthState::FINISHED)
-                            {
-                                labyrinth_state = LabyrinthState::MISSION_SWITCH;
-                            }
-                            else { next_node = goal_path[++path_idx]; }
-                            previous_node = at_node;
 
-                            // find the selected edge, which is the index that connects the previous
-                            // node to the next node
-                            for (unsigned long i = 0; i < graph[at_node].edges.size(); i++)
+                            at_node = next_node;
+
+                            switch (labyrinth_state)
                             {
-                                if (graph[at_node].edges[i].node == next_node)
+                                case LabyrinthState::EXPLORING:
                                 {
-                                    selected_edge = i;
+                                    exploring_callback();
+                                    break;
+                                }
+                                case LabyrinthState::FINISHED:
+                                {
+                                    finished_callback();
+                                    break;
+                                }
+                                case LabyrinthState::REVERSE_ESCAPE:
+                                {
+                                    auto result = graph.Dijkstra(previous_node, at_node, '@', true);
+
+                                    if (result.weight == std::numeric_limits<float>::infinity())
+                                    {
+                                        labyrinth_state = LabyrinthState::ERROR;
+                                        error_callback();
+                                        break;
+                                    }
+                                    else { previous_node = result.path[1]; }
+
+                                    if (prev_labyrinth_state == LabyrinthState::EXPLORING)
+                                    {
+                                        prev_labyrinth_state = labyrinth_state;
+                                        labyrinth_state      = LabyrinthState::EXPLORING;
+                                        exploring_callback();
+                                    }
+                                    else if (prev_labyrinth_state == LabyrinthState::FINISHED)
+                                    {
+                                        prev_labyrinth_state = labyrinth_state;
+                                        labyrinth_state      = LabyrinthState::FINISHED;
+                                        finished_callback();
+                                    }
+                                    break;
+                                }
+                                default:
+                                {
                                     break;
                                 }
                             }
-
-                            controller.set_direction(graph[at_node].edges[selected_edge].direction);
-                            odometry.correction(graph[previous_node].x, graph[previous_node].y);
 
 #ifdef SIMULATION
                             switch (controller.direction)
@@ -195,7 +432,74 @@ namespace jlb
 
                     prev_at_decision_point = at_decision_point;
 
-                    reference_speed = LABYRINTH_SPEED;
+                    switch (labyrinth_state)
+                    {
+                        case LabyrinthState::ERROR:
+                        {
+                            error_callback();
+                            break;
+                        }
+                        case LabyrinthState::STANDBY:
+                        {
+                            standby_callback();
+                            break;
+                        }
+                        case LabyrinthState::ESCAPE:
+                        {
+                            escape_callback();
+                            break;
+                        }
+                        case LabyrinthState::MISSION_SWITCH:
+                        {
+                            mission_switch_callback();
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                    }
+
+                    if ((next_node == Edge::pirate_next_node || next_node == Edge::pirate_after_next_node) &&
+                        labyrinth_state != LabyrinthState::REVERSE_ESCAPE)
+                    {
+                        if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED)
+                        {
+                            prev_labyrinth_state = labyrinth_state;
+                        }
+                        labyrinth_state = LabyrinthState::REVERSE_ESCAPE;
+                        previous_node   = next_node;
+                        reverse_escape_callback();
+
+                        reference_speed = -LABYRINTH_SPEED_REVERSE;
+
+#ifdef SIMULATION
+                        switch (controller.direction)
+                        {
+                            case Direction::LEFT:
+                                std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
+                                break;
+                            case Direction::RIGHT:
+                                std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
+                                break;
+                            case Direction::STRAIGHT:
+                                std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
+                                break;
+                            default:
+                                break;
+                        }
+#endif
+                    }
+                    else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE)
+                    {
+                        if (controller.target_speed < 0.0f)
+                        {
+                            const auto& dir = graph[at_node].edges[selected_edge].direction;
+                            if (dir == Direction::LEFT) { controller.set_direction(Direction::RIGHT); }
+                            else if (dir == Direction::RIGHT) { controller.set_direction(Direction::LEFT); }
+                            else { controller.set_direction(Direction::STRAIGHT); }
+                        }
+                    }
+                    else { reference_speed = LABYRINTH_SPEED; }
 
                     break;
                 }
@@ -318,9 +622,7 @@ namespace jlb
         [[maybe_unused]] Controller& controller;
         [[maybe_unused]] Graph&      graph;
 
-#ifndef SIMULATION
-        // TODO: add timestamp
-#else
+#ifdef SIMULATION
         std::chrono::time_point<std::chrono::steady_clock> prev_update_timestamp_ = std::chrono::steady_clock::now();
 #endif
     };

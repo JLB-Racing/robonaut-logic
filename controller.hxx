@@ -33,6 +33,7 @@ namespace jlb
         [[maybe_unused]] float prev_line_position_front = 0.0f;
         [[maybe_unused]] float prev_line_position_rear  = 0.0f;
 
+        float reference_speed   = 0.0f;
         float target_angle      = 0.0f;
         float target_speed      = 0.0f;
         float cross_track_error = 0.0f;
@@ -190,6 +191,8 @@ namespace jlb
 
             if (target_angle > deg2rad(MAX_WHEEL_ANGLE)) target_angle = deg2rad(MAX_WHEEL_ANGLE);
             if (target_angle < -deg2rad(MAX_WHEEL_ANGLE)) target_angle = -deg2rad(MAX_WHEEL_ANGLE);
+
+            if (target_speed < 0.0f) { target_angle = -target_angle; }
         }
 
         void longitudinal_control([[maybe_unused]] const float dt)
@@ -209,8 +212,6 @@ namespace jlb
             else if (reference_speed < target_speed - MAX_DECELERATION * dt) { target_speed -= MAX_DECELERATION * dt; }
             else { target_speed = reference_speed; }
 
-            if (target_speed < MIN_SPEED) target_speed = MIN_SPEED;
-
             // float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
             // target_speed *= std::pow((1 - object_rate), 2);
         }
@@ -218,7 +219,6 @@ namespace jlb
         ControlSignal update()
         {
 #ifndef SIMULATION
-            // TODO: add timestamp
             tick_counter_prev = tick_counter;
             tick_counter      = HAL_GetTick();
             float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
@@ -238,7 +238,6 @@ namespace jlb
         ControlSignal update_mission_switch()
         {
 #ifndef SIMULATION
-            // TODO: add timestamp
             tick_counter_prev = tick_counter;
             tick_counter      = HAL_GetTick();
             float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
@@ -268,6 +267,22 @@ namespace jlb
             line_positions_rear = line_positions_rear_;
         }
 
+        void swap_front_rear()
+        {
+            std::swap(detection_front, detection_rear);
+            std::swap(line_positions_front, line_positions_rear);
+            std::reverse(std::begin(detection_front), std::end(detection_front));
+            std::reverse(std::begin(detection_rear), std::end(detection_rear));
+            std::reverse(std::begin(line_positions_front), std::end(line_positions_front));
+            std::reverse(std::begin(line_positions_rear), std::end(line_positions_rear));
+
+            // use multiplication lambda with -1 on line positions
+            std::transform(
+                std::begin(line_positions_front), std::end(line_positions_front), std::begin(line_positions_front), [](float f) { return -f; });
+            std::transform(
+                std::begin(line_positions_rear), std::end(line_positions_rear), std::begin(line_positions_rear), [](float f) { return -f; });
+        }
+
         void set_current_velocity(const float current_velocity_) { current_velocity = current_velocity_; }
 
         void set_direction(const Direction direction_)
@@ -279,14 +294,11 @@ namespace jlb
         void set_reference_speed(const float reference_speed_) { reference_speed = reference_speed_; }
 
     private:
-        float reference_speed  = 0.0f;
         float current_velocity = 0.0f;
 
         PID object_pid{obj::kP, obj::kI, obj::kD, obj::TAU, obj::T, obj::LIM_MIN, obj::LIM_MAX, obj::DEADBAND, obj::DERIVATIVE_FILTER_ALPHA};
 
-#ifndef SIMULATION
-        // TODO: add timestamp
-#else
+#ifdef SIMULATION
         std::chrono::time_point<std::chrono::steady_clock> prev_control_timestamp_ = std::chrono::steady_clock::now();
 #endif
     };

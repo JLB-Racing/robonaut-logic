@@ -34,6 +34,14 @@ namespace jlb
                 auto [target_angle, target_speed] = controller.update_mission_switch();
                 return ControlSignal{target_angle, target_speed};
             }
+            else if (as_state.labyrinth_state == LabyrinthState::STANDBY) { return ControlSignal{0.0f, 0.0f}; }
+            else if (as_state.labyrinth_state == LabyrinthState::ERROR) { return ControlSignal{0.0f, 0.0f}; }
+            else if (as_state.labyrinth_state == LabyrinthState::REVERSE_ESCAPE)
+            {
+                if (controller.target_speed < 0.0f) { controller.swap_front_rear(); }
+                auto [target_angle, target_speed] = controller.update();
+                return ControlSignal{target_angle, target_speed};
+            }
             else
             {
                 auto [target_angle, target_speed] = controller.update();
@@ -64,8 +72,16 @@ namespace jlb
         void set_measurements(const Measurements &measurements_) { measurements = measurements_; }
         void set_flood(const bool flood_)
         {
-            if (flood_ && as_state.labyrinth_state == LabyrinthState::EXPLORING) { as_state.labyrinth_state = LabyrinthState::FLOOD_TO_BALANCER; }
-            else if (!flood_ && as_state.labyrinth_state == LabyrinthState::FLOOD_SOLVING) { as_state.labyrinth_state = LabyrinthState::EXPLORING; }
+            if (flood_ && as_state.labyrinth_state == LabyrinthState::EXPLORING)
+            {
+                Edge::flood              = true;
+                as_state.labyrinth_state = LabyrinthState::FLOOD_TO_BALANCER;
+            }
+            else if (!flood_ && as_state.labyrinth_state == LabyrinthState::FLOOD_SOLVING)
+            {
+                Edge::flood              = false;
+                as_state.labyrinth_state = LabyrinthState::EXPLORING;
+            }
         }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
 
