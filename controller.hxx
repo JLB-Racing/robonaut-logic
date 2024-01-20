@@ -115,23 +115,25 @@ namespace jlb
             }
             else if (line_positions.size() == 4)
             {
-                switch (direction)
-                {
-                    case Direction::LEFT:
-                    {
-                        return line_positions[0];
-                    }
-                    case Direction::STRAIGHT:
-                    {
-                        return line_positions[1] + line_positions[2] / 2.0f;
-                    }
-                    case Direction::RIGHT:
-                    {
-                        return line_positions[3];
-                    }
-                    default:
-                        return 0.0f;
-                }
+                // switch (direction)
+                // {
+                //     case Direction::LEFT:
+                //     {
+                //         return line_positions[0];
+                //     }
+                //     case Direction::STRAIGHT:
+                //     {
+                //         return line_positions[1] + line_positions[2] / 2.0f;
+                //     }
+                //     case Direction::RIGHT:
+                //     {
+                //         return line_positions[3];
+                //     }
+                //     default:
+                //         return 0.0f;
+                // }
+
+                return line_positions[1] + line_positions[2] / 2.0f;
             }
             else
             {
@@ -165,9 +167,9 @@ namespace jlb
                 std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; }) || line_positions_front.size() == 0 ||
                 line_positions_rear.size() == 0)
             {
-                if (target_angle < 0) { target_angle = -MAX_WHEEL_ANGLE; }
+                if (target_angle < 0) { target_angle = deg2rad(-MAX_WHEEL_ANGLE); }
                 else if (target_angle == 0) { target_angle = 0; }
-                else if (target_angle > 0) { target_angle = MAX_WHEEL_ANGLE; }
+                else if (target_angle > 0) { target_angle = deg2rad(MAX_WHEEL_ANGLE); }
                 return;
             }
 
@@ -285,10 +287,23 @@ namespace jlb
 
         void set_current_velocity(const float current_velocity_) { current_velocity = current_velocity_; }
 
-        void set_direction(const Direction direction_)
+        void set_direction(const Direction direction_, const bool reverse = false)
         {
-            prev_direction = direction;
-            direction      = direction_;
+            if (!reverse)
+            {
+                prev_direction = direction;
+                direction      = direction_;
+            }
+            else
+            {
+                if (direction == Direction::LEFT) { prev_direction = Direction::RIGHT; }
+                else if (direction == Direction::RIGHT) { prev_direction = Direction::LEFT; }
+                else { prev_direction = Direction::STRAIGHT; }
+
+                if (direction_ == Direction::LEFT) { direction = Direction::RIGHT; }
+                else if (direction_ == Direction::RIGHT) { direction = Direction::LEFT; }
+                else { direction = Direction::STRAIGHT; }
+            }
         }
 
         void set_reference_speed(const float reference_speed_) { reference_speed = reference_speed_; }

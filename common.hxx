@@ -32,12 +32,13 @@ namespace jlb
     PARAM char     MISSION_SWITCH_PREV_NODES[NUMER_OF_PREV_GATES] = {'Q'};  // -
     PARAM int      NUMBER_OF_GATES                                = 17;     // -
     PARAM char     GATE_NAMES[NUMBER_OF_GATES] = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
-    PARAM float    PIRATE_WEIGHT_PENALTY       = 1000.0f;
+    PARAM float    WEIGHT_PENALTY              = 1000.0f;
     PARAM float    SAFETY_MARGIN               = 1.5f;
 
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.5f;
+    PARAM float LOCALIZATION_INACCURACY     = 0.1f;  // m
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -125,7 +126,7 @@ namespace jlb
     PARAM char     MISSION_SWITCH_PREV_NODES[NUMER_OF_PREV_GATES] = {'Q'};  // -
     PARAM int      NUMBER_OF_GATES                                = 17;     // -
     PARAM char     GATE_NAMES[NUMBER_OF_GATES]              = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
-    PARAM float    PIRATE_WEIGHT_PENALTY                    = 1000.0f;
+    PARAM float    WEIGHT_PENALTY                           = 1000.0f;
     PARAM float    SAFETY_MARGIN                            = 1.0f;
     PARAM int      NUMBER_OF_CROSS_SECTIONS                 = 3;
     PARAM cross    CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
@@ -134,7 +135,7 @@ namespace jlb
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.25f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.25f;  // m
+    PARAM float LOCALIZATION_INACCURACY     = 0.1f;  // m
 
     ///////////////////////////////////////////////////////////////////////////
     //

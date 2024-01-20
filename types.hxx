@@ -34,11 +34,48 @@ namespace jlb
         STRAIGHT,
     };
 
+    std::ostream &operator<<(std::ostream &os, const Direction &direction)
+    {
+        switch (direction)
+        {
+            case Direction::LEFT:
+                os << "LEFT";
+                break;
+            case Direction::RIGHT:
+                os << "RIGHT";
+                break;
+            case Direction::STRAIGHT:
+                os << "STRAIGHT";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
+
     enum class Mission
     {
         LABYRINTH,
         FAST,
     };
+
+    std::ostream &operator<<(std::ostream &os, const Mission &mission)
+    {
+        switch (mission)
+        {
+            case Mission::LABYRINTH:
+                os << "LABYRINTH";
+                break;
+            case Mission::FAST:
+                os << "FAST";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
 
     enum class LabyrinthState
     {

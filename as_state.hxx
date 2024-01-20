@@ -58,6 +58,8 @@ namespace jlb
         char          goal_node     = 'U';
         unsigned long selected_edge = 0u;
 
+        Direction reverse_saved_dir = Direction::STRAIGHT;
+
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
 
         void set_states(const CompositeState state_)
@@ -78,14 +80,6 @@ namespace jlb
             goal_node = result.node;
             next_node = result.path[1];
 
-            std::cout << "path: ";
-            for (auto node : result.path) std::cout << node << " ";
-            std::cout << std::endl;
-            std::cout << "weight: " << result.weight << std::endl;
-
-            std::cout << Edge::pirate_previous_node << "->" << Edge::pirate_next_node << "->" << Edge::pirate_after_next_node << "\t"
-                      << Edge::pirate_section_percentage << std::endl;
-
             for (unsigned long i = 0; i < graph[at_node].edges.size(); i++)
                 if (graph[at_node].edges[i].to == next_node) selected_edge = i;
 
@@ -100,34 +94,21 @@ namespace jlb
             goal_node = result.node;
             next_node = result.path[1];
 
-            std::cout << "path: ";
-            for (auto node : result.path) std::cout << node << " ";
-            std::cout << std::endl;
-            std::cout << "weight: " << result.weight << std::endl;
-
-            std::cout << Edge::pirate_previous_node << "->" << Edge::pirate_next_node << "->" << Edge::pirate_after_next_node << "\t"
-                      << Edge::pirate_section_percentage << std::endl;
-
             for (unsigned long i = 0; i < graph[at_node].edges.size(); i++)
                 if (graph[at_node].edges[i].to == next_node) selected_edge = i;
 
-            if (controller.target_speed < 0.0f)
+            if (controller.target_speed < 0.0f && odometry.distance_local < WHEELBASE)
             {
-                const auto& dir = graph[at_node].edges[selected_edge].direction;
-                if (dir == Direction::LEFT) { controller.set_direction(Direction::RIGHT); }
-                else if (dir == Direction::RIGHT) { controller.set_direction(Direction::LEFT); }
-                else { controller.set_direction(Direction::STRAIGHT); }
+                controller.set_direction(graph[at_node].edges[selected_edge].direction);
             }
 
-            // odometry.correction(graph[at_node].x, graph[at_node].y);
+            if (controller.target_speed < 0.0f && odometry.distance_local >= WHEELBASE) { controller.set_direction(reverse_saved_dir, true); }
 
             previous_node = at_node;
         }
 
         void exploring_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), at_node) != std::end(GATE_NAMES) &&
                 std::find(graph.collected_nodes.begin(), graph.collected_nodes.end(), at_node) == graph.collected_nodes.end())
             {
@@ -162,12 +143,12 @@ namespace jlb
                     escape_callback();
                 }
             }
-            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
             {
                 if (result.path.size() > 1)
                 {
                     auto new_result = graph.Dijkstra(at_node, result.path[1]);
-                    if (std::fabs(result.weight - new_result.weight) < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
                     {
                         apply_path(result);
                         return;
@@ -178,7 +159,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::STANDBY;
                 standby_callback();
             }
-            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::ESCAPE;
@@ -189,8 +170,6 @@ namespace jlb
 
         void finished_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -199,12 +178,12 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ESCAPE;
                 escape_callback();
             }
-            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
             {
                 if (result.path.size() > 1)
                 {
                     auto new_result = graph.Dijkstra(at_node, result.path[1], MISSION_SWITCH_NODE);
-                    if (std::fabs(result.weight - new_result.weight) < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
                     {
                         apply_path(result);
 
@@ -222,7 +201,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::STANDBY;
                 standby_callback();
             }
-            else if (result.weight >= PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::ESCAPE;
@@ -240,12 +219,10 @@ namespace jlb
             }
         }
 
-        void error_callback() { std::cout << labyrinth_state << std::endl; }
+        void error_callback() {}
 
         void standby_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (Edge::pirate_intersecting(at_node))
             {
                 labyrinth_state = LabyrinthState::ESCAPE;
@@ -262,13 +239,12 @@ namespace jlb
                         labyrinth_state = LabyrinthState::ESCAPE;
                         escape_callback();
                     }
-                    else if (result.weight < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
                     {
                         prev_labyrinth_state = labyrinth_state;
                         labyrinth_state      = LabyrinthState::EXPLORING;
                         exploring_callback();
                     }
-                    else { std::cout << previous_node << " " << at_node << " " << result.weight << std::endl; }
                 }
                 else if (prev_labyrinth_state == LabyrinthState::FINISHED)
                 {
@@ -279,7 +255,7 @@ namespace jlb
                         labyrinth_state = LabyrinthState::ESCAPE;
                         escape_callback();
                     }
-                    else if (result.weight < PIRATE_WEIGHT_PENALTY * SAFETY_MARGIN)
+                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
                     {
                         prev_labyrinth_state = labyrinth_state;
                         labyrinth_state      = LabyrinthState::FINISHED;
@@ -291,8 +267,6 @@ namespace jlb
 
         void escape_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -309,8 +283,6 @@ namespace jlb
 
         void reverse_escape_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -323,8 +295,6 @@ namespace jlb
 
         void mission_switch_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             // TODO: this is a placeholder
         }
 
@@ -391,6 +361,9 @@ namespace jlb
                                     }
                                     else { previous_node = result.path[1]; }
 
+                                    odometry.correction(graph[at_node].x, graph[at_node].y);
+                                    controller.set_direction(reverse_saved_dir, true);
+
                                     if (prev_labyrinth_state == LabyrinthState::EXPLORING)
                                     {
                                         prev_labyrinth_state = labyrinth_state;
@@ -403,6 +376,9 @@ namespace jlb
                                         labyrinth_state      = LabyrinthState::FINISHED;
                                         finished_callback();
                                     }
+
+                                    odometry.distance_local += WHEELBASE;
+
                                     break;
                                 }
                                 default:
@@ -412,20 +388,8 @@ namespace jlb
                             }
 
 #ifdef SIMULATION
-                            switch (controller.direction)
-                            {
-                                case Direction::LEFT:
-                                    std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
-                                    break;
-                                case Direction::RIGHT:
-                                    std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
-                                    break;
-                                case Direction::STRAIGHT:
-                                    std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
-                                    break;
-                                default:
-                                    break;
-                            }
+                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: " << controller.direction << std::endl;
+
 #endif
                         }
                     }
@@ -459,7 +423,8 @@ namespace jlb
                         }
                     }
 
-                    if ((next_node == Edge::pirate_next_node || next_node == Edge::pirate_after_next_node) &&
+                    if ((next_node == Edge::pirate_next_node ||
+                         (next_node == Edge::pirate_after_next_node && Edge::pirate_section_percentage > 0.5f)) &&
                         labyrinth_state != LabyrinthState::REVERSE_ESCAPE)
                     {
                         if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED)
@@ -468,36 +433,25 @@ namespace jlb
                         }
                         labyrinth_state = LabyrinthState::REVERSE_ESCAPE;
                         previous_node   = next_node;
+                        odometry.distance_local -= WHEELBASE;
                         reverse_escape_callback();
 
-                        reference_speed = -LABYRINTH_SPEED_REVERSE;
-
-#ifdef SIMULATION
-                        switch (controller.direction)
-                        {
-                            case Direction::LEFT:
-                                std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: left" << std::endl;
-                                break;
-                            case Direction::RIGHT:
-                                std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: right" << std::endl;
-                                break;
-                            case Direction::STRAIGHT:
-                                std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: straight" << std::endl;
-                                break;
-                            default:
-                                break;
-                        }
-#endif
+                        reference_speed   = -LABYRINTH_SPEED_REVERSE;
+                        reverse_saved_dir = controller.direction;
                     }
                     else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE)
                     {
-                        if (controller.target_speed < 0.0f)
+                        if (controller.target_speed < 0.0f && odometry.distance_local < WHEELBASE)
                         {
-                            const auto& dir = graph[at_node].edges[selected_edge].direction;
-                            if (dir == Direction::LEFT) { controller.set_direction(Direction::RIGHT); }
-                            else if (dir == Direction::RIGHT) { controller.set_direction(Direction::LEFT); }
-                            else { controller.set_direction(Direction::STRAIGHT); }
+                            controller.set_direction(graph[at_node].edges[selected_edge].direction);
                         }
+
+                        if (controller.target_speed < 0.0f && odometry.distance_local >= WHEELBASE)
+                        {
+                            controller.set_direction(reverse_saved_dir, true);
+                        }
+
+                        reference_speed = -LABYRINTH_SPEED_REVERSE;
                     }
                     else { reference_speed = LABYRINTH_SPEED; }
 

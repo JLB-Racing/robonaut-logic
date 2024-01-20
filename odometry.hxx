@@ -144,10 +144,13 @@ namespace jlb
 
             theta_t = normalize_angle(theta_t);
 
-            x_t_local      = 0.0f;
-            y_t_local      = 0.0f;
-            theta_t_local  = 0.0f;
-            distance_local = 0.0f;
+            if (std::fabs(distance_local) > WHEELBASE)
+            {
+                x_t_local      = 0.0f;
+                y_t_local      = 0.0f;
+                theta_t_local  = 0.0f;
+                distance_local = 0.0f;
+            }
         }
 
     private:

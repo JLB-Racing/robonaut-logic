@@ -45,13 +45,13 @@ namespace jlb
             float weight = distance;
 
             // PIRATE
-            if (from == pirate_next_node || to == pirate_next_node) { weight += 2.0f * PIRATE_WEIGHT_PENALTY; }
+            if (from == pirate_next_node || to == pirate_next_node) { weight += 2.0f * WEIGHT_PENALTY; }
             else if (from == pirate_previous_node || to == pirate_previous_node)
             {
-                weight += 1.5f * PIRATE_WEIGHT_PENALTY * (1 - pirate_section_percentage);
+                weight += 1.5f * WEIGHT_PENALTY * (1 - pirate_section_percentage);
             }
-            else if (to == pirate_after_next_node) { weight += PIRATE_WEIGHT_PENALTY; }
-            else if (from == pirate_after_next_node) { weight += PIRATE_WEIGHT_PENALTY * pirate_section_percentage; }
+            else if (to == pirate_after_next_node) { weight += WEIGHT_PENALTY; }
+            else if (from == pirate_after_next_node) { weight += WEIGHT_PENALTY * pirate_section_percentage; }
 
             // FLOOD
             if (!flood && to == 'X') { weight = std::numeric_limits<float>::infinity(); }
@@ -70,7 +70,7 @@ namespace jlb
                      ((pirate_previous_node == v.first && pirate_next_node == v.second) ||
                       (pirate_next_node == v.first && pirate_previous_node == v.second))))
                 {
-                    weight += PIRATE_WEIGHT_PENALTY;
+                    weight += 2.0f * WEIGHT_PENALTY;
                     break;
                 }
                 else if ((((from == v.first && to == v.second) || (to == v.first && from == v.second)) &&
@@ -80,7 +80,7 @@ namespace jlb
                           ((pirate_next_node == v.first && pirate_after_next_node == v.second) ||
                            (pirate_after_next_node == v.first && pirate_next_node == v.second))))
                 {
-                    weight += PIRATE_WEIGHT_PENALTY * pirate_section_percentage;
+                    weight += WEIGHT_PENALTY;
                     break;
                 }
             }
@@ -352,8 +352,11 @@ namespace jlb
             // insert starting to the back of vector the uuid of the specified vertex
             for (auto &[vertex_id, pair] : result)
             {
-                if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 1 && pair.first != 0) { pair.first += PIRATE_WEIGHT_PENALTY / 4.0f; }
-                else if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 0 && pair.first != 0) { pair.first += PIRATE_WEIGHT_PENALTY / 8.0f; }
+                if (end_node == '@' && !escape)
+                {
+                    if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 1 && pair.first != 0) { pair.first += WEIGHT_PENALTY / 5.0f; }
+                    else if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 0 && pair.first != 0) { pair.first += WEIGHT_PENALTY / 10.0f; }
+                }
                 pair.second.push_back(vertex_id);
             }
 
@@ -372,8 +375,6 @@ namespace jlb
                         min_node     = vertex_id;
                     }
                 }
-
-                print_dijkstra(result);
 
                 return DijkstraResult{min_node, result[min_node].second, min_distance};
             }
