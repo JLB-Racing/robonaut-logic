@@ -26,7 +26,7 @@ namespace jlb
     PARAM unsigned BITMAP_SIZE   = 64;   // px
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.02f;
     PARAM float STATE_MIN_TIME              = 0.5f;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,13 +87,16 @@ namespace jlb
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
     }  // namespace lat
 
-    PARAM float OFFSET  = 0.25f;
-    PARAM float SLOPE   = 1.0f;
+    PARAM float OFFSET  = -4.625f;
+    PARAM float SLOPE   = 3.5f;
     PARAM float DAMPING = 0.9f;
     PARAM float D5_MIN = 1.5f;
+    PARAM float OFFSET_EXP1  = 4.5f;
+    PARAM float OFFSET_EXP2  = -1.38f;
 
-    PARAM float MAX_ACCELERATION = 3.0f;  // m/s^2
-    PARAM float MAX_DECELERATION = 4.0f;  // m/s^2
+
+    PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
+    PARAM float MAX_DECELERATION = 10.0f;  // m/s^2
 
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
@@ -101,7 +104,7 @@ namespace jlb
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
-    PARAM float FAST_SPEED              = 4.5f;   // m/s
+    PARAM float FAST_SPEED              = 7.0f;   // m/s
     PARAM float FAST_SPEED_TURN         = 1.5f;   // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s

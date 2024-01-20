@@ -38,7 +38,7 @@ namespace jlb
         void set_detection_rear(bool *detection_rear_, std::vector<float> line_positions_rear_) { controller.set_detection_rear(detection_rear_, line_positions_rear_); }
         void set_under_gate(const bool under_gate_) { as_state.under_gate = under_gate_; }
         void set_at_cross_section(const bool at_cross_section_) { as_state.at_cross_section = at_cross_section_; }
-        void imu_callback(const float yaw_rate_) { odometry.imu_callback(yaw_rate_); }
+        void imu_callback(const float ang_vel_x, const float ang_vel_y, const float ang_vel_z, const float lin_acc_x, const float lin_acc_y, const float lin_acc_z) { odometry.imu_callback(ang_vel_x, ang_vel_y, ang_vel_z, lin_acc_x, lin_acc_y, lin_acc_z); }
         void rpm_callback(const float motor_rpm_) { odometry.rpm_callback(motor_rpm_); }
         void set_object_range(const float object_range_) { controller.set_object_range(object_range_); }
         void set_states(const CompositeState state_) { as_state.set_states(state_); }

@@ -5,6 +5,13 @@
 #include <limits>
 #include <algorithm>
 
+struct DebugOutput
+{
+	float derivative;
+	float integral;
+	float prev_error;
+};
+
 class PID
 {
 public:
@@ -70,7 +77,7 @@ public:
             float deltaIntegral = unsaturatedIntegral - integral_;
 
             // Back-calculation: Adjust the integral term based on the impact of saturation
-            integral_ += (error * dt) - deltaIntegral;
+            integral_ += (error * dt)/* - deltaIntegral*/;
         }
         else
         {
@@ -81,8 +88,8 @@ public:
         integral_ = std::clamp(integral_, minOutput_, maxOutput_);
 
         // Deadband: Scale the integral term based on the proximity to the deadband
-        float deadbandFactor = 1.0f - std::min(1.0f, std::abs(error) / (deadband_ + epsilon));
-        integral_ *= deadbandFactor;
+        //float deadbandFactor = 1.0f - std::min(1.0f, std::abs(error) / (deadband_ + epsilon));
+        //integral_ *= deadbandFactor;
 
         // Calculate the derivative term with low-pass filtering
         derivative_ = (1.0f - derivativeFilterAlpha_) * derivative_ + derivativeFilterAlpha_ * (error - prevError_) / dt;
@@ -113,6 +120,12 @@ public:
         ki_ = ki;
         kd_ = kd;
     }
+
+    DebugOutput get_debug()
+    {
+    	return {derivative_, integral_, prevError_};
+    }
+
 
 private:
     // params

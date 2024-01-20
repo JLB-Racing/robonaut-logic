@@ -8,6 +8,11 @@
 #include "common.hxx"
 #include "pid.hxx"
 
+#ifndef SIMULATION
+#include "Servo.h"
+
+extern uint32_t usWidth_throttle;
+#endif
 namespace jlb
 {
 
@@ -135,7 +140,10 @@ namespace jlb
 
         ControlParams get_control_params()
         {
-            float               d5  = OFFSET + SLOPE * current_velocity;
+        	current_velocity += std::numeric_limits<float>::epsilon();
+
+        	//float               d5  = OFFSET + SLOPE * current_velocity;
+        	float               d5  = OFFSET_EXP1 + std::log2(current_velocity + OFFSET_EXP2);
             if (d5 < D5_MIN) d5 = D5_MIN;
             float               t5  = d5 / current_velocity;
             float               T   = t5 / 3.0f * DAMPING;
@@ -153,12 +161,20 @@ namespace jlb
 
         void lateral_control([[maybe_unused]] const float dt)
         {
-            if (std::all_of(std::begin(detection_front), std::end(detection_front), [](bool b) { return b; })) { return; }
+        	if (std::all_of(std::begin(detection_front), std::end(detection_front), [](bool b) { return b; }) ||
+			std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; }) || line_positions_front.size() == 0 ||
+			line_positions_rear.size() == 0)
+        	{
+				if(target_speed <= FAST_SPEED_TURN || target_speed <= LABYRINTH_SPEED || target_speed <= LABYRINTH_SPEED_REVERSE)
+				{
+					if (target_angle < 0) { target_angle = -deg2rad(MAX_WHEEL_ANGLE); }
+					else if (target_angle == 0) { target_angle = 0; }
+					else if (target_angle > 0) { target_angle = deg2rad(MAX_WHEEL_ANGLE); }
+				}
+				return;
+        	}
 
-            if (std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; })) { return; }
-
-            if (line_positions_front.size() == 0 || line_positions_rear.size() == 0 || line_positions_front.size() > 4 || line_positions_rear.size() > 4) { return; }
-
+		if (line_positions_front.size() > 4 || line_positions_rear.size() > 4) { return; }
             line_position_front      = select_control_point(line_positions_front, prev_line_position_front);
             line_position_rear       = select_control_point(line_positions_rear, prev_line_position_rear);
             prev_line_position_front = line_position_front;
@@ -194,6 +210,13 @@ namespace jlb
             float x      = std::max(dist_error_norm, ang_error_norm);
             target_speed = std::min(reference_speed, reference_speed * (1.0f - (0.1666667f * x) - (0.8333333f * x * x)));
             */
+
+#ifndef SIMULATION
+        	if(!((usWidth_throttle > 1800) && (usWidth_throttle < 2800)))
+			{
+				reference_speed = 0.0f;
+			}
+#endif
 
             if (reference_speed > target_speed + MAX_ACCELERATION * dt) { target_speed += MAX_ACCELERATION * dt; }
             else if (reference_speed < target_speed - MAX_DECELERATION * dt) { target_speed -= MAX_DECELERATION * dt; }
