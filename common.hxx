@@ -31,12 +31,15 @@ namespace jlb
     PARAM int      NUMER_OF_PREV_GATES                            = 1;      // -
     PARAM char     MISSION_SWITCH_PREV_NODES[NUMER_OF_PREV_GATES] = {'Q'};  // -
     PARAM int      NUMBER_OF_GATES                                = 17;     // -
-    PARAM char     GATE_NAMES[NUMBER_OF_GATES] = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
-    PARAM float    WEIGHT_PENALTY              = 1000.0f;
-    PARAM float    SAFETY_MARGIN               = 1.5f;
+    PARAM char     GATE_NAMES[NUMBER_OF_GATES]              = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
+    PARAM float    WEIGHT_PENALTY                           = 1000.0f;
+    PARAM float    SAFETY_MARGIN                            = 1.0f;
+    PARAM int      NUMBER_OF_CROSS_SECTIONS                 = 3;
+    PARAM cross    CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
+        cross(pcc('K', 'L'), pcc('N', 'I')), cross(pcc('F', 'G'), pcc('I', 'D')), cross(pcc('T', 'U'), pcc('W', 'O'))};
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.02f;
     PARAM float STATE_MIN_TIME              = 0.5f;
     PARAM float LOCALIZATION_INACCURACY     = 0.1f;  // m
 
@@ -84,24 +87,27 @@ namespace jlb
         PARAM float FOLLOW_DISTANCE         = 0.3f;
     }  // namespace obj
 
-    PARAM float OFFSET  = 0.25f;
-    PARAM float SLOPE   = 1.0f;
-    PARAM float DAMPING = 0.9f;
-    PARAM float D5_MIN  = 1.5f;
+    PARAM float OFFSET      = -4.625f;
+    PARAM float SLOPE       = 3.5f;
+    PARAM float DAMPING     = 0.9f;
+    PARAM float D5_MIN      = 1.5f;
+    PARAM float OFFSET_EXP1 = 4.5f;
+    PARAM float OFFSET_EXP2 = -1.38f;
 
-    PARAM float MAX_ACCELERATION = 3.0f;  // m/s^2
-    PARAM float MAX_DECELERATION = 4.0f;  // m/s^2
+    PARAM float MAX_ACCELERATION = 7.5f;   // m/s^2
+    PARAM float MAX_DECELERATION = 10.0f;  // m/s^2
 
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.0f;  // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 4.5f;  // m/s
-    PARAM float FAST_SPEED_TURN         = 1.5f;  // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
+    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
+    PARAM float FAST_SPEED              = 7.0f;   // m/s
+    PARAM float FAST_SPEED_TURN         = 1.5f;   // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
+    PARAM float MIN_SPEED               = 0.25f;  // m/s
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -182,10 +188,12 @@ namespace jlb
         PARAM float FOLLOW_DISTANCE         = 0.3f;
     }  // namespace obj
 
-    PARAM float OFFSET  = 0.25f;
-    PARAM float SLOPE   = 1.0f;
-    PARAM float DAMPING = 0.25f;
-    PARAM float D5_MIN  = 0.0f;
+    PARAM float OFFSET      = 0.25f;
+    PARAM float SLOPE       = 1.0f;
+    PARAM float DAMPING     = 0.25f;
+    PARAM float D5_MIN      = 0.0f;
+    PARAM float OFFSET_EXP1 = 4.5f;
+    PARAM float OFFSET_EXP2 = -1.38f;
 
     PARAM float MAX_ACCELERATION = 1.0f;  // m/s^2
     PARAM float MAX_DECELERATION = 1.0f;  // m/s^2

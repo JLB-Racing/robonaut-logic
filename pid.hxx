@@ -1,15 +1,30 @@
 #ifndef PID_HXX
 #define PID_HXX
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
-#include <algorithm>
+
+struct DebugOutput
+{
+    float derivative;
+    float integral;
+    float prev_error;
+};
 
 class PID
 {
 public:
     PID(float kp, float ki, float kd, float tau, float T, float minOutput, float maxOutput, float deadband, float derivativeFilterAlpha)
-        : kp_(kp), ki_(ki), kd_(kd), tau_(tau), T_(T), minOutput_(minOutput), maxOutput_(maxOutput), deadband_(deadband), derivativeFilterAlpha_(derivativeFilterAlpha)
+        : kp_(kp),
+          ki_(ki),
+          kd_(kd),
+          tau_(tau),
+          T_(T),
+          minOutput_(minOutput),
+          maxOutput_(maxOutput),
+          deadband_(deadband),
+          derivativeFilterAlpha_(derivativeFilterAlpha)
     {
     }
 
@@ -33,9 +48,9 @@ public:
 
     void update_params(float kp, float ki, float kd)
     {
-    	kp_                    = kp;
-		ki_                    = ki;
-		kd_                    = kd;
+        kp_ = kp;
+        ki_ = ki;
+        kd_ = kd;
     }
 
     float update(float setpoint, float processVariable, float dt)
@@ -67,10 +82,10 @@ public:
             if (std::isnan(unsaturatedIntegral)) { unsaturatedIntegral = 0.0f; }
 
             // Calculate the adjustment needed due to saturation
-            float deltaIntegral = unsaturatedIntegral - integral_;
+            [[maybe_unused]] float deltaIntegral = unsaturatedIntegral - integral_;
 
             // Back-calculation: Adjust the integral term based on the impact of saturation
-            integral_ += (error * dt) - deltaIntegral;
+            integral_ += (error * dt) /* - deltaIntegral*/;
         }
         else
         {
@@ -81,8 +96,8 @@ public:
         integral_ = std::clamp(integral_, minOutput_, maxOutput_);
 
         // Deadband: Scale the integral term based on the proximity to the deadband
-        float deadbandFactor = 1.0f - std::min(1.0f, std::abs(error) / (deadband_ + epsilon));
-        integral_ *= deadbandFactor;
+        // float deadbandFactor = 1.0f - std::min(1.0f, std::abs(error) / (deadband_ + epsilon));
+        // integral_ *= deadbandFactor;
 
         // Calculate the derivative term with low-pass filtering
         derivative_ = (1.0f - derivativeFilterAlpha_) * derivative_ + derivativeFilterAlpha_ * (error - prevError_) / dt;
@@ -113,6 +128,8 @@ public:
         ki_ = ki;
         kd_ = kd;
     }
+
+    DebugOutput get_debug() { return {derivative_, integral_, prevError_}; }
 
 private:
     // params

@@ -60,7 +60,7 @@ namespace jlb
         }
         void set_under_gate(const bool under_gate_) { as_state.under_gate = under_gate_; }
         void set_at_cross_section(const bool at_cross_section_) { as_state.at_cross_section = at_cross_section_; }
-        void imu_callback(const float yaw_rate_) { odometry.imu_callback(yaw_rate_); }
+        void imu_callback(const float ang_vel_x, const float ang_vel_y, const float ang_vel_z, const float lin_acc_x, const float lin_acc_y, const float lin_acc_z) { odometry.imu_callback(ang_vel_x, ang_vel_y, ang_vel_z, lin_acc_x, lin_acc_y, lin_acc_z); }
         void rpm_callback(const float motor_rpm_) { odometry.rpm_callback(motor_rpm_); }
         void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)
         {

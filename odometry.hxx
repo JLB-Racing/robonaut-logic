@@ -61,9 +61,14 @@ namespace jlb
             vx_t = std::accumulate(v_buffer_.begin(), v_buffer_.end(), 0.0f) / v_buffer_.size();
         }
 
-        void imu_callback(const float ang_vel_z)
+        void imu_callback(const float ang_vel_x, const float ang_vel_y, const float ang_vel_z, const float lin_acc_x, const float lin_acc_y, const float lin_acc_z)
         {
-            meas_ang_vel_z = ang_vel_z;
+        	meas_ang_vel_z = ang_vel_x;
+        	meas_ang_vel_z = ang_vel_y;
+        	meas_ang_vel_z = ang_vel_z;
+        	meas_lin_acc_x = lin_acc_x;
+        	meas_lin_acc_x = lin_acc_y;
+        	meas_lin_acc_x = lin_acc_z;
 
             if (std::fabs(ang_vel_z) > jlb::MAX_YAW_RATE) { return; }
 
