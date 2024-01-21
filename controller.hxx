@@ -273,6 +273,27 @@ namespace jlb
             return {0, 0};
         }
 
+        ControlSignal update_balancer()
+        {
+#ifndef SIMULATION
+            tick_counter_prev = tick_counter;
+            tick_counter      = HAL_GetTick();
+            float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
+#else
+            auto                   control_timestamp_ = std::chrono::steady_clock::now();
+            [[maybe_unused]] float dt =
+                std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
+            prev_control_timestamp_ = control_timestamp_;
+#endif
+
+            // TODO: balancer control
+
+            lateral_control(dt);
+            longitudinal_control(dt);
+
+            return {target_angle, target_speed};
+        }
+
         void set_object_range(const float object_range_) { object_range = object_range_; }
 
         void set_detection_front(bool *detection_front_, std::vector<float> line_positions_front_)

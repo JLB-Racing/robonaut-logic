@@ -55,6 +55,18 @@ namespace jlb
 
             // FLOOD
             if (!flood && to == 'X') { weight = std::numeric_limits<float>::infinity(); }
+            else if (flood)
+            {
+                // iterate over BALANCER_PROHIBITED_EDGES
+                for (int i = 0; i < NUMBER_OF_BALANCER_PROHIBITED_EDGES; ++i)
+                {
+                    if (from == BALANCER_PROHIBITED_EDGES[i].first && to == BALANCER_PROHIBITED_EDGES[i].second)
+                    {
+                        weight = std::numeric_limits<float>::infinity();
+                        break;
+                    }
+                }
+            }
 
             // CROSS SECTION
             for (int i = 0; i < NUMBER_OF_CROSS_SECTIONS; ++i)
@@ -163,6 +175,7 @@ namespace jlb
             nodes.push_back(Node{static_cast<char>('V'), px_to_m(256), px_to_m(448)});
             nodes.push_back(Node{static_cast<char>('W'), px_to_m(256), px_to_m(576)});
             nodes.push_back(Node{static_cast<char>('X'), px_to_m(96), px_to_m(448)});
+            nodes.push_back(Node{static_cast<char>('Y'), px_to_m(96), px_to_m(576)});
 
             const auto UNIT           = SQUARE_LENGTH;
             const auto QUARTER_CIRCLE = 2 * UNIT * M_PI / 4.0f;
@@ -236,7 +249,6 @@ namespace jlb
             this->operator[]('Q').add_edge('M', Direction::STRAIGHT, {'V', 'X'}, UNIT);
             // this->operator[]('Q').add_edge('R', Direction::STRAIGHT, {'P'}, UNIT);
             this->operator[]('Q').add_edge('V', Direction::LEFT, {'M'}, QUARTER_CIRCLE);
-            this->operator[]('Q').add_edge('X', Direction::STRAIGHT, {'M'}, 2.5f * UNIT + QUARTER_CIRCLE);
             // this->operator[]('R').add_edge('Q', Direction::STRAIGHT, {'N', 'S'}, UNIT);
             this->operator[]('R').add_edge('M', Direction::RIGHT, {'N', 'S'}, QUARTER_CIRCLE);
             this->operator[]('R').add_edge('N', Direction::LEFT, {'M', 'Q'}, QUARTER_CIRCLE);
@@ -258,20 +270,30 @@ namespace jlb
             this->operator[]('W').add_edge('V', Direction::STRAIGHT, {'O'}, 2.0f * UNIT);
             this->operator[]('W').add_edge('S', Direction::RIGHT, {'O'}, QUARTER_CIRCLE);
             this->operator[]('W').add_edge('O', Direction::STRAIGHT, {'S', 'V'}, UNIT + QUARTER_CIRCLE);
+#ifndef SIMULATION
+            this->operator[]('Q').add_edge('X', Direction::STRAIGHT, {'M'}, 2.5f * UNIT + QUARTER_CIRCLE);
             this->operator[]('X').add_edge('Q', Direction::STRAIGHT, {'X'}, 2.5f * UNIT + QUARTER_CIRCLE);
+            this->operator[]('X').add_edge('Y', Direction::STRAIGHT, {'Q'}, 1.7f * UNIT);
+            this->operator[]('Y').add_edge('X', Direction::STRAIGHT, {'Y'}, 1.7f * UNIT);
+#else
+            this->operator[]('Q').add_edge('X', Direction::STRAIGHT, {'M'}, 3.0f * UNIT + 0.85f * QUARTER_CIRCLE);
+            this->operator[]('X').add_edge('Q', Direction::STRAIGHT, {'X'}, 3.0f * UNIT + 0.85f * QUARTER_CIRCLE);
+            this->operator[]('X').add_edge('Y', Direction::STRAIGHT, {'Q'}, 2.0f * UNIT);
+            this->operator[]('Y').add_edge('X', Direction::STRAIGHT, {'Y'}, 2.0f * UNIT);
+#endif
         }
 
         ~Graph() {}
 
         Node &operator[](char name)
         {
-            if (nodes.empty() || name < 'A' || name > 'X') { return invalid_node; }
+            if (nodes.empty() || name < 'A' || name > 'Y') { return invalid_node; }
             return nodes[static_cast<int>(name - 'A')];
         }
 
         const Node &operator[](char name) const
         {
-            if (nodes.empty() || name < 'A' || name > 'X') { return invalid_node; }
+            if (nodes.empty() || name < 'A' || name > 'Y') { return invalid_node; }
             return nodes[static_cast<int>(name - 'A')];
         }
 
@@ -352,7 +374,7 @@ namespace jlb
             // insert starting to the back of vector the uuid of the specified vertex
             for (auto &[vertex_id, pair] : result)
             {
-                if (end_node == '@' && !escape)
+                if (end_node == '@' && !escape && !Edge::flood)
                 {
                     if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 1 && pair.first != 0) { pair.first += WEIGHT_PENALTY / 5.0f; }
                     else if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 0 && pair.first != 0) { pair.first += WEIGHT_PENALTY / 10.0f; }
@@ -378,7 +400,12 @@ namespace jlb
 
                 return DijkstraResult{min_node, result[min_node].second, min_distance};
             }
-            else { return DijkstraResult{end_node, result[end_node].second, result[end_node].first}; }
+            else
+            {
+                std::cout << previous_node << " " << current_node << " " << end_node << std::endl;
+                print_dijkstra(result);
+                return DijkstraResult{end_node, result[end_node].second, result[end_node].first};
+            }
         }
     };
 

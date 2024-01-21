@@ -34,8 +34,17 @@ namespace jlb
                 auto [target_angle, target_speed] = controller.update_mission_switch();
                 return ControlSignal{target_angle, target_speed};
             }
-            else if (as_state.labyrinth_state == LabyrinthState::STANDBY) { return ControlSignal{0.0f, 0.0f}; }
-            else if (as_state.labyrinth_state == LabyrinthState::ERROR) { return ControlSignal{0.0f, 0.0f}; }
+            else if (as_state.labyrinth_state == LabyrinthState::FLOOD_SOLVING)
+            {
+                std::cout << odometry.distance_local << std::endl;
+                auto [target_angle, target_speed] = controller.update_balancer();
+                return ControlSignal{target_angle, target_speed};
+            }
+            else if (as_state.labyrinth_state == LabyrinthState::STANDBY || as_state.labyrinth_state == LabyrinthState::ERROR ||
+                     as_state.labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+            {
+                return ControlSignal{0.0f, 0.0f};
+            }
             else if (as_state.labyrinth_state == LabyrinthState::REVERSE_ESCAPE)
             {
                 if (controller.target_speed < 0.0f) { controller.swap_front_rear(); }
@@ -60,7 +69,11 @@ namespace jlb
         }
         void set_under_gate(const bool under_gate_) { as_state.under_gate = under_gate_; }
         void set_at_cross_section(const bool at_cross_section_) { as_state.at_cross_section = at_cross_section_; }
-        void imu_callback(const float ang_vel_x, const float ang_vel_y, const float ang_vel_z, const float lin_acc_x, const float lin_acc_y, const float lin_acc_z) { odometry.imu_callback(ang_vel_x, ang_vel_y, ang_vel_z, lin_acc_x, lin_acc_y, lin_acc_z); }
+        void imu_callback(
+            const float ang_vel_x, const float ang_vel_y, const float ang_vel_z, const float lin_acc_x, const float lin_acc_y, const float lin_acc_z)
+        {
+            odometry.imu_callback(ang_vel_x, ang_vel_y, ang_vel_z, lin_acc_x, lin_acc_y, lin_acc_z);
+        }
         void rpm_callback(const float motor_rpm_) { odometry.rpm_callback(motor_rpm_); }
         void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)
         {
@@ -70,19 +83,7 @@ namespace jlb
         void set_states(const CompositeState state_) { as_state.set_states(state_); }
         void send_telemetry() { signal_sender.send_telemetry(); }
         void set_measurements(const Measurements &measurements_) { measurements = measurements_; }
-        void set_flood(const bool flood_)
-        {
-            if (flood_ && as_state.labyrinth_state == LabyrinthState::EXPLORING)
-            {
-                Edge::flood              = true;
-                as_state.labyrinth_state = LabyrinthState::FLOOD_TO_BALANCER;
-            }
-            else if (!flood_ && as_state.labyrinth_state == LabyrinthState::FLOOD_SOLVING)
-            {
-                Edge::flood              = false;
-                as_state.labyrinth_state = LabyrinthState::EXPLORING;
-            }
-        }
+        void set_flood(const bool flood_) { Edge::flood = flood_; }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
 
     private:
