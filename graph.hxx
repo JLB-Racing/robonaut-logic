@@ -151,6 +151,36 @@ namespace jlb
 
         Graph()
         {
+#ifdef Q2
+            nodes.push_back(Node{static_cast<char>('A'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('B'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('C'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('D'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('E'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('F'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('G'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('H'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('I'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('J'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('K'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('L'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('M'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('N'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('O'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('P'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('Q'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('R'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('S'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('T'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('U'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('V'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('W'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('X'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('Y'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('Z'), 0, 0});
+            nodes.push_back(Node{static_cast<char>('['), 0, 0});
+
+#else
             nodes.push_back(Node{static_cast<char>('A'), px_to_m(704), px_to_m(448)});
             nodes.push_back(Node{static_cast<char>('B'), px_to_m(704), px_to_m(576)});
             nodes.push_back(Node{static_cast<char>('C'), px_to_m(640), px_to_m(384)});
@@ -272,14 +302,15 @@ namespace jlb
             this->operator[]('W').add_edge('O', Direction::STRAIGHT, {'S', 'V'}, UNIT + QUARTER_CIRCLE);
 #ifndef SIMULATION
             this->operator[]('Q').add_edge('X', Direction::STRAIGHT, {'M'}, 2.5f * UNIT + QUARTER_CIRCLE);
-            this->operator[]('X').add_edge('Q', Direction::STRAIGHT, {'X'}, 2.5f * UNIT + QUARTER_CIRCLE);
+            this->operator[]('X').add_edge('Q', Direction::STRAIGHT, {'Y'}, 2.5f * UNIT + QUARTER_CIRCLE);
             this->operator[]('X').add_edge('Y', Direction::STRAIGHT, {'Q'}, 1.7f * UNIT);
             this->operator[]('Y').add_edge('X', Direction::STRAIGHT, {'Y'}, 1.7f * UNIT);
 #else
             this->operator[]('Q').add_edge('X', Direction::STRAIGHT, {'M'}, 3.0f * UNIT + 0.85f * QUARTER_CIRCLE);
-            this->operator[]('X').add_edge('Q', Direction::STRAIGHT, {'X'}, 3.0f * UNIT + 0.85f * QUARTER_CIRCLE);
+            this->operator[]('X').add_edge('Q', Direction::STRAIGHT, {'Y'}, 3.0f * UNIT + 0.85f * QUARTER_CIRCLE);
             this->operator[]('X').add_edge('Y', Direction::STRAIGHT, {'Q'}, 2.0f * UNIT);
             this->operator[]('Y').add_edge('X', Direction::STRAIGHT, {'Y'}, 2.0f * UNIT);
+#endif
 #endif
         }
 
@@ -287,14 +318,24 @@ namespace jlb
 
         Node &operator[](char name)
         {
+#ifdef Q2
+            if (nodes.empty() || name < 'A' || name > '[') { return invalid_node; }
+            return nodes[static_cast<int>(name - 'A')];
+#else
             if (nodes.empty() || name < 'A' || name > 'Y') { return invalid_node; }
             return nodes[static_cast<int>(name - 'A')];
+#endif
         }
 
         const Node &operator[](char name) const
         {
+#ifdef Q2
+            if (nodes.empty() || name < 'A' || name > '[') { return invalid_node; }
+            return nodes[static_cast<int>(name - 'A')];
+#else
             if (nodes.empty() || name < 'A' || name > 'Y') { return invalid_node; }
             return nodes[static_cast<int>(name - 'A')];
+#endif
         }
 
         void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)
@@ -400,12 +441,7 @@ namespace jlb
 
                 return DijkstraResult{min_node, result[min_node].second, min_distance};
             }
-            else
-            {
-                std::cout << previous_node << " " << current_node << " " << end_node << std::endl;
-                print_dijkstra(result);
-                return DijkstraResult{end_node, result[end_node].second, result[end_node].first};
-            }
+            else { return DijkstraResult{end_node, result[end_node].second, result[end_node].first}; }
         }
     };
 

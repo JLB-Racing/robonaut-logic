@@ -148,7 +148,10 @@ namespace jlb
             else if (min_theta == theta_360) { theta_t = (theta_t + 2.0f * M_PI) / 2.0f; }
 
             theta_t = normalize_angle(theta_t);
+        }
 
+        void reset_local()
+        {
             if (std::fabs(distance_local) > WHEELBASE)
             {
                 x_t_local      = 0.0f;

@@ -29,32 +29,52 @@ namespace jlb
             auto [mission, labyrinth_state, fast_state, reference_speed] = as_state.update();
             controller.set_reference_speed(reference_speed);
 
-            if (as_state.labyrinth_state == LabyrinthState::MISSION_SWITCH)
+            switch (as_state.mission)
             {
-                auto [target_angle, target_speed] = controller.update_mission_switch();
-                return ControlSignal{target_angle, target_speed};
-            }
-            else if (as_state.labyrinth_state == LabyrinthState::FLOOD_SOLVING)
-            {
-                std::cout << odometry.distance_local << std::endl;
-                auto [target_angle, target_speed] = controller.update_balancer();
-                return ControlSignal{target_angle, target_speed};
-            }
-            else if (as_state.labyrinth_state == LabyrinthState::STANDBY || as_state.labyrinth_state == LabyrinthState::ERROR ||
-                     as_state.labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
-            {
-                return ControlSignal{0.0f, 0.0f};
-            }
-            else if (as_state.labyrinth_state == LabyrinthState::REVERSE_ESCAPE)
-            {
-                if (controller.target_speed < 0.0f) { controller.swap_front_rear(); }
-                auto [target_angle, target_speed] = controller.update();
-                return ControlSignal{target_angle, target_speed};
-            }
-            else
-            {
-                auto [target_angle, target_speed] = controller.update();
-                return ControlSignal{target_angle, target_speed};
+                case Mission::LABYRINTH:
+                {
+                    if (as_state.labyrinth_state == LabyrinthState::MISSION_SWITCH)
+                    {
+                        auto [target_angle, target_speed] = controller.update_mission_switch(as_state.follow_car);
+                        return ControlSignal{target_angle, target_speed};
+                    }
+                    else if (as_state.labyrinth_state == LabyrinthState::FLOOD_SOLVING)
+                    {
+                        auto [target_angle, target_speed] = controller.update_balancer();
+                        return ControlSignal{target_angle, target_speed};
+                    }
+                    else if (as_state.labyrinth_state == LabyrinthState::STANDBY || as_state.labyrinth_state == LabyrinthState::ERROR)
+                    {
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+
+                        return ControlSignal{target_angle, 0.0f};
+                    }
+                    else if (as_state.labyrinth_state == LabyrinthState::REVERSE_ESCAPE ||
+                             as_state.labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+                    {
+                        if (controller.target_speed < 0.0f) { controller.swap_front_rear(); }
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                        return ControlSignal{target_angle, target_speed};
+                    }
+                    else
+                    {
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                        return ControlSignal{target_angle, target_speed};
+                    }
+                    break;
+                }
+                case Mission::FAST:
+                {
+                    auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                    return ControlSignal{target_angle, target_speed};
+                    break;
+                }
+                default:
+                {
+                    auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                    return ControlSignal{target_angle, target_speed};
+                    break;
+                }
             }
         }
 
@@ -83,7 +103,11 @@ namespace jlb
         void set_states(const CompositeState state_) { as_state.set_states(state_); }
         void send_telemetry() { signal_sender.send_telemetry(); }
         void set_measurements(const Measurements &measurements_) { measurements = measurements_; }
-        void set_flood(const bool flood_) { Edge::flood = flood_; }
+        void set_flood(const bool flood_)
+        {
+            if (as_state.labyrinth_state == LabyrinthState::EXPLORING && flood_) { Edge::flood = true; }
+            if (as_state.labyrinth_state == LabyrinthState::EXPLORING && !flood_) { Edge::flood = false; }
+        }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
 
     private:

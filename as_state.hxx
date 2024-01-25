@@ -60,6 +60,8 @@ namespace jlb
 
         Direction reverse_saved_dir = Direction::STRAIGHT;
 
+        bool follow_car = false;
+
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
 
         void set_states(const CompositeState state_)
@@ -85,6 +87,7 @@ namespace jlb
 
             controller.set_direction(graph[at_node].edges[selected_edge].direction);
             odometry.correction(graph[at_node].x, graph[at_node].y);
+            odometry.reset_local();
 
             previous_node = at_node;
         }
@@ -104,13 +107,13 @@ namespace jlb
 
             if (controller.target_speed < 0.0f && odometry.distance_local >= WHEELBASE) { controller.set_direction(reverse_saved_dir, true); }
 
+            odometry.reset_local();
+
             previous_node = at_node;
         }
 
         void exploring_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (Edge::flood)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -180,8 +183,6 @@ namespace jlb
 
         void flood_to_balancer_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (at_node == BALANCER_START_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -215,13 +216,13 @@ namespace jlb
 
         void flood_solving_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (at_node == BALANCER_END_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::FLOOD_TO_LABYRINTH;
+                previous_node        = BALANCER_END_NODE;
                 flood_to_labyrinth_callback();
+                odometry.distance_local -= WHEELBASE;
                 return;
             }
 
@@ -238,13 +239,42 @@ namespace jlb
 
         void flood_to_labyrinth_callback()
         {
-            // TODO: flood to labyrinth
+            if (at_node == BALANCER_PREV_NODE)
+            {
+                auto result = graph.Dijkstra(previous_node, at_node, '@', true);
+
+                if (result.weight == std::numeric_limits<float>::infinity())
+                {
+                    labyrinth_state = LabyrinthState::ERROR;
+                    error_callback();
+                    return;
+                }
+                else { previous_node = result.path[1]; }
+
+                Edge::flood = false;
+
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::EXPLORING;
+                exploring_callback();
+
+                odometry.distance_local += WHEELBASE;
+
+                return;
+            }
+
+            auto result = graph.Dijkstra(previous_node, at_node, BALANCER_PREV_NODE);
+
+            if (result.weight == std::numeric_limits<float>::infinity())
+            {
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::ERROR;
+                error_callback();
+            }
+            else { apply_path_reverse(result); }
         }
 
         void finished_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -294,12 +324,10 @@ namespace jlb
             }
         }
 
-        void error_callback() { std::cout << labyrinth_state << std::endl; }
+        void error_callback() {}
 
         void standby_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (Edge::pirate_intersecting(at_node))
             {
                 labyrinth_state = LabyrinthState::ESCAPE;
@@ -360,8 +388,6 @@ namespace jlb
 
         void escape_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -378,8 +404,6 @@ namespace jlb
 
         void reverse_escape_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -392,8 +416,6 @@ namespace jlb
 
         void mission_switch_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             // TODO: this is a placeholder
         }
 
@@ -419,27 +441,63 @@ namespace jlb
                 {
                     bool at_decision_point = under_gate || at_cross_section;
 
-                    if ((!prev_at_decision_point && at_decision_point) ||
+                    if ((!prev_at_decision_point && at_decision_point) || (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
-                        (labyrinth_state == LabyrinthState::FLOOD_SOLVING && (next_node == BALANCER_END_NODE || next_node == BALANCER_START_NODE)))
+                        (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||
+                        (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
+                         (next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE)))
                     {
                         auto distance = graph[previous_node].edges[selected_edge].distance;
 
-                        if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE) { distance = graph[at_node].edges[selected_edge].distance; }
+                        if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+                        {
+                            distance = graph[at_node].edges[selected_edge].distance;
+                        }
 
-                        if ((!(labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) &&
-                             std::fabs(distance - std::fabs(odometry.distance_local)) < LOCALIZATION_INACCURACY) ||
-                            ((labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) &&
-                             std::fabs(distance - std::fabs(odometry.distance_local)) < 0.01f) ||
-                            ((labyrinth_state == LabyrinthState::FLOOD_SOLVING &&
-                              (next_node == BALANCER_END_NODE || next_node == BALANCER_START_NODE)) &&
-                             std::fabs(distance - std::fabs(odometry.distance_local)) < 0.01f) ||
-                            labyrinth_state == LabyrinthState::START)
+                        bool  decide = false;
+                        float delta  = distance - std::fabs(odometry.distance_local);
+                        switch (labyrinth_state)
+                        {
+                            case LabyrinthState::START:
+                            {
+                                decide = true;
+                                break;
+                            }
+                            case LabyrinthState::FLOOD_TO_BALANCER:
+                            {
+                                if (next_node == BALANCER_START_NODE && delta < 0.01f) { decide = true; }
+                                else if (delta < LOCALIZATION_INACCURACY) { decide = true; }
+                                break;
+                            }
+                            case LabyrinthState::FLOOD_SOLVING:
+                            {
+                                if (next_node == BALANCER_END_NODE && delta < 0.01f) { decide = true; }
+                                break;
+                            }
+                            case LabyrinthState::FLOOD_TO_LABYRINTH:
+                            {
+                                if ((next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE) && delta < 0.01f) { decide = true; }
+                                break;
+                            }
+                            case LabyrinthState::REVERSE_ESCAPE:
+                            {
+                                if (delta < -LOCALIZATION_INACCURACY / 2.0f) { decide = true; }
+                                break;
+                            }
+                            default:
+                            {
+                                if (delta < LOCALIZATION_INACCURACY) { decide = true; }
+                                break;
+                            }
+                        }
+
+                        if (decide)
                         {
                             if (labyrinth_state == LabyrinthState::START)
                             {
-                                prev_labyrinth_state = labyrinth_state;
-                                labyrinth_state      = LabyrinthState::EXPLORING;
+                                prev_labyrinth_state    = labyrinth_state;
+                                labyrinth_state         = LabyrinthState::EXPLORING;
+                                odometry.distance_local = 0.0f;
                             }
 
                             at_node = next_node;
@@ -461,6 +519,11 @@ namespace jlb
                                     flood_solving_callback();
                                     break;
                                 }
+                                case LabyrinthState::FLOOD_TO_LABYRINTH:
+                                {
+                                    flood_to_labyrinth_callback();
+                                    break;
+                                }
                                 case LabyrinthState::FINISHED:
                                 {
                                     finished_callback();
@@ -477,9 +540,6 @@ namespace jlb
                                         break;
                                     }
                                     else { previous_node = result.path[1]; }
-
-                                    odometry.correction(graph[at_node].x, graph[at_node].y);
-                                    controller.set_direction(reverse_saved_dir, true);
 
                                     if (prev_labyrinth_state == LabyrinthState::EXPLORING)
                                     {
@@ -506,7 +566,6 @@ namespace jlb
 
 #ifdef SIMULATION
                             std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: " << controller.direction << std::endl;
-
 #endif
                         }
                     }
@@ -557,26 +616,36 @@ namespace jlb
                         reference_speed   = -LABYRINTH_SPEED_REVERSE;
                         reverse_saved_dir = controller.direction;
                     }
-                    else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE)
+                    else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
                         if (controller.target_speed < 0.0f && odometry.distance_local < WHEELBASE)
                         {
                             controller.set_direction(graph[at_node].edges[selected_edge].direction);
                         }
-
                         if (controller.target_speed < 0.0f && odometry.distance_local >= WHEELBASE)
                         {
                             controller.set_direction(reverse_saved_dir, true);
                         }
-
                         reference_speed = -LABYRINTH_SPEED_REVERSE;
                     }
-                    else { reference_speed = LABYRINTH_SPEED; }
+                    else if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
+                             labyrinth_state == LabyrinthState::ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER ||
+                             labyrinth_state == LabyrinthState::START)
+                    {
+                        reference_speed = LABYRINTH_SPEED;
+                    }
+                    else if (labyrinth_state == LabyrinthState::MISSION_SWITCH) { reference_speed = MISSION_SWITCH_SPEED; }
+                    else if (labyrinth_state == LabyrinthState::FLOOD_SOLVING) { reference_speed = BALANCER_SPEED; }
+
+                    if (next_node == Edge::pirate_previous_node || next_node == Edge::pirate_next_node) { follow_car = true; }
+                    else { follow_car = false; }
 
                     break;
                 }
                 case Mission::FAST:
                 {
+                    follow_car = true;
+
                     switch (fast_state)
                     {
                         case FastState::FOLLOW_SAFETY_CAR:

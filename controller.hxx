@@ -79,13 +79,13 @@ namespace jlb
                     {
                         if (direction == prev_direction)
                         {
-                            return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position)
+                            return std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position)
                                        ? line_positions[0]
                                        : line_positions[1];
                         }
                         else
                         {
-                            return std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position)
+                            return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position)
                                        ? line_positions[0]
                                        : line_positions[1];
                         }
@@ -155,10 +155,10 @@ namespace jlb
 #ifndef SIMULATION
             float d5 = OFFSET_EXP1 + std::log2(current_velocity + OFFSET_EXP2);
 #else
-            float d5 = OFFSET + SLOPE * current_velocity;
+            float d5 = OFFSET + SLOPE * std::fabs(current_velocity);
 #endif
             if (d5 < D5_MIN) d5 = D5_MIN;
-            float               t5  = d5 / current_velocity;
+            float               t5  = d5 / std::fabs(current_velocity);
             float               T   = t5 / 3.0f * DAMPING;
             float               wp  = (1.0f / T) * sqrt(1.0f - DAMPING * DAMPING);
             float               phi = acosf(DAMPING);
@@ -166,8 +166,8 @@ namespace jlb
             std::complex<float> s1  = std::complex<float>(x, wp);
             std::complex<float> s2  = std::complex<float>(x, -wp);
 
-            std::complex<float> kP     = -SENSOR_BASE / (current_velocity * current_velocity) * s1 * s2;
-            std::complex<float> kDelta = -SENSOR_BASE / current_velocity * ((s1 + s2) - current_velocity * kP);
+            std::complex<float> kP     = -SENSOR_BASE / (std::fabs(current_velocity) * std::fabs(current_velocity)) * s1 * s2;
+            std::complex<float> kDelta = -SENSOR_BASE / std::fabs(current_velocity) * ((s1 + s2) - std::fabs(current_velocity) * kP);
 
             return {kP.real(), kDelta.real()};
         }
@@ -211,7 +211,7 @@ namespace jlb
             if (target_speed < 0.0f) { target_angle = -target_angle; }
         }
 
-        void longitudinal_control([[maybe_unused]] const float dt)
+        void longitudinal_control([[maybe_unused]] const float dt, [[maybe_unused]] bool follow_car)
         {
             /*
             float dist_error = std::min(std::abs(cross_track_error), DIST_ERROR_MAX);
@@ -232,11 +232,14 @@ namespace jlb
             else if (reference_speed < target_speed - MAX_DECELERATION * dt) { target_speed -= MAX_DECELERATION * dt; }
             else { target_speed = reference_speed; }
 
-            // float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
-            // target_speed *= std::pow((1 - object_rate), 2);
+            if (follow_car)
+            {
+                float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
+                target_speed *= std::pow((1 - object_rate), 2);
+            }
         }
 
-        ControlSignal update()
+        ControlSignal update(bool follow_car = false)
         {
 #ifndef SIMULATION
             tick_counter_prev = tick_counter;
@@ -250,12 +253,12 @@ namespace jlb
 #endif
 
             lateral_control(dt);
-            longitudinal_control(dt);
+            longitudinal_control(dt, follow_car);
 
             return {target_angle, target_speed};
         }
 
-        ControlSignal update_mission_switch()
+        ControlSignal update_mission_switch(bool follow_car = false)
         {
 #ifndef SIMULATION
             tick_counter_prev = tick_counter;
@@ -269,6 +272,8 @@ namespace jlb
 #endif
 
             // TODO: mission switch
+            lateral_control(dt);
+            longitudinal_control(dt, follow_car);
 
             return {0, 0};
         }
@@ -289,7 +294,7 @@ namespace jlb
             // TODO: balancer control
 
             lateral_control(dt);
-            longitudinal_control(dt);
+            longitudinal_control(dt, false);
 
             return {target_angle, target_speed};
         }
