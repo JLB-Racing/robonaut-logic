@@ -6,10 +6,10 @@
 #define PARAM static constexpr
 
 #ifndef px_to_m
-#define px_to_m(px) (px * jlb::SQUARE_LENGTH / jlb::BITMAP_SIZE)
+#define px_to_m(px) (px * (jlb::SQUARE_LENGTH * 2.0f) / jlb::BITMAP_SIZE)
 #endif
 #ifndef m_to_px
-#define m_to_px(m) (m * jlb::BITMAP_SIZE / jlb::SQUARE_LENGTH)
+#define m_to_px(m) (m * jlb::BITMAP_SIZE / (jlb::SQUARE_LENGTH * 2.0f))
 #endif
 
 #ifndef rad2deg
@@ -18,6 +18,9 @@
 #ifndef deg2rad
 #define deg2rad(deg) (deg * static_cast<float>(M_PI) / 180.0f)
 #endif
+
+typedef std::pair<char, char> pcc;
+typedef std::pair<pcc, pcc>   cross;
 
 namespace jlb
 {
@@ -187,16 +190,4 @@ namespace jlb
 
 }  // namespace jlb
 
-#endif  // TYPES_HXX///////////////////////////////////////////////////////////////////////////
-        //
-//      LOGIC
-//
-
-/* STATIC PARAMETERS OF THE TRACK */
-PARAM float    SQUARE_LENGTH = 0.6;  // m
-PARAM unsigned BITMAP_SIZE   = 64;   // px
-
-//
-//      END LOGIC
-//
-///////////////////////////////////////////////////////////////////////////
+#endif  // TYPES_HXX
