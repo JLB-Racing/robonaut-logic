@@ -457,8 +457,6 @@ namespace jlb
                         (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
                          (next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE)))
                     {
-                        std::cout << distance << " " << odometry.distance_local << std::endl;
-
                         bool  decide = false;
                         float delta  = distance - std::fabs(odometry.distance_local);
                         switch (labyrinth_state)
