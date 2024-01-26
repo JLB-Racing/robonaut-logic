@@ -26,7 +26,7 @@ namespace jlb
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.02f;
     PARAM float STATE_MIN_TIME              = 0.5f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.15f;  // m
+    PARAM float LOCALIZATION_INACCURACY     = 0.2f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
 
@@ -115,7 +115,7 @@ namespace jlb
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.25f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.15f;  // m
+    PARAM float LOCALIZATION_INACCURACY     = 0.2f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
 
@@ -164,9 +164,9 @@ namespace jlb
         PARAM float FOLLOW_DISTANCE         = 0.3f;
     }  // namespace obj
 
-    PARAM float OFFSET      = 0.25f;
-    PARAM float SLOPE       = 1.0f;
-    PARAM float DAMPING     = 0.25f;
+    PARAM float OFFSET      = 0.0f;
+    PARAM float SLOPE       = 0.001f;
+    PARAM float DAMPING     = 0.001f;
     PARAM float D5_MIN      = 0.0f;
     PARAM float OFFSET_EXP1 = 4.5f;
     PARAM float OFFSET_EXP2 = -1.38f;

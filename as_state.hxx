@@ -52,10 +52,10 @@ namespace jlb
         uint32_t tick_counter             = 0u;
         uint32_t tick_counter_prev        = 0u;
 
-        char          at_node       = 'U';
-        char          previous_node = 'U';
-        char          next_node     = 'U';
-        char          goal_node     = 'U';
+        char          at_node       = START_GATE;
+        char          previous_node = START_GATE;
+        char          next_node     = START_GATE;
+        char          goal_node     = START_GATE;
         unsigned long selected_edge = 0u;
 
         Direction reverse_saved_dir = Direction::STRAIGHT;
@@ -439,6 +439,16 @@ namespace jlb
             {
                 case Mission::LABYRINTH:
                 {
+                    auto distance = graph[previous_node].edges[selected_edge].distance;
+
+                    if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+                    {
+                        distance = graph[at_node].edges[selected_edge].distance;
+                    }
+
+                    if (odometry.distance_local > distance / 2.0f) { controller.set_passed_half(true); }
+                    else { controller.set_passed_half(false); }
+
                     bool at_decision_point = under_gate || at_cross_section;
 
                     if ((!prev_at_decision_point && at_decision_point) || (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
@@ -447,12 +457,7 @@ namespace jlb
                         (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
                          (next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE)))
                     {
-                        auto distance = graph[previous_node].edges[selected_edge].distance;
-
-                        if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
-                        {
-                            distance = graph[at_node].edges[selected_edge].distance;
-                        }
+                        std::cout << distance << " " << odometry.distance_local << std::endl;
 
                         bool  decide = false;
                         float delta  = distance - std::fabs(odometry.distance_local);
@@ -486,7 +491,7 @@ namespace jlb
                             }
                             default:
                             {
-                                if (delta < LOCALIZATION_INACCURACY) { decide = true; }
+                                if (std::fabs(delta) < LOCALIZATION_INACCURACY) { decide = true; }
                                 break;
                             }
                         }

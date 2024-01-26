@@ -16,10 +16,7 @@ namespace jlb
     class Logic
     {
     public:
-        Logic(Direction direction_ = Direction::STRAIGHT, const float x_t_ = 0.0f, const float y_t_ = 0.0f, const float theta_t_ = 0.0f)
-            : odometry(x_t_, y_t_, theta_t_), controller(direction_)
-        {
-        }
+        Logic() : odometry(START_X, START_Y, START_ORIENTATION) {}
 
         ControlSignal update()
         {

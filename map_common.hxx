@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-// #define Q2
+#define Q2
 
 namespace jlb
 {
@@ -31,9 +31,14 @@ namespace jlb
     PARAM int   NUMBER_OF_CROSS_SECTIONS                 = 3;
     PARAM cross CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
         cross(pcc('K', 'L'), pcc('N', 'I')), cross(pcc('F', 'G'), pcc('I', 'D')), cross(pcc('T', 'U'), pcc('W', 'O'))};
+
+    PARAM float START_X           = px_to_m(320.0f);
+    PARAM float START_Y           = px_to_m(724.0f);
+    PARAM float START_ORIENTATION = -M_PI / 2.0f;
+    PARAM char  START_GATE        = 'U';
 #else
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float    SQUARE_LENGTH                                                  = 0.3f;             // m
+    PARAM float    SQUARE_LENGTH                                                  = 0.6f;             // m
     PARAM unsigned BITMAP_SIZE                                                    = 64;               // px
     PARAM char     MISSION_SWITCH_NODE                                            = 'N';              // -
     PARAM int      NUMER_OF_PREV_GATES                                            = 2;                // -
@@ -49,6 +54,11 @@ namespace jlb
     PARAM int   NUMBER_OF_CROSS_SECTIONS                 = 3;
     PARAM cross CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
         cross(pcc('F', 'I'), pcc('H', 'G')), cross(pcc('K', 'N'), pcc('M', 'L')), cross(pcc('P', 'S'), pcc('R', 'Q'))};
+
+    PARAM float START_X           = px_to_m(320.0f);
+    PARAM float START_Y           = px_to_m(724.0f);
+    PARAM float START_ORIENTATION = 0.0f;
+    PARAM char  START_GATE        = 'A';
 #endif
 
 }  // namespace jlb

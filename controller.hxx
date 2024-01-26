@@ -58,7 +58,9 @@ namespace jlb
         uint32_t tick_counter      = 0u;
         uint32_t tick_counter_prev = 0u;
 
-        Controller(Direction direction_ = Direction::STRAIGHT) : direction{direction_} {}
+        bool passed_half = false;
+
+        Controller() : direction{} {}
 
         ~Controller() {}
 
@@ -69,34 +71,44 @@ namespace jlb
             if (line_positions.size() == 1) { return line_positions[0]; }
             else if (line_positions.size() == 2)
             {
+                float tmp;
                 switch (direction)
                 {
                     case Direction::LEFT:
                     {
-                        return line_positions[0];
+                        tmp = line_positions[0];
+                        break;
                     }
                     case Direction::STRAIGHT:
                     {
                         if (direction == prev_direction)
                         {
-                            return std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position)
-                                       ? line_positions[0]
-                                       : line_positions[1];
+                            tmp = std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position)
+                                      ? line_positions[0]
+                                      : line_positions[1];
                         }
                         else
                         {
-                            return std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position)
-                                       ? line_positions[0]
-                                       : line_positions[1];
+                            tmp = std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position)
+                                      ? line_positions[0]
+                                      : line_positions[1];
                         }
+                        break;
                     }
                     case Direction::RIGHT:
                     {
-                        return line_positions[1];
+                        tmp = line_positions[1];
+                        break;
                     }
                     default:
-                        return 0.0f;
+                    {
+                        tmp = 0.0f;
+                        break;
+                    }
                 }
+
+                if (passed_half) { tmp = std::fabs(line_positions[0]) < std::fabs(line_positions[1]) ? line_positions[0] : line_positions[1]; }
+                return tmp;
             }
             else if (line_positions.size() == 3)
             {
@@ -178,12 +190,12 @@ namespace jlb
                 std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; }) || line_positions_front.size() == 0 ||
                 line_positions_rear.size() == 0)
             {
-                if (target_speed <= FAST_SPEED_TURN || target_speed <= LABYRINTH_SPEED || target_speed <= LABYRINTH_SPEED_REVERSE)
-                {
-                    if (target_angle < 0) { target_angle = -deg2rad(MAX_WHEEL_ANGLE); }
-                    else if (target_angle == 0) { target_angle = 0; }
-                    else if (target_angle > 0) { target_angle = deg2rad(MAX_WHEEL_ANGLE); }
-                }
+                // if (target_speed <= FAST_SPEED_TURN || target_speed <= LABYRINTH_SPEED || target_speed <= LABYRINTH_SPEED_REVERSE)
+                // {
+                //     if (target_angle < 0) { target_angle = -deg2rad(MAX_WHEEL_ANGLE); }
+                //     else if (target_angle == 0) { target_angle = 0; }
+                //     else if (target_angle > 0) { target_angle = deg2rad(MAX_WHEEL_ANGLE); }
+                // }
                 return;
             }
 
@@ -351,6 +363,8 @@ namespace jlb
         }
 
         void set_reference_speed(const float reference_speed_) { reference_speed = reference_speed_; }
+
+        void set_passed_half(const bool passed_half_) { passed_half = passed_half_; }
 
     private:
         float current_velocity = 0.0f;

@@ -54,7 +54,7 @@ namespace jlb
             else if (from == pirate_after_next_node) { weight += WEIGHT_PENALTY * pirate_section_percentage; }
 
             // FLOOD
-            if (!flood && to == 'X') { weight = std::numeric_limits<float>::infinity(); }
+            if (!flood && to == BALANCER_START_NODE) { weight = std::numeric_limits<float>::infinity(); }
             else if (flood)
             {
                 // iterate over BALANCER_PROHIBITED_EDGES
@@ -152,34 +152,35 @@ namespace jlb
         Graph()
         {
 #ifdef Q2
-            nodes.push_back(Node{static_cast<char>('A'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('B'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('C'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('D'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('E'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('F'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('G'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('H'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('I'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('J'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('K'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('L'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('M'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('N'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('O'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('P'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('Q'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('R'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('S'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('T'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('U'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('V'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('W'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('X'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('Y'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('Z'), 0, 0});
-            nodes.push_back(Node{static_cast<char>('['), 0, 0});
+            nodes.push_back(Node{static_cast<char>('A'), px_to_m(128.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('B'), px_to_m(192.0f), px_to_m(192.0f)});
+            nodes.push_back(Node{static_cast<char>('C'), px_to_m(256.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('D'), px_to_m(320.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('E'), px_to_m(320.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('F'), px_to_m(448.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('G'), px_to_m(448.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('H'), px_to_m(576.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('I'), px_to_m(576.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('J'), px_to_m(704.0f), px_to_m(192.0f)});
+            nodes.push_back(Node{static_cast<char>('K'), px_to_m(832.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('L'), px_to_m(832.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('M'), px_to_m(960.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('N'), px_to_m(960.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('O'), px_to_m(1088.0f), px_to_m(192.0f)});
+            nodes.push_back(Node{static_cast<char>('P'), px_to_m(1216.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('Q'), px_to_m(1216.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('R'), px_to_m(1344.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('S'), px_to_m(1344.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('T'), px_to_m(1472.0f), px_to_m(192.0f)});
+            nodes.push_back(Node{static_cast<char>('U'), px_to_m(1600.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('V'), px_to_m(1600.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('W'), px_to_m(1664.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('X'), px_to_m(1664.0f), px_to_m(256.0f)});
+            nodes.push_back(Node{static_cast<char>('Y'), px_to_m(1792.0f), px_to_m(128.0f)});
+            nodes.push_back(Node{static_cast<char>('Z'), px_to_m(1792.0f), px_to_m(224.0f)});
+            nodes.push_back(Node{static_cast<char>('['), px_to_m(1920.0f), px_to_m(224.0f)});
 
+#ifndef SIMULATION
             this->operator[]('A').add_edge('C', Direction::RIGHT, {'A'}, 3.6455f);
             this->operator[]('B').add_edge('C', Direction::LEFT, {'D'}, 2.1818f);
             this->operator[]('B').add_edge('D', Direction::STRAIGHT, {'C'}, 4.5223f);
@@ -262,9 +263,95 @@ namespace jlb
             this->operator[]('Z').add_edge('X', Direction::LEFT, {'['}, 2.1500f);
             this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 2.0400f);
             this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 2.0400f);
+#else
+            const auto UNIT            = SQUARE_LENGTH * 2.0f;
+            const auto QUARTER_CIRCLE  = 2 * UNIT * M_PI / 4.0f;
+            const auto CROSS_UNIT      = 3.65f;
+            const auto HALF_CROSS_UNIT = 2.7f;
 
-            // const auto UNIT           = SQUARE_LENGTH;
-            // const auto QUARTER_CIRCLE = 2 * UNIT * M_PI / 4.0f;
+            this->operator[]('A').add_edge('C', Direction::RIGHT, {'A'}, 2.0f * UNIT);
+            this->operator[]('B').add_edge('C', Direction::LEFT, {'D'}, QUARTER_CIRCLE);
+            this->operator[]('B').add_edge('D', Direction::STRAIGHT, {'C'}, QUARTER_CIRCLE + UNIT);
+            // this->operator[]('C').add_edge('A', Direction::LEFT, {'E'}, 2.0f * UNIT);
+            this->operator[]('C').add_edge('E', Direction::STRAIGHT, {'A', 'B'}, UNIT);
+            this->operator[]('C').add_edge('B', Direction::RIGHT, {'E'}, QUARTER_CIRCLE);
+            this->operator[]('D').add_edge('B', Direction::STRAIGHT, {'F'}, QUARTER_CIRCLE + UNIT);
+            this->operator[]('D').add_edge('F', Direction::LEFT, {'B'}, 2.0f * UNIT);
+            this->operator[]('E').add_edge('C', Direction::STRAIGHT, {'F', 'G'}, UNIT);
+            this->operator[]('E').add_edge('F', Direction::LEFT, {'C'}, CROSS_UNIT);
+            this->operator[]('E').add_edge('G', Direction::RIGHT, {'C'}, 2.0f * UNIT);
+            this->operator[]('F').add_edge('D', Direction::RIGHT, {'H', 'I'}, 2.0f * UNIT);
+            this->operator[]('F').add_edge('E', Direction::LEFT, {'H', 'I'}, CROSS_UNIT);
+            this->operator[]('F').add_edge('H', Direction::LEFT, {'D', 'E'}, 2.0f * UNIT);
+            this->operator[]('F').add_edge('I', Direction::RIGHT, {'D', 'E'}, CROSS_UNIT);
+            this->operator[]('G').add_edge('E', Direction::LEFT, {'H', 'I'}, 2.0f * UNIT);
+            this->operator[]('G').add_edge('H', Direction::LEFT, {'E'}, CROSS_UNIT);
+            this->operator[]('G').add_edge('I', Direction::RIGHT, {'E'}, 2.0f * UNIT);
+            this->operator[]('H').add_edge('F', Direction::RIGHT, {'J', 'K'}, 2.0f * UNIT);
+            this->operator[]('H').add_edge('G', Direction::LEFT, {'J', 'K'}, CROSS_UNIT);
+            this->operator[]('H').add_edge('J', Direction::RIGHT, {'F', 'G'}, HALF_CROSS_UNIT);
+            this->operator[]('H').add_edge('K', Direction::LEFT, {'F', 'G'}, 4.0f * UNIT);
+            this->operator[]('I').add_edge('F', Direction::RIGHT, {'L'}, CROSS_UNIT);
+            this->operator[]('I').add_edge('G', Direction::LEFT, {'L'}, 2.0f * UNIT);
+            this->operator[]('I').add_edge('L', Direction::RIGHT, {'F', 'G'}, 4.0f * UNIT);
+            this->operator[]('J').add_edge('H', Direction::LEFT, {'K', 'L'}, HALF_CROSS_UNIT);
+            this->operator[]('J').add_edge('K', Direction::LEFT, {'H'}, HALF_CROSS_UNIT);
+            this->operator[]('J').add_edge('L', Direction::RIGHT, {'H'}, HALF_CROSS_UNIT);
+            this->operator[]('K').add_edge('H', Direction::RIGHT, {'M', 'N'}, 4.0f * UNIT);
+            this->operator[]('K').add_edge('J', Direction::LEFT, {'M', 'N'}, HALF_CROSS_UNIT);
+            this->operator[]('K').add_edge('M', Direction::LEFT, {'H', 'J'}, 2.0f * UNIT);
+            this->operator[]('K').add_edge('N', Direction::RIGHT, {'H', 'J'}, CROSS_UNIT);
+            this->operator[]('L').add_edge('I', Direction::LEFT, {'M', 'N'}, 4.0f * UNIT);
+            this->operator[]('L').add_edge('J', Direction::RIGHT, {'M', 'N'}, HALF_CROSS_UNIT);
+            this->operator[]('L').add_edge('M', Direction::LEFT, {'I', 'J'}, CROSS_UNIT);
+            this->operator[]('L').add_edge('N', Direction::RIGHT, {'I', 'J'}, 2.0f * UNIT);
+            this->operator[]('M').add_edge('K', Direction::RIGHT, {'O', 'P'}, 2.0f * UNIT);
+            this->operator[]('M').add_edge('L', Direction::LEFT, {'O', 'P'}, CROSS_UNIT);
+            this->operator[]('M').add_edge('O', Direction::RIGHT, {'K', 'L'}, HALF_CROSS_UNIT);
+            this->operator[]('M').add_edge('P', Direction::LEFT, {'K', 'L'}, 4.0f * UNIT);
+            this->operator[]('N').add_edge('K', Direction::RIGHT, {'O', 'Q'}, CROSS_UNIT);
+            this->operator[]('N').add_edge('L', Direction::LEFT, {'O', 'Q'}, 2.0f * UNIT);
+            this->operator[]('N').add_edge('O', Direction::LEFT, {'K', 'L'}, HALF_CROSS_UNIT);
+            this->operator[]('N').add_edge('Q', Direction::RIGHT, {'K', 'L'}, 4.0f * UNIT);
+            this->operator[]('O').add_edge('M', Direction::RIGHT, {'P'}, HALF_CROSS_UNIT);
+            this->operator[]('O').add_edge('N', Direction::LEFT, {'P'}, HALF_CROSS_UNIT);
+            this->operator[]('O').add_edge('P', Direction::RIGHT, {'M', 'N'}, HALF_CROSS_UNIT);
+            this->operator[]('P').add_edge('M', Direction::RIGHT, {'R', 'S'}, 4.0f * UNIT);
+            this->operator[]('P').add_edge('O', Direction::LEFT, {'R', 'S'}, HALF_CROSS_UNIT);
+            this->operator[]('P').add_edge('R', Direction::LEFT, {'M', 'O'}, 2.0f * UNIT);
+            this->operator[]('P').add_edge('S', Direction::RIGHT, {'M', 'O'}, CROSS_UNIT);
+            this->operator[]('Q').add_edge('N', Direction::LEFT, {'R', 'S'}, 4.0f * UNIT);
+            this->operator[]('Q').add_edge('R', Direction::LEFT, {'N'}, CROSS_UNIT);
+            this->operator[]('Q').add_edge('S', Direction::RIGHT, {'N'}, 2.0f * UNIT);
+            this->operator[]('R').add_edge('P', Direction::RIGHT, {'T', 'U'}, 2.0f * UNIT);
+            this->operator[]('R').add_edge('Q', Direction::LEFT, {'T', 'U'}, CROSS_UNIT);
+            this->operator[]('R').add_edge('T', Direction::RIGHT, {'P', 'Q'}, HALF_CROSS_UNIT);
+            this->operator[]('R').add_edge('U', Direction::LEFT, {'P', 'Q'}, 4.0f * UNIT);
+            this->operator[]('S').add_edge('P', Direction::RIGHT, {'T', 'V'}, CROSS_UNIT);
+            this->operator[]('S').add_edge('Q', Direction::LEFT, {'T', 'V'}, 2.0f * UNIT);
+            this->operator[]('S').add_edge('T', Direction::LEFT, {'P', 'Q'}, HALF_CROSS_UNIT);
+            this->operator[]('S').add_edge('V', Direction::RIGHT, {'P', 'Q'}, 4.0f * UNIT);
+            this->operator[]('T').add_edge('R', Direction::RIGHT, {'U', 'V'}, HALF_CROSS_UNIT);
+            this->operator[]('T').add_edge('S', Direction::LEFT, {'U', 'V'}, HALF_CROSS_UNIT);
+            this->operator[]('T').add_edge('U', Direction::LEFT, {'R', 'S'}, HALF_CROSS_UNIT);
+            this->operator[]('T').add_edge('V', Direction::RIGHT, {'R', 'S'}, HALF_CROSS_UNIT);
+            this->operator[]('U').add_edge('R', Direction::RIGHT, {'W'}, 4.0f * UNIT);
+            this->operator[]('U').add_edge('T', Direction::LEFT, {'W'}, HALF_CROSS_UNIT);
+            this->operator[]('U').add_edge('W', Direction::STRAIGHT, {'R', 'T'}, UNIT);
+            this->operator[]('V').add_edge('S', Direction::LEFT, {'X'}, 4.0f * UNIT);
+            this->operator[]('V').add_edge('T', Direction::RIGHT, {'X'}, HALF_CROSS_UNIT);
+            this->operator[]('V').add_edge('X', Direction::STRAIGHT, {'S', 'T'}, UNIT);
+            this->operator[]('W').add_edge('U', Direction::STRAIGHT, {'X', 'Y'}, UNIT);
+            this->operator[]('W').add_edge('X', Direction::RIGHT, {'U'}, 2.0f * QUARTER_CIRCLE);
+            // this->operator[]('W').add_edge('Y', Direction::LEFT, {'U'}, 2.0f * UNIT);
+            this->operator[]('X').add_edge('V', Direction::STRAIGHT, {'W', 'Z'}, UNIT);
+            this->operator[]('X').add_edge('W', Direction::LEFT, {'V'}, 2.0f * QUARTER_CIRCLE);
+            this->operator[]('X').add_edge('Z', Direction::RIGHT, {'V'}, 2.8f);
+            // this->operator[]('Y').add_edge('W', Direction::RIGHT, {'Y'}, 2.0f * UNIT);
+            this->operator[]('Z').add_edge('X', Direction::LEFT, {'['}, 2.8f);
+            this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 2.0f * UNIT);
+            this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 2.0f * UNIT);
+#endif
 
 #else
             nodes.push_back(Node{static_cast<char>('A'), px_to_m(704), px_to_m(448)});
