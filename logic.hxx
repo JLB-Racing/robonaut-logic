@@ -42,9 +42,10 @@ namespace jlb
                     }
                     else if (as_state.labyrinth_state == LabyrinthState::STANDBY || as_state.labyrinth_state == LabyrinthState::ERROR)
                     {
+                        controller.set_reference_speed(0.0f);
                         auto [target_angle, target_speed] = controller.update(as_state.follow_car);
 
-                        return ControlSignal{target_angle, 0.0f};
+                        return ControlSignal{target_angle, target_speed};
                     }
                     else if (as_state.labyrinth_state == LabyrinthState::REVERSE_ESCAPE ||
                              as_state.labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
@@ -102,8 +103,8 @@ namespace jlb
         void set_measurements(const Measurements &measurements_) { measurements = measurements_; }
         void set_flood(const bool flood_)
         {
-            if (as_state.labyrinth_state == LabyrinthState::EXPLORING && flood_) { Edge::flood = true; }
-            if (as_state.labyrinth_state == LabyrinthState::EXPLORING && !flood_) { Edge::flood = false; }
+            Edge::flood    = flood_;
+            as_state.flood = flood_;
         }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
 

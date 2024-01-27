@@ -54,8 +54,9 @@ namespace jlb
             else if (from == pirate_after_next_node) { weight += WEIGHT_PENALTY * pirate_section_percentage; }
 
             // FLOOD
-            if (!flood && to == BALANCER_START_NODE) { weight = std::numeric_limits<float>::infinity(); }
-            else if (flood)
+            if (!flood && from != BALANCER_END_NODE && to == BALANCER_START_NODE) { weight = std::numeric_limits<float>::infinity(); }
+
+            if (flood)
             {
                 // iterate over BALANCER_PROHIBITED_EDGES
                 for (int i = 0; i < NUMBER_OF_BALANCER_PROHIBITED_EDGES; ++i)
@@ -92,7 +93,7 @@ namespace jlb
                           ((pirate_next_node == v.first && pirate_after_next_node == v.second) ||
                            (pirate_after_next_node == v.first && pirate_next_node == v.second))))
                 {
-                    weight += WEIGHT_PENALTY;
+                    weight += 1.5f * WEIGHT_PENALTY;
                     break;
                 }
             }

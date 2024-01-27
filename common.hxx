@@ -88,13 +88,12 @@ namespace jlb
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
     }  // namespace lat
 
-    PARAM float OFFSET  = -4.625f;
-    PARAM float SLOPE   = 3.5f;
-    PARAM float DAMPING = 0.95f;
-    PARAM float D5_MIN = 1.5f;
-    PARAM float OFFSET_EXP1  = 4.0f;
-    PARAM float OFFSET_EXP2  = -1.38f;
-
+    PARAM float OFFSET      = -4.625f;
+    PARAM float SLOPE       = 3.5f;
+    PARAM float DAMPING     = 0.95f;
+    PARAM float D5_MIN      = 1.5f;
+    PARAM float OFFSET_EXP1 = 4.0f;
+    PARAM float OFFSET_EXP2 = -1.38f;
 
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
@@ -140,7 +139,7 @@ namespace jlb
 
     /* STATIC PARAMETERS OF THE VEHICLE */
     PARAM float WHEEL_DIAMETER  = px_to_m(1.0f);          // m
-    PARAM int   SENSOR_COUNT    = 16;                     // -
+    PARAM int   SENSOR_COUNT    = 24;                     // -
     PARAM float SENSOR_BASE     = px_to_m(16);            // m
     PARAM float SENSOR_WIDTH    = px_to_m(SENSOR_COUNT);  // m
     PARAM float MAX_WHEEL_ANGLE = 30.0f;                  // deg

@@ -60,7 +60,14 @@ namespace jlb
 
         Direction reverse_saved_dir = Direction::STRAIGHT;
 
-        bool follow_car = false;
+        bool  follow_car = false;
+        bool  flood      = false;
+        char  pirate_previous_node;
+        char  pirate_next_node;
+        char  pirate_after_next_node;
+        float pirate_section_percentage;
+
+        bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
 
@@ -74,6 +81,10 @@ namespace jlb
 
         void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)
         {
+            pirate_previous_node      = prev_node_;
+            pirate_next_node          = next_node_;
+            pirate_after_next_node    = after_next_node_;
+            pirate_section_percentage = section_percentage_;
             graph.pirate_callback(prev_node_, next_node_, after_next_node_, section_percentage_);
         }
 
@@ -86,10 +97,12 @@ namespace jlb
                 if (graph[at_node].edges[i].to == next_node) selected_edge = i;
 
             controller.set_direction(graph[at_node].edges[selected_edge].direction);
-            odometry.correction(graph[at_node].x, graph[at_node].y);
-            odometry.reset_local();
 
             previous_node = at_node;
+
+#ifdef SIMULATION
+            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: " << controller.direction << std::endl;
+#endif
         }
 
         void apply_path_reverse(const DijkstraResult& result)
@@ -107,14 +120,18 @@ namespace jlb
 
             if (controller.target_speed < 0.0f && odometry.distance_local >= WHEELBASE) { controller.set_direction(reverse_saved_dir, true); }
 
-            odometry.reset_local();
-
             previous_node = at_node;
+
+#ifdef SIMULATION
+            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: " << controller.direction << std::endl;
+#endif
         }
 
         void exploring_callback()
         {
-            if (Edge::flood)
+            std::cout << labyrinth_state << std::endl;
+
+            if (flood)
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::FLOOD_TO_BALANCER;
@@ -123,7 +140,7 @@ namespace jlb
             }
 
             if (std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), at_node) != std::end(GATE_NAMES) &&
-                std::find(graph.collected_nodes.begin(), graph.collected_nodes.end(), at_node) == graph.collected_nodes.end() && !Edge::flood)
+                std::find(graph.collected_nodes.begin(), graph.collected_nodes.end(), at_node) == graph.collected_nodes.end() && !flood)
             {
                 graph.collected_nodes.push_back(at_node);
             }
@@ -134,15 +151,11 @@ namespace jlb
             {
                 if (graph.collected_nodes.size() == NUMBER_OF_GATES)
                 {
-                    for (auto& node : graph.nodes)
+                    for (unsigned i = 0; i < NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES; i++)
                     {
-                        if (node.name == MISSION_SWITCH_NODE ||
-                            std::find(std::begin(MISSION_SWITCH_PREV_NODES), std::end(MISSION_SWITCH_PREV_NODES), node.name) !=
-                                std::end(MISSION_SWITCH_PREV_NODES))
-                        {
-                            continue;
-                        }
-                        node.remove_edge(MISSION_SWITCH_NODE);
+                        char from = MISSION_SWITCH_PROHIBITED_EDGES[i].first;
+                        char to   = MISSION_SWITCH_PROHIBITED_EDGES[i].second;
+                        graph[from].remove_edge(to);
                     }
 
                     prev_labyrinth_state = labyrinth_state;
@@ -156,7 +169,7 @@ namespace jlb
                     escape_callback();
                 }
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node))
             {
                 if (result.path.size() > 1)
                 {
@@ -172,7 +185,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::STANDBY;
                 standby_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && pirate_intersecting(at_node))
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::ESCAPE;
@@ -183,6 +196,8 @@ namespace jlb
 
         void flood_to_balancer_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (at_node == BALANCER_START_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -199,13 +214,23 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ESCAPE;
                 escape_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node))
             {
+                if (result.path.size() > 1)
+                {
+                    auto new_result = graph.Dijkstra(at_node, result.path[1], BALANCER_START_NODE);
+                    if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
+                    {
+                        apply_path(result);
+                        return;
+                    }
+                }
+
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::STANDBY;
                 standby_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && pirate_intersecting(at_node))
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::ESCAPE;
@@ -216,6 +241,8 @@ namespace jlb
 
         void flood_solving_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (at_node == BALANCER_END_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -239,6 +266,8 @@ namespace jlb
 
         void flood_to_labyrinth_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (at_node == BALANCER_PREV_NODE)
             {
                 auto result = graph.Dijkstra(previous_node, at_node, '@', true);
@@ -251,13 +280,12 @@ namespace jlb
                 }
                 else { previous_node = result.path[1]; }
 
-                Edge::flood = false;
+                flood = false;
+                odometry.distance_local += WHEELBASE;
 
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::EXPLORING;
                 exploring_callback();
-
-                odometry.distance_local += WHEELBASE;
 
                 return;
             }
@@ -275,6 +303,8 @@ namespace jlb
 
         void finished_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             auto result = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -283,7 +313,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ESCAPE;
                 escape_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node))
             {
                 if (result.path.size() > 1)
                 {
@@ -306,7 +336,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::STANDBY;
                 standby_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && Edge::pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && pirate_intersecting(at_node))
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::ESCAPE;
@@ -324,11 +354,13 @@ namespace jlb
             }
         }
 
-        void error_callback() {}
+        void error_callback() { std::cout << labyrinth_state << std::endl; }
 
         void standby_callback()
         {
-            if (Edge::pirate_intersecting(at_node))
+            std::cout << labyrinth_state << std::endl;
+
+            if (pirate_intersecting(at_node))
             {
                 labyrinth_state = LabyrinthState::ESCAPE;
                 escape_callback();
@@ -366,6 +398,16 @@ namespace jlb
                         labyrinth_state      = LabyrinthState::FINISHED;
                         finished_callback();
                     }
+                    else if (result.path.size() > 1)
+                    {
+                        auto new_result = graph.Dijkstra(at_node, result.path[1], MISSION_SWITCH_NODE);
+                        if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
+                        {
+                            prev_labyrinth_state = labyrinth_state;
+                            labyrinth_state      = LabyrinthState::FINISHED;
+                            finished_callback();
+                        }
+                    }
                 }
                 else if (prev_labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER)
                 {
@@ -375,12 +417,24 @@ namespace jlb
                     {
                         labyrinth_state = LabyrinthState::ESCAPE;
                         escape_callback();
+                        return;
                     }
                     else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
                     {
                         prev_labyrinth_state = labyrinth_state;
                         labyrinth_state      = LabyrinthState::FLOOD_TO_BALANCER;
                         flood_to_balancer_callback();
+                        return;
+                    }
+                    else if (result.path.size() > 1)
+                    {
+                        auto new_result = graph.Dijkstra(at_node, result.path[1], BALANCER_START_NODE);
+                        if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
+                        {
+                            prev_labyrinth_state = labyrinth_state;
+                            labyrinth_state      = LabyrinthState::FLOOD_TO_BALANCER;
+                            flood_to_balancer_callback();
+                        }
                     }
                 }
             }
@@ -388,6 +442,8 @@ namespace jlb
 
         void escape_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -404,6 +460,8 @@ namespace jlb
 
         void reverse_escape_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -416,6 +474,8 @@ namespace jlb
 
         void mission_switch_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             // TODO: this is a placeholder
         }
 
@@ -444,6 +504,8 @@ namespace jlb
                     if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
                         distance = graph[at_node].edges[selected_edge].distance;
+                        // if (-WHEELBASE < odometry.distance_local && odometry.distance_local < distance / 2.0f) { controller.set_passed_half(true);
+                        // } else { controller.set_passed_half(false); }
                     }
 
                     if (odometry.distance_local > distance / 2.0f) { controller.set_passed_half(true); }
@@ -457,6 +519,8 @@ namespace jlb
                         (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
                          (next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE)))
                     {
+                        std::cout << "target: " << distance << " actual: " << odometry.distance_local << std::endl;
+
                         bool  decide = false;
                         float delta  = distance - std::fabs(odometry.distance_local);
                         switch (labyrinth_state)
@@ -484,7 +548,7 @@ namespace jlb
                             }
                             case LabyrinthState::REVERSE_ESCAPE:
                             {
-                                if (delta < -LOCALIZATION_INACCURACY / 2.0f) { decide = true; }
+                                if (delta < LOCALIZATION_INACCURACY / 2.0f) { decide = true; }
                                 break;
                             }
                             default:
@@ -504,6 +568,14 @@ namespace jlb
                             }
 
                             at_node = next_node;
+
+                            // std::cout << "prev: " << previous_node << " at: " << at_node << " next: " << next_node << " goal: " << goal_node << " "
+                            //           << labyrinth_state << " flood: " << flood << std::endl;
+
+                            odometry.correction(graph[at_node].x, graph[at_node].y);
+                            odometry.reset_local();
+
+                            std::cout << "reset: " << labyrinth_state << " prev: " << prev_labyrinth_state << std::endl;
 
                             switch (labyrinth_state)
                             {
@@ -534,6 +606,17 @@ namespace jlb
                                 }
                                 case LabyrinthState::REVERSE_ESCAPE:
                                 {
+                                    if (next_node == pirate_next_node || (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
+                                        (next_node == pirate_previous_node && previous_node == pirate_next_node))
+                                    {
+                                        labyrinth_state = LabyrinthState::REVERSE_ESCAPE;
+                                        reverse_escape_callback();
+
+                                        reference_speed   = -LABYRINTH_SPEED_REVERSE;
+                                        reverse_saved_dir = controller.direction;
+                                        break;
+                                    }
+
                                     auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
                                     if (result.weight == std::numeric_limits<float>::infinity())
@@ -543,6 +626,8 @@ namespace jlb
                                         break;
                                     }
                                     else { previous_node = result.path[1]; }
+
+                                    odometry.distance_local += WHEELBASE;
 
                                     if (prev_labyrinth_state == LabyrinthState::EXPLORING)
                                     {
@@ -556,8 +641,12 @@ namespace jlb
                                         labyrinth_state      = LabyrinthState::FINISHED;
                                         finished_callback();
                                     }
-
-                                    odometry.distance_local += WHEELBASE;
+                                    else if (prev_labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER)
+                                    {
+                                        prev_labyrinth_state = labyrinth_state;
+                                        labyrinth_state      = LabyrinthState::FLOOD_TO_BALANCER;
+                                        flood_to_balancer_callback();
+                                    }
 
                                     break;
                                 }
@@ -566,10 +655,6 @@ namespace jlb
                                     break;
                                 }
                             }
-
-#ifdef SIMULATION
-                            std::cout << "[C] at: " << previous_node << " to: " << next_node << " dir: " << controller.direction << std::endl;
-#endif
                         }
                     }
 
@@ -602,8 +687,8 @@ namespace jlb
                         }
                     }
 
-                    if ((next_node == Edge::pirate_next_node ||
-                         (next_node == Edge::pirate_after_next_node && Edge::pirate_section_percentage > 0.5f)) &&
+                    if ((next_node == pirate_next_node || (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
+                         (next_node == pirate_previous_node && previous_node == pirate_next_node)) &&
                         labyrinth_state != LabyrinthState::REVERSE_ESCAPE)
                     {
                         if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
@@ -640,7 +725,11 @@ namespace jlb
                     else if (labyrinth_state == LabyrinthState::MISSION_SWITCH) { reference_speed = MISSION_SWITCH_SPEED; }
                     else if (labyrinth_state == LabyrinthState::FLOOD_SOLVING) { reference_speed = BALANCER_SPEED; }
 
-                    if (next_node == Edge::pirate_previous_node || next_node == Edge::pirate_next_node) { follow_car = true; }
+                    if ((next_node == pirate_previous_node || next_node == pirate_next_node) && labyrinth_state != LabyrinthState::REVERSE_ESCAPE &&
+                        labyrinth_state != LabyrinthState::FLOOD_TO_LABYRINTH)
+                    {
+                        follow_car = true;
+                    }
                     else { follow_car = false; }
 
                     break;
@@ -744,7 +833,7 @@ namespace jlb
                         }
                         default:
                         {
-                            // this should never happen
+                            // this should never happen== pirate_next_node
                             break;
                         }
                     }

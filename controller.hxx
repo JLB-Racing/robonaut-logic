@@ -238,27 +238,13 @@ namespace jlb
 
 #ifndef SIMULATION
             if (!((usWidth_throttle > 1800) && (usWidth_throttle < 2800))) { reference_speed = 0.0f; }
+            target_speed = reference_speed;
+#else
+            if (reference_speed > target_speed + MAX_ACCELERATION * dt) { target_speed += MAX_ACCELERATION * dt; }
+            else if (reference_speed < target_speed - MAX_DECELERATION * dt) { target_speed -= MAX_DECELERATION * dt; }
+            else { target_speed = reference_speed; }
 #endif
 
-            /*if (reference_speed > target_speed + MAX_ACCELERATION * dt)
-            {
-                target_speed += MAX_ACCELERATION * dt;
-            }
-            else if (reference_speed < target_speed - MAX_DECELERATION * dt)
-            {
-                target_speed -= MAX_DECELERATION * dt;
-            }
-            else
-            {
-                target_speed = reference_speed;
-            }
-
-            if(reference_speed < reference_speed_prev)
-            {
-                target_speed = current_velocity - MAX_DECELERATION * dt;
-            }
-*/
-            target_speed = reference_speed;
             if (follow_car)
             {
                 // reference_speed_prev = reference_speed;

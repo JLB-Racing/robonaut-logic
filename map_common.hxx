@@ -8,23 +8,23 @@
 //      DEFINES
 //
 
-#define Q2
+// #define Q2
 
 namespace jlb
 {
 
 #ifndef Q2
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float    SQUARE_LENGTH                                                  = 0.6f;             // m
-    PARAM unsigned BITMAP_SIZE                                                    = 64;               // px
-    PARAM char     MISSION_SWITCH_NODE                                            = 'V';              // -
-    PARAM int      NUMER_OF_PREV_GATES                                            = 1;                // -
-    PARAM char     MISSION_SWITCH_PREV_NODES[NUMER_OF_PREV_GATES]                 = {'Q'};            // -
-    PARAM char     BALANCER_PREV_NODE                                             = 'Q';              // -
-    PARAM char     BALANCER_START_NODE                                            = 'X';              // -
-    PARAM char     BALANCER_END_NODE                                              = 'Y';              // -
-    PARAM int      NUMBER_OF_BALANCER_PROHIBITED_EDGES                            = 1;                // -
-    PARAM pcc      BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES] = {pcc('V', 'Q')};  // -
+    PARAM float    SQUARE_LENGTH                                                              = 0.6f;                                           // m
+    PARAM unsigned BITMAP_SIZE                                                                = 64;                                             // px
+    PARAM char     MISSION_SWITCH_NODE                                                        = 'V';                                            // -
+    PARAM int      NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES                                  = 3;                                              // -
+    PARAM pcc      MISSION_SWITCH_PROHIBITED_EDGES[NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES] = {pcc('S', 'V'), pcc('W', 'V'), pcc('R', 'Q')};  // -
+    PARAM char     BALANCER_PREV_NODE                                                         = 'Q';                                            // -
+    PARAM char     BALANCER_START_NODE                                                        = 'X';                                            // -
+    PARAM char     BALANCER_END_NODE                                                          = 'Y';                                            // -
+    PARAM int      NUMBER_OF_BALANCER_PROHIBITED_EDGES                                        = 1;                                              // -
+    PARAM pcc      BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES]             = {pcc('V', 'Q')};                                // -
 
     PARAM int   NUMBER_OF_GATES                          = 17;  // -
     PARAM char  GATE_NAMES[NUMBER_OF_GATES]              = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
@@ -38,16 +38,17 @@ namespace jlb
     PARAM char  START_GATE        = 'U';
 #else
     /* STATIC PARAMETERS OF THE TRACK */
-    PARAM float    SQUARE_LENGTH                                                  = 0.6f;             // m
-    PARAM unsigned BITMAP_SIZE                                                    = 64;               // px
-    PARAM char     MISSION_SWITCH_NODE                                            = 'N';              // -
-    PARAM int      NUMER_OF_PREV_GATES                                            = 2;                // -
-    PARAM char     MISSION_SWITCH_PREV_NODES[NUMER_OF_PREV_GATES]                 = {'K', 'L'};       // -
-    PARAM char     BALANCER_PREV_NODE                                             = 'X';              // -
-    PARAM char     BALANCER_START_NODE                                            = 'Z';              // -
-    PARAM char     BALANCER_END_NODE                                              = '[';              // -
-    PARAM int      NUMBER_OF_BALANCER_PROHIBITED_EDGES                            = 1;                // -
-    PARAM pcc      BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES] = {pcc('W', 'X')};  // -
+    PARAM float    SQUARE_LENGTH                                                              = 0.6f;  // m
+    PARAM unsigned BITMAP_SIZE                                                                = 64;    // px
+    PARAM char     MISSION_SWITCH_NODE                                                        = 'N';   // -
+    PARAM int      NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES                                  = 5;     // -
+    PARAM pcc      MISSION_SWITCH_PROHIBITED_EDGES[NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES] = {
+        pcc('Q', 'N'), pcc('S', 'Q'), pcc('R', 'Q'), pcc('O', 'N'), pcc('M', 'L')};          // -
+    PARAM char BALANCER_PREV_NODE                                             = 'X';              // -
+    PARAM char BALANCER_START_NODE                                            = 'Z';              // -
+    PARAM char BALANCER_END_NODE                                              = '[';              // -
+    PARAM int  NUMBER_OF_BALANCER_PROHIBITED_EDGES                            = 1;                // -
+    PARAM pcc  BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES] = {pcc('W', 'X')};  // -
 
     PARAM int   NUMBER_OF_GATES                          = 17;  // -
     PARAM char  GATE_NAMES[NUMBER_OF_GATES]              = {'B', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'};
