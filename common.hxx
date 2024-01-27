@@ -24,7 +24,7 @@ namespace jlb
     //
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.02f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.5f;
     PARAM float LOCALIZATION_INACCURACY     = 0.2f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
@@ -74,28 +74,42 @@ namespace jlb
         PARAM float FOLLOW_DISTANCE         = 0.3f;
     }  // namespace obj
 
-    PARAM float OFFSET      = -4.625f;
-    PARAM float SLOPE       = 3.5f;
-    PARAM float DAMPING     = 0.9f;
-    PARAM float D5_MIN      = 1.5f;
-    PARAM float OFFSET_EXP1 = 4.5f;
-    PARAM float OFFSET_EXP2 = -1.38f;
+    /* LATERAL PID CONTROLLER PARAMETERS */
+    namespace lat
+    {
+        PARAM float kP                      = 6.9f;
+        PARAM float kI                      = 4.20f;
+        PARAM float kD                      = 0.0f;
+        PARAM float TAU                     = 0.05f;
+        PARAM float T                       = 0.005f;
+        PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
+        PARAM float LIM_MAX                 = MAX_WHEEL_ANGLE;
+        PARAM float DEADBAND                = 0.5f;
+        PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
+    }  // namespace lat
 
-    PARAM float MAX_ACCELERATION = 7.5f;   // m/s^2
-    PARAM float MAX_DECELERATION = 10.0f;  // m/s^2
+    PARAM float OFFSET  = -4.625f;
+    PARAM float SLOPE   = 3.5f;
+    PARAM float DAMPING = 0.95f;
+    PARAM float D5_MIN = 1.5f;
+    PARAM float OFFSET_EXP1  = 4.0f;
+    PARAM float OFFSET_EXP2  = -1.38f;
+
+
+    PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
+    PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
 
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.5f;  // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
-    PARAM float BALANCER_SPEED          = 0.5f;  // m/s
-    PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 7.0f;  // m/s
-    PARAM float FAST_SPEED_TURN         = 1.5f;  // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
+    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
+    PARAM float FAST_SPEED              = 4.0f;   // m/s
+    PARAM float FAST_SPEED_TURN         = 0.9f;   // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
+    PARAM float MIN_SPEED               = 0.25f;  // m/s
 
     ///////////////////////////////////////////////////////////////////////////
     //

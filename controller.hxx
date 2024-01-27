@@ -165,11 +165,11 @@ namespace jlb
             current_velocity += std::numeric_limits<float>::epsilon();
 
 #ifndef SIMULATION
-            float d5 = OFFSET_EXP1 + std::log2(current_velocity + OFFSET_EXP2);
+            float d5 = OFFSET_EXP1 + std::log2(std::fabs(current_velocity) + OFFSET_EXP2);
 #else
             float d5 = OFFSET + SLOPE * std::fabs(current_velocity);
 #endif
-            if (d5 < D5_MIN) d5 = D5_MIN;
+            if ((d5 < D5_MIN) || std::isnan(d5)) d5 = D5_MIN;
             float               t5  = d5 / std::fabs(current_velocity);
             float               T   = t5 / 3.0f * DAMPING;
             float               wp  = (1.0f / T) * sqrt(1.0f - DAMPING * DAMPING);
@@ -240,12 +240,28 @@ namespace jlb
             if (!((usWidth_throttle > 1800) && (usWidth_throttle < 2800))) { reference_speed = 0.0f; }
 #endif
 
-            if (reference_speed > target_speed + MAX_ACCELERATION * dt) { target_speed += MAX_ACCELERATION * dt; }
-            else if (reference_speed < target_speed - MAX_DECELERATION * dt) { target_speed -= MAX_DECELERATION * dt; }
-            else { target_speed = reference_speed; }
+            /*if (reference_speed > target_speed + MAX_ACCELERATION * dt)
+            {
+                target_speed += MAX_ACCELERATION * dt;
+            }
+            else if (reference_speed < target_speed - MAX_DECELERATION * dt)
+            {
+                target_speed -= MAX_DECELERATION * dt;
+            }
+            else
+            {
+                target_speed = reference_speed;
+            }
 
+            if(reference_speed < reference_speed_prev)
+            {
+                target_speed = current_velocity - MAX_DECELERATION * dt;
+            }
+*/
+            target_speed = reference_speed;
             if (follow_car)
             {
+                // reference_speed_prev = reference_speed;
                 float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
                 target_speed *= std::pow((1 - object_rate), 2);
             }
@@ -368,8 +384,7 @@ namespace jlb
 
     private:
         float current_velocity = 0.0f;
-
-        PID object_pid{obj::kP, obj::kI, obj::kD, obj::TAU, obj::T, obj::LIM_MIN, obj::LIM_MAX, obj::DEADBAND, obj::DERIVATIVE_FILTER_ALPHA};
+        PID   object_pid{obj::kP, obj::kI, obj::kD, obj::TAU, obj::T, obj::LIM_MIN, obj::LIM_MAX, obj::DEADBAND, obj::DERIVATIVE_FILTER_ALPHA};
 
 #ifdef SIMULATION
         std::chrono::time_point<std::chrono::steady_clock> prev_control_timestamp_ = std::chrono::steady_clock::now();
