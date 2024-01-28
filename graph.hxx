@@ -32,6 +32,7 @@ namespace jlb
         static float pirate_section_percentage;
         static int   stolen_gates[NUMBER_OF_GATES];
         static bool  flood;
+        static bool  finished;
 
         Edge(const char from_, const char to_, const Direction direction_, const std::vector<char> &prev_nodes_, const float distance_)
             : from{from_}, to{to_}, direction{direction_}, prev_nodes{prev_nodes_}, distance{distance_}
@@ -63,7 +64,21 @@ namespace jlb
                 {
                     if (from == BALANCER_PROHIBITED_EDGES[i].first && to == BALANCER_PROHIBITED_EDGES[i].second)
                     {
-                        weight = std::numeric_limits<float>::infinity();
+                        weight = WEIGHT_PENALTY / 2.0f;
+                        break;
+                    }
+                }
+            }
+
+            // FINISHED
+            if (finished)
+            {
+                // iterate over MISSION_SWITCH_PROHIBITED_EDGES
+                for (int i = 0; i < NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES; ++i)
+                {
+                    if (from == MISSION_SWITCH_PROHIBITED_EDGES[i].first && to == MISSION_SWITCH_PROHIBITED_EDGES[i].second)
+                    {
+                        weight = WEIGHT_PENALTY / 2.0f;
                         break;
                     }
                 }
@@ -112,6 +127,7 @@ namespace jlb
     float Edge::pirate_section_percentage     = 0.0f;
     int   Edge::stolen_gates[NUMBER_OF_GATES] = {0};
     bool  Edge::flood                         = false;
+    bool  Edge::finished                      = false;
 
     class Node
     {
@@ -589,10 +605,12 @@ namespace jlb
             // insert starting to the back of vector the uuid of the specified vertex
             for (auto &[vertex_id, pair] : result)
             {
-                if (end_node == '@' && !escape && !Edge::flood)
+                if (end_node == '@' && !escape && !Edge::flood && !Edge::finished)
                 {
                     if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 1 && pair.first != 0) { pair.first += WEIGHT_PENALTY / 5.0f; }
                     else if (Edge::stolen_gates[static_cast<int>(vertex_id - 'A')] > 0 && pair.first != 0) { pair.first += WEIGHT_PENALTY / 10.0f; }
+
+                    if (vertex_id == 'Q') { pair.first += 3.0f * WEIGHT_PENALTY / 4.0f; }
                 }
                 pair.second.push_back(vertex_id);
             }

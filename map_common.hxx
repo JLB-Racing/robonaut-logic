@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-// #define Q2
+#define Q2
 
 namespace jlb
 {
@@ -43,7 +43,9 @@ namespace jlb
     PARAM char     MISSION_SWITCH_NODE                                                        = 'N';   // -
     PARAM int      NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES                                  = 5;     // -
     PARAM pcc      MISSION_SWITCH_PROHIBITED_EDGES[NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES] = {
-        pcc('Q', 'N'), pcc('S', 'Q'), pcc('R', 'Q'), pcc('O', 'N'), pcc('M', 'L')};          // -
+        pcc('Q', 'N'), pcc('S', 'Q'), pcc('R', 'Q'), pcc('O', 'N'), pcc('M', 'L')};  // -
+    PARAM int  NUMBER_OF_MISSION_SWITCH_PREV_NODES                            = 2;        // -
+    PARAM char MISSION_SWITCH_PREV_NODES[NUMBER_OF_MISSION_SWITCH_PREV_NODES] = {'K', 'L'};
     PARAM char BALANCER_PREV_NODE                                             = 'X';              // -
     PARAM char BALANCER_START_NODE                                            = 'Z';              // -
     PARAM char BALANCER_END_NODE                                              = '[';              // -

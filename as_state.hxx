@@ -129,8 +129,6 @@ namespace jlb
 
         void exploring_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (flood)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -151,13 +149,13 @@ namespace jlb
             {
                 if (graph.collected_nodes.size() == NUMBER_OF_GATES)
                 {
-                    for (unsigned i = 0; i < NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES; i++)
-                    {
-                        char from = MISSION_SWITCH_PROHIBITED_EDGES[i].first;
-                        char to   = MISSION_SWITCH_PROHIBITED_EDGES[i].second;
-                        graph[from].remove_edge(to);
-                    }
-
+                    // for (unsigned i = 0; i < NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES; i++)
+                    // {
+                    //     char from = MISSION_SWITCH_PROHIBITED_EDGES[i].first;
+                    //     char to   = MISSION_SWITCH_PROHIBITED_EDGES[i].second;
+                    //     graph[from].remove_edge(to);
+                    // }
+                    Edge::finished       = true;
                     prev_labyrinth_state = labyrinth_state;
                     labyrinth_state      = LabyrinthState::FINISHED;
                     finished_callback();
@@ -196,8 +194,6 @@ namespace jlb
 
         void flood_to_balancer_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (at_node == BALANCER_START_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -241,8 +237,6 @@ namespace jlb
 
         void flood_solving_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (at_node == BALANCER_END_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -266,8 +260,6 @@ namespace jlb
 
         void flood_to_labyrinth_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (at_node == BALANCER_PREV_NODE)
             {
                 auto result = graph.Dijkstra(previous_node, at_node, '@', true);
@@ -298,12 +290,33 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ERROR;
                 error_callback();
             }
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && at_node == BALANCER_START_NODE)
+            {
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::STANDBY;
+                standby_callback();
+            }
             else { apply_path_reverse(result); }
         }
 
         void finished_callback()
         {
-            std::cout << labyrinth_state << std::endl;
+            if (at_node == MISSION_SWITCH_NODE &&
+                std::find(std::begin(MISSION_SWITCH_PREV_NODES), std::end(MISSION_SWITCH_PREV_NODES), previous_node) !=
+                    std::end(MISSION_SWITCH_PREV_NODES))
+            {
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::MISSION_SWITCH;
+                mission_switch_callback();
+                return;
+            }
+            else if (at_node == MISSION_SWITCH_NODE)
+            {
+                prev_labyrinth_state = labyrinth_state;
+                labyrinth_state      = LabyrinthState::ESCAPE;
+                escape_callback();
+                return;
+            }
 
             auto result = graph.Dijkstra(previous_node, at_node, MISSION_SWITCH_NODE);
 
@@ -321,13 +334,6 @@ namespace jlb
                     if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
                     {
                         apply_path(result);
-
-                        if (at_node == goal_node)
-                        {
-                            prev_labyrinth_state = labyrinth_state;
-                            labyrinth_state      = LabyrinthState::MISSION_SWITCH;
-                        }
-
                         return;
                     }
                 }
@@ -342,24 +348,13 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ESCAPE;
                 escape_callback();
             }
-            else
-            {
-                apply_path(result);
-
-                if (at_node == goal_node)
-                {
-                    prev_labyrinth_state = labyrinth_state;
-                    labyrinth_state      = LabyrinthState::MISSION_SWITCH;
-                }
-            }
+            else { apply_path(result); }
         }
 
-        void error_callback() { std::cout << labyrinth_state << std::endl; }
+        void error_callback() {}
 
         void standby_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             if (pirate_intersecting(at_node))
             {
                 labyrinth_state = LabyrinthState::ESCAPE;
@@ -437,13 +432,29 @@ namespace jlb
                         }
                     }
                 }
+                else if (prev_labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+                {
+                    auto result = graph.Dijkstra(previous_node, at_node, BALANCER_PREV_NODE);
+
+                    if (result.weight == std::numeric_limits<float>::infinity())
+                    {
+                        labyrinth_state = LabyrinthState::ERROR;
+                        error_callback();
+                        return;
+                    }
+                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
+                    {
+                        prev_labyrinth_state = labyrinth_state;
+                        labyrinth_state      = LabyrinthState::FLOOD_TO_LABYRINTH;
+                        flood_to_labyrinth_callback();
+                        return;
+                    }
+                }
             }
         }
 
         void escape_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -460,8 +471,6 @@ namespace jlb
 
         void reverse_escape_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -474,8 +483,6 @@ namespace jlb
 
         void mission_switch_callback()
         {
-            std::cout << labyrinth_state << std::endl;
-
             // TODO: this is a placeholder
         }
 
@@ -519,7 +526,7 @@ namespace jlb
                         (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
                          (next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE)))
                     {
-                        std::cout << "target: " << distance << " actual: " << odometry.distance_local << std::endl;
+                        // std::cout << "target: " << distance << " actual: " << odometry.distance_local << std::endl;
 
                         bool  decide = false;
                         float delta  = distance - std::fabs(odometry.distance_local);
@@ -575,7 +582,7 @@ namespace jlb
                             odometry.correction(graph[at_node].x, graph[at_node].y);
                             odometry.reset_local();
 
-                            std::cout << "reset: " << labyrinth_state << " prev: " << prev_labyrinth_state << std::endl;
+                            // std::cout << "reset: " << labyrinth_state << " prev: " << prev_labyrinth_state << std::endl;
 
                             switch (labyrinth_state)
                             {
