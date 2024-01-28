@@ -184,8 +184,8 @@ namespace jlb
     PARAM float OFFSET_EXP1 = 4.5f;
     PARAM float OFFSET_EXP2 = -1.38f;
 
-    PARAM float MAX_ACCELERATION = 2.5f;  // m/s^2
-    PARAM float MAX_DECELERATION = 5.0f;  // m/s^2
+    PARAM float MAX_ACCELERATION = 5.0f;  // m/s^2
+    PARAM float MAX_DECELERATION = 7.5f;  // m/s^2
 
     PARAM float DIST_ERROR_MAX = 1.0f;   // m
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg

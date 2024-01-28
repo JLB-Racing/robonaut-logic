@@ -14,9 +14,9 @@ namespace jlb
 
     struct CompositeState
     {
-        Mission        mission;
-        LabyrinthState labyrinth_state;
-        FastState      fast_state;
+        Mission        mission         = Mission::STANDBY;
+        LabyrinthState labyrinth_state = LabyrinthState::START;
+        FastState      fast_state      = FastState::OUT_ACCEL_ZONE;
         float          reference_speed = 0.0f;
 
         CompositeState(FastState fast_state_)
@@ -36,10 +36,10 @@ namespace jlb
     class ASState
     {
     public:
-        Mission        mission              = Mission::LABYRINTH;
+        Mission        mission              = Mission::STANDBY;
         LabyrinthState labyrinth_state      = LabyrinthState::START;
         LabyrinthState prev_labyrinth_state = LabyrinthState::START;
-        FastState      fast_state           = FastState::FOLLOW_SAFETY_CAR;
+        FastState      fast_state           = FastState::OUT_ACCEL_ZONE;
         float          reference_speed      = 0.0f;
 
         bool     under_gate               = false;
@@ -60,12 +60,12 @@ namespace jlb
 
         Direction reverse_saved_dir = Direction::STRAIGHT;
 
-        bool  follow_car = false;
-        bool  flood      = false;
-        char  pirate_previous_node;
-        char  pirate_next_node;
-        char  pirate_after_next_node;
-        float pirate_section_percentage;
+        bool  follow_car                = false;
+        bool  flood                     = false;
+        char  pirate_previous_node      = 'P';
+        char  pirate_next_node          = 'M';
+        char  pirate_after_next_node    = 'H';
+        float pirate_section_percentage = 0.0f;
 
         bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
@@ -77,6 +77,35 @@ namespace jlb
             prev_labyrinth_state = labyrinth_state;
             labyrinth_state      = state_.labyrinth_state;
             fast_state           = state_.fast_state;
+        }
+
+        void reset(const CompositeState state_)
+        {
+            set_states(state_);
+            under_gate               = false;
+            at_cross_section         = false;
+            prev_at_decision_point   = false;
+            current_number_of_lines  = 0u;
+            state_time               = 0.0f;
+            state_transition_time    = 0.0f;
+            started_state_transition = false;
+            tick_counter             = 0u;
+            tick_counter_prev        = 0u;
+
+            at_node       = START_GATE;
+            previous_node = START_GATE;
+            next_node     = START_GATE;
+            goal_node     = START_GATE;
+            selected_edge = 0u;
+
+            reverse_saved_dir = Direction::STRAIGHT;
+
+            follow_car                = false;
+            flood                     = false;
+            pirate_previous_node      = 'P';
+            pirate_next_node          = 'M';
+            pirate_after_next_node    = 'H';
+            pirate_section_percentage = 0.0f;
         }
 
         void pirate_callback(const char prev_node_, const char next_node_, const char after_next_node_, const int section_percentage_)

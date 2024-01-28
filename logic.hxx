@@ -67,6 +67,11 @@ namespace jlb
                     return ControlSignal{target_angle, target_speed};
                     break;
                 }
+                case Mission::STANDBY:
+                {
+                    return ControlSignal{0.0f, 0.0f};
+                    break;
+                }
                 default:
                 {
                     auto [target_angle, target_speed] = controller.update(as_state.follow_car);
@@ -107,6 +112,18 @@ namespace jlb
             as_state.flood = flood_;
         }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
+        void start_signal()
+        {
+            if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
+        }
+        void reset_signal(const CompositeState state_)
+        {
+            graph.reset();
+            as_state.reset(state_);
+            as_state.mission = Mission::STANDBY;
+            controller       = Controller{};
+            odometry         = Odometry{START_X, START_Y, START_ORIENTATION};
+        }
 
     private:
         Odometry     odometry;

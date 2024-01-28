@@ -59,6 +59,7 @@ namespace jlb
 
     enum class Mission
     {
+        STANDBY,
         LABYRINTH,
         FAST,
     };

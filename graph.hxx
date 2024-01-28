@@ -119,6 +119,16 @@ namespace jlb
         static bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
         static Edge invalid_edge;
+
+        static void reset()
+        {
+            pirate_previous_node      = 'P';
+            pirate_next_node          = 'M';
+            pirate_after_next_node    = 'H';
+            pirate_section_percentage = 0.0f;
+            flood                     = false;
+            finished                  = false;
+        }
     };
 
     char  Edge::pirate_previous_node          = 'P';
@@ -165,6 +175,8 @@ namespace jlb
         std::vector<char> collected_nodes;
 
         Node invalid_node = Node{'@', 0.0f, 0.0f};
+
+        void reset() { Edge::reset(); }
 
         Graph()
         {
@@ -634,8 +646,8 @@ namespace jlb
             }
             else
             {
-                print_dijkstra(result);
-                std::cout << previous_node << " " << current_node << " " << end_node << std::endl;
+                // print_dijkstra(result);
+                // std::cout << previous_node << " " << current_node << " " << end_node << std::endl;
                 return DijkstraResult{end_node, result[end_node].second, result[end_node].first};
             }
         }
