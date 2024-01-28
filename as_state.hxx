@@ -129,6 +129,7 @@ namespace jlb
 
         void exploring_callback()
         {
+            std::cout << labyrinth_state << std::endl;
             if (flood)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -149,12 +150,6 @@ namespace jlb
             {
                 if (graph.collected_nodes.size() == NUMBER_OF_GATES)
                 {
-                    // for (unsigned i = 0; i < NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES; i++)
-                    // {
-                    //     char from = MISSION_SWITCH_PROHIBITED_EDGES[i].first;
-                    //     char to   = MISSION_SWITCH_PROHIBITED_EDGES[i].second;
-                    //     graph[from].remove_edge(to);
-                    // }
                     Edge::finished       = true;
                     prev_labyrinth_state = labyrinth_state;
                     labyrinth_state      = LabyrinthState::FINISHED;
@@ -194,6 +189,8 @@ namespace jlb
 
         void flood_to_balancer_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (at_node == BALANCER_START_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -237,6 +234,8 @@ namespace jlb
 
         void flood_solving_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (at_node == BALANCER_END_NODE)
             {
                 prev_labyrinth_state = labyrinth_state;
@@ -260,6 +259,8 @@ namespace jlb
 
         void flood_to_labyrinth_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (at_node == BALANCER_PREV_NODE)
             {
                 auto result = graph.Dijkstra(previous_node, at_node, '@', true);
@@ -301,6 +302,8 @@ namespace jlb
 
         void finished_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (at_node == MISSION_SWITCH_NODE &&
                 std::find(std::begin(MISSION_SWITCH_PREV_NODES), std::end(MISSION_SWITCH_PREV_NODES), previous_node) !=
                     std::end(MISSION_SWITCH_PREV_NODES))
@@ -351,10 +354,12 @@ namespace jlb
             else { apply_path(result); }
         }
 
-        void error_callback() {}
+        void error_callback() { std::cout << labyrinth_state << std::endl; }
 
         void standby_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             if (pirate_intersecting(at_node))
             {
                 labyrinth_state = LabyrinthState::ESCAPE;
@@ -455,6 +460,8 @@ namespace jlb
 
         void escape_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -471,6 +478,8 @@ namespace jlb
 
         void reverse_escape_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             auto result = graph.Dijkstra(previous_node, at_node, '@', true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
@@ -483,6 +492,8 @@ namespace jlb
 
         void mission_switch_callback()
         {
+            std::cout << labyrinth_state << std::endl;
+
             // TODO: this is a placeholder
         }
 
@@ -696,7 +707,7 @@ namespace jlb
 
                     if ((next_node == pirate_next_node || (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
                          (next_node == pirate_previous_node && previous_node == pirate_next_node)) &&
-                        labyrinth_state != LabyrinthState::REVERSE_ESCAPE)
+                        labyrinth_state != LabyrinthState::REVERSE_ESCAPE && labyrinth_state != LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
                         if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
                             labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER)

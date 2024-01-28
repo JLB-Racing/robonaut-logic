@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-#define Q2
+// #define Q2
 
 namespace jlb
 {
@@ -20,11 +20,13 @@ namespace jlb
     PARAM char     MISSION_SWITCH_NODE                                                        = 'V';                                            // -
     PARAM int      NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES                                  = 3;                                              // -
     PARAM pcc      MISSION_SWITCH_PROHIBITED_EDGES[NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES] = {pcc('S', 'V'), pcc('W', 'V'), pcc('R', 'Q')};  // -
-    PARAM char     BALANCER_PREV_NODE                                                         = 'Q';                                            // -
-    PARAM char     BALANCER_START_NODE                                                        = 'X';                                            // -
-    PARAM char     BALANCER_END_NODE                                                          = 'Y';                                            // -
-    PARAM int      NUMBER_OF_BALANCER_PROHIBITED_EDGES                                        = 1;                                              // -
-    PARAM pcc      BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES]             = {pcc('V', 'Q')};                                // -
+    PARAM int      NUMBER_OF_MISSION_SWITCH_PREV_NODES                                        = 1;                                              // -
+    PARAM char     MISSION_SWITCH_PREV_NODES[NUMBER_OF_MISSION_SWITCH_PREV_NODES]             = {'Q'};
+    PARAM char     BALANCER_PREV_NODE                                                         = 'Q';              // -
+    PARAM char     BALANCER_START_NODE                                                        = 'X';              // -
+    PARAM char     BALANCER_END_NODE                                                          = 'Y';              // -
+    PARAM int      NUMBER_OF_BALANCER_PROHIBITED_EDGES                                        = 1;                // -
+    PARAM pcc      BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES]             = {pcc('V', 'Q')};  // -
 
     PARAM int   NUMBER_OF_GATES                          = 17;  // -
     PARAM char  GATE_NAMES[NUMBER_OF_GATES]              = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};

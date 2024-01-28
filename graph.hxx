@@ -632,7 +632,12 @@ namespace jlb
                 }
                 return DijkstraResult{min_node, result[min_node].second, min_distance};
             }
-            else { return DijkstraResult{end_node, result[end_node].second, result[end_node].first}; }
+            else
+            {
+                print_dijkstra(result);
+                std::cout << previous_node << " " << current_node << " " << end_node << std::endl;
+                return DijkstraResult{end_node, result[end_node].second, result[end_node].first};
+            }
         }
     };
 
