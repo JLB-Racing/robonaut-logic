@@ -26,9 +26,6 @@ namespace jlb
             auto [mission, labyrinth_state, mission_switch_state, fast_state, reference_speed] = as_state.update();
             controller.set_reference_speed(reference_speed);
 
-            std::cout << mission << " " << labyrinth_state << " " << mission_switch_state << " " << fast_state << " "
-                      << as_state.mission_switch_arc_length / 2.0f << " " << odometry.distance_local << std::endl;
-
             switch (mission)
             {
                 case Mission::LABYRINTH:
