@@ -102,13 +102,14 @@ namespace jlb
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
-    PARAM float FAST_SPEED              = 4.0f;   // m/s
-    PARAM float FAST_SPEED_TURN         = 0.9f;   // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
-    PARAM float MIN_SPEED               = 0.25f;  // m/s
+    PARAM float LABYRINTH_SPEED         = 0.9f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
+    PARAM float BALANCER_SPEED          = 0.5f;  // m/s
+    PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
+    PARAM float FAST_SPEED              = 4.0f;  // m/s
+    PARAM float FAST_SPEED_TURN         = 0.9f;  // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -194,7 +195,7 @@ namespace jlb
     PARAM float LABYRINTH_SPEED         = 2.0f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 1.0f;   // m/s
     PARAM float BALANCER_SPEED          = 1.0f;   // m/s
-    PARAM float MISSION_SWITCH_SPEED    = 1.0f;   // m/s
+    PARAM float MISSION_SWITCH_SPEED    = 0.5f;   // m/s
     PARAM float FAST_SPEED              = 1.5f;   // m/s
     PARAM float FAST_SPEED_TURN         = 0.75f;  // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s

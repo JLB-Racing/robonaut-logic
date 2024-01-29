@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-#define Q2
+// #define Q2
 
 namespace jlb
 {
@@ -38,6 +38,13 @@ namespace jlb
     PARAM float START_Y           = px_to_m(724.0f);
     PARAM float START_ORIENTATION = -M_PI / 2.0f;
     PARAM char  START_GATE        = 'U';
+
+    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.3f;   // m
+    PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.3f;   // m
+    PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 30.0f;  // deg
+    PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.6f;   // m
+    PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::RIGHT;
+
 #else
     /* STATIC PARAMETERS OF THE TRACK */
     PARAM float    SQUARE_LENGTH                                                              = 0.6f;  // m

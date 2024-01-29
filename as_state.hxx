@@ -14,21 +14,38 @@ namespace jlb
 
     struct CompositeState
     {
-        Mission        mission         = Mission::STANDBY;
-        LabyrinthState labyrinth_state = LabyrinthState::START;
-        FastState      fast_state      = FastState::OUT_ACCEL_ZONE;
-        float          reference_speed = 0.0f;
+        Mission            mission              = Mission::STANDBY;
+        LabyrinthState     labyrinth_state      = LabyrinthState::START;
+        MissionSwitchState mission_switch_state = MissionSwitchState::STANDBY;
+        FastState          fast_state           = FastState::OUT_ACCEL_ZONE;
+        float              reference_speed      = 0.0f;
 
         CompositeState(FastState fast_state_)
-            : mission{Mission::FAST}, labyrinth_state{LabyrinthState::START}, fast_state{fast_state_}, reference_speed{0.0f}
+            : mission{Mission::FAST},
+              labyrinth_state{LabyrinthState::START},
+              mission_switch_state{MissionSwitchState::STANDBY},
+              fast_state{fast_state_},
+              reference_speed{0.0f}
         {
         }
         CompositeState(LabyrinthState labyrinth_state_)
-            : mission{Mission::LABYRINTH}, labyrinth_state{labyrinth_state_}, fast_state{FastState::FOLLOW_SAFETY_CAR}, reference_speed{0.0f}
+            : mission{Mission::LABYRINTH},
+              labyrinth_state{labyrinth_state_},
+              mission_switch_state{MissionSwitchState::STANDBY},
+              fast_state{FastState::FOLLOW_SAFETY_CAR},
+              reference_speed{0.0f}
         {
         }
-        CompositeState(Mission mission_, LabyrinthState labyrinth_state_, FastState fast_state_, float reference_speed_)
-            : mission{mission_}, labyrinth_state{labyrinth_state_}, fast_state{fast_state_}, reference_speed{reference_speed_}
+        CompositeState(Mission            mission_,
+                       LabyrinthState     labyrinth_state_,
+                       MissionSwitchState mission_switch_state_,
+                       FastState          fast_state_,
+                       float              reference_speed_)
+            : mission{mission_},
+              labyrinth_state{labyrinth_state_},
+              mission_switch_state{mission_switch_state_},
+              fast_state{fast_state_},
+              reference_speed{reference_speed_}
         {
         }
     };
@@ -36,11 +53,12 @@ namespace jlb
     class ASState
     {
     public:
-        Mission        mission              = Mission::STANDBY;
-        LabyrinthState labyrinth_state      = LabyrinthState::START;
-        LabyrinthState prev_labyrinth_state = LabyrinthState::START;
-        FastState      fast_state           = FastState::OUT_ACCEL_ZONE;
-        float          reference_speed      = 0.0f;
+        Mission            mission              = Mission::STANDBY;
+        LabyrinthState     labyrinth_state      = LabyrinthState::START;
+        LabyrinthState     prev_labyrinth_state = LabyrinthState::START;
+        MissionSwitchState mission_switch_state = MissionSwitchState::STANDBY;
+        FastState          fast_state           = FastState::OUT_ACCEL_ZONE;
+        float              reference_speed      = 0.0f;
 
         bool     under_gate               = false;
         bool     at_cross_section         = false;
@@ -67,6 +85,9 @@ namespace jlb
         char  pirate_after_next_node    = 'H';
         float pirate_section_percentage = 0.0f;
 
+        float mission_switch_steering_angle = deg2rad(MAX_WHEEL_ANGLE) * 2.0f;
+        float mission_switch_arc_length     = 0.0f;
+
         bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
@@ -76,6 +97,7 @@ namespace jlb
             mission              = state_.mission;
             prev_labyrinth_state = labyrinth_state;
             labyrinth_state      = state_.labyrinth_state;
+            mission_switch_state = state_.mission_switch_state;
             fast_state           = state_.fast_state;
         }
 
@@ -330,6 +352,15 @@ namespace jlb
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::MISSION_SWITCH;
+
+                float h             = MISSION_SWITCH_LATERAL_DIST / 2.0f;
+                float R             = WHEELBASE / std::tan(deg2rad(MISSION_SWITCH_STEERING_ANGLE));
+                float alpha_per_two = std::acos(1.0f - (h / R));
+                float alpha         = 2.0f * alpha_per_two;
+
+                mission_switch_steering_angle = deg2rad(MISSION_SWITCH_STEERING_ANGLE);
+                mission_switch_arc_length     = alpha * R;
+
                 mission_switch_callback();
                 return;
             }
@@ -506,7 +537,76 @@ namespace jlb
 
         void mission_switch_callback()
         {
-            // TODO: this is a placeholder
+            switch (mission_switch_state)
+            {
+                case MissionSwitchState::STANDBY:
+                {
+                    if (std::fabs(odometry.vx_t) < 0.1f)
+                    {
+                        odometry.reset_local(true);
+                        mission_switch_state = MissionSwitchState::FIRST_FORWARD;
+                        break;
+                    }
+
+                    follow_car = false;
+                    controller.set_direction(Direction::STRAIGHT);
+                    break;
+                }
+                case MissionSwitchState::FIRST_FORWARD:
+                {
+                    if (std::fabs(MISSION_SWITCH_FIRST_FORWARD_DIST - odometry.distance_local) < 0.01f)
+                    {
+                        odometry.reset_local(true);
+                        mission_switch_state = MissionSwitchState::FIRST_TURN;
+                        break;
+                    }
+
+                    follow_car = false;
+                    controller.set_direction(Direction::STRAIGHT);
+                    break;
+                }
+                case MissionSwitchState::FIRST_TURN:
+                {
+                    if (std::fabs((mission_switch_arc_length / 2.0f) - odometry.distance_local) < 0.01f)
+                    {
+                        odometry.reset_local(true);
+                        mission_switch_state = MissionSwitchState::SECOND_TURN;
+                        break;
+                    }
+
+                    follow_car = false;
+                    break;
+                }
+                case MissionSwitchState::SECOND_TURN:
+                {
+                    if (std::fabs((mission_switch_arc_length / 2.0f) - odometry.distance_local) < 0.01f)
+                    {
+                        odometry.reset_local(true);
+                        mission_switch_state = MissionSwitchState::SECOND_FORWARD;
+                        break;
+                    }
+
+                    follow_car = false;
+                    break;
+                }
+                case MissionSwitchState::SECOND_FORWARD:
+                {
+                    if (std::fabs(MISSION_SWITCH_SECOND_FORWARD_DIST - odometry.distance_local) < 0.01f)
+                    {
+                        odometry.reset_local(true);
+                        mission_switch_state = MissionSwitchState::STANDBY;
+                        mission              = Mission::STANDBY;
+                        break;
+                    }
+
+                    follow_car = true;
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
         }
 
         CompositeState update()
@@ -710,6 +810,7 @@ namespace jlb
                         case LabyrinthState::MISSION_SWITCH:
                         {
                             mission_switch_callback();
+                            break;
                         }
                         default:
                         {
@@ -877,7 +978,7 @@ namespace jlb
                 }
             }
 
-            return CompositeState{mission, labyrinth_state, fast_state, reference_speed};
+            return CompositeState{mission, labyrinth_state, mission_switch_state, fast_state, reference_speed};
         }
 
     private:

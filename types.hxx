@@ -68,6 +68,9 @@ namespace jlb
     {
         switch (mission)
         {
+            case Mission::STANDBY:
+                os << "STANDBY";
+                break;
             case Mission::LABYRINTH:
                 os << "LABYRINTH";
                 break;
@@ -133,6 +136,41 @@ namespace jlb
                 break;
             case LabyrinthState::ERROR:
                 os << "ERROR";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
+
+    enum class MissionSwitchState
+    {
+        STANDBY,
+        FIRST_FORWARD,
+        FIRST_TURN,
+        SECOND_TURN,
+        SECOND_FORWARD,
+    };
+
+    std::ostream &operator<<(std::ostream &os, const MissionSwitchState &state)
+    {
+        switch (state)
+        {
+            case MissionSwitchState::STANDBY:
+                os << "STANDBY";
+                break;
+            case MissionSwitchState::FIRST_FORWARD:
+                os << "FIRST_FORWARD";
+                break;
+            case MissionSwitchState::FIRST_TURN:
+                os << "FIRST_TURN";
+                break;
+            case MissionSwitchState::SECOND_TURN:
+                os << "SECOND_TURN";
+                break;
+            case MissionSwitchState::SECOND_FORWARD:
+                os << "SECOND_FORWARD";
                 break;
             default:
                 os << "UNKNOWN";

@@ -151,9 +151,9 @@ namespace jlb
             theta_t = normalize_angle(theta_t);
         }
 
-        void reset_local()
+        void reset_local(bool force = false)
         {
-            if (std::fabs(distance_local) > WHEELBASE)
+            if (std::fabs(distance_local) > WHEELBASE || force)
             {
                 x_t_local      = 0.0f;
                 y_t_local      = 0.0f;

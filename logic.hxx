@@ -23,32 +23,73 @@ namespace jlb
             auto [vx, x, y, theta] = odometry.update_odom();
             controller.set_current_velocity(vx);
 
-            auto [mission, labyrinth_state, fast_state, reference_speed] = as_state.update();
+            auto [mission, labyrinth_state, mission_switch_state, fast_state, reference_speed] = as_state.update();
             controller.set_reference_speed(reference_speed);
 
-            switch (as_state.mission)
+            std::cout << mission << " " << labyrinth_state << " " << mission_switch_state << " " << fast_state << " "
+                      << as_state.mission_switch_arc_length / 2.0f << " " << odometry.distance_local << std::endl;
+
+            switch (mission)
             {
                 case Mission::LABYRINTH:
                 {
-                    if (as_state.labyrinth_state == LabyrinthState::MISSION_SWITCH)
+                    if (labyrinth_state == LabyrinthState::MISSION_SWITCH)
                     {
-                        auto [target_angle, target_speed] = controller.update_mission_switch(as_state.follow_car);
-                        return ControlSignal{target_angle, target_speed};
+                        if (mission_switch_state == MissionSwitchState::STANDBY)
+                        {
+                            controller.set_reference_speed(0.0f);
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            return ControlSignal{target_angle, target_speed};
+                        }
+                        else if (mission_switch_state == MissionSwitchState::FIRST_FORWARD)
+                        {
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            return ControlSignal{target_angle, target_speed};
+                        }
+                        else if (mission_switch_state == MissionSwitchState::FIRST_TURN)
+                        {
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            if (MISSION_SWITCH_DIRECTION == Direction::RIGHT)
+                            {
+                                return ControlSignal{as_state.mission_switch_steering_angle, target_speed};
+                            }
+                            else if (MISSION_SWITCH_DIRECTION == Direction::LEFT)
+                            {
+                                return ControlSignal{-as_state.mission_switch_steering_angle, target_speed};
+                            }
+                        }
+                        else if (mission_switch_state == MissionSwitchState::SECOND_TURN)
+                        {
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            if (MISSION_SWITCH_DIRECTION == Direction::RIGHT)
+                            {
+                                return ControlSignal{-as_state.mission_switch_steering_angle, target_speed};
+                            }
+                            else if (MISSION_SWITCH_DIRECTION == Direction::LEFT)
+                            {
+                                return ControlSignal{as_state.mission_switch_steering_angle, target_speed};
+                            }
+                        }
+                        else if (mission_switch_state == MissionSwitchState::SECOND_FORWARD)
+                        {
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            return ControlSignal{target_angle, target_speed};
+                        }
+                        else { return ControlSignal{0.0f, 0.0f}; }
                     }
-                    else if (as_state.labyrinth_state == LabyrinthState::FLOOD_SOLVING)
+                    else if (labyrinth_state == LabyrinthState::FLOOD_SOLVING)
                     {
                         auto [target_angle, target_speed] = controller.update_balancer();
                         return ControlSignal{target_angle, target_speed};
                     }
-                    else if (as_state.labyrinth_state == LabyrinthState::STANDBY || as_state.labyrinth_state == LabyrinthState::ERROR)
+                    else if (labyrinth_state == LabyrinthState::STANDBY || labyrinth_state == LabyrinthState::ERROR)
                     {
                         controller.set_reference_speed(0.0f);
                         auto [target_angle, target_speed] = controller.update(as_state.follow_car);
 
                         return ControlSignal{target_angle, target_speed};
                     }
-                    else if (as_state.labyrinth_state == LabyrinthState::REVERSE_ESCAPE ||
-                             as_state.labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+                    else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
                         if (controller.target_speed < 0.0f) { controller.swap_front_rear(); }
                         auto [target_angle, target_speed] = controller.update(as_state.follow_car);
