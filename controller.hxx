@@ -272,26 +272,6 @@ namespace jlb
             return {target_angle, target_speed};
         }
 
-        ControlSignal update_mission_switch(bool follow_car = false)
-        {
-#ifndef SIMULATION
-            tick_counter_prev = tick_counter;
-            tick_counter      = HAL_GetTick();
-            float dt          = (((float)tick_counter) - ((float)(tick_counter_prev))) / 1000.0f;
-#else
-            auto                   control_timestamp_ = std::chrono::steady_clock::now();
-            [[maybe_unused]] float dt =
-                std::chrono::duration_cast<std::chrono::milliseconds>(control_timestamp_ - prev_control_timestamp_).count() / 1000.0f;
-            prev_control_timestamp_ = control_timestamp_;
-#endif
-
-            // TODO: mission switch
-            lateral_control(dt);
-            longitudinal_control(dt, follow_car);
-
-            return {0, 0};
-        }
-
         ControlSignal update_balancer()
         {
 #ifndef SIMULATION
