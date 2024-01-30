@@ -101,6 +101,7 @@ namespace jlb
                 }
                 case Mission::FAST:
                 {
+                	controller.set_direction(Direction::STRAIGHT);
                     auto [target_angle, target_speed] = controller.update(as_state.follow_car);
                     return ControlSignal{target_angle, target_speed};
                     break;

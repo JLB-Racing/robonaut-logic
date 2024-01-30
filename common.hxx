@@ -88,12 +88,12 @@ namespace jlb
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
     }  // namespace lat
 
-    PARAM float OFFSET      = -4.625f;
-    PARAM float SLOPE       = 3.5f;
-    PARAM float DAMPING     = 0.95f;
-    PARAM float D5_MIN      = 1.5f;
-    PARAM float OFFSET_EXP1 = 4.0f;
-    PARAM float OFFSET_EXP2 = -1.38f;
+    PARAM float OFFSET  = -4.625f;
+    PARAM float SLOPE   = 3.5f;
+    PARAM float DAMPING = 0.95f;
+    PARAM float D5_MIN = 1.5f;
+    PARAM float OFFSET_EXP1  = 4.0f;
+    PARAM float OFFSET_EXP2  = -1.38f;
 
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
@@ -106,7 +106,7 @@ namespace jlb
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
     PARAM float BALANCER_SPEED          = 0.5f;  // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 4.0f;  // m/s
+    PARAM float FAST_SPEED              = 3.0f;  // m/s
     PARAM float FAST_SPEED_TURN         = 0.9f;  // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
