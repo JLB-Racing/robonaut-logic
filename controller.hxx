@@ -249,7 +249,7 @@ namespace jlb
             {
                 // reference_speed_prev = reference_speed;
                 float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
-                target_speed *= std::pow((1 - object_rate), 2);
+                //target_speed *= std::pow((1 - object_rate), 2);
             }
         }
 
