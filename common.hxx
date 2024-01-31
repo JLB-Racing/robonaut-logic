@@ -106,7 +106,7 @@ namespace jlb
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
     PARAM float BALANCER_SPEED          = 0.5f;  // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 3.0f;  // m/s
+    PARAM float FAST_SPEED              = 4.0f;  // m/s
     PARAM float FAST_SPEED_TURN         = 0.9f;  // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
