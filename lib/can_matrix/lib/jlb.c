@@ -475,6 +475,79 @@ uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, uint8_t* _d, uint8_t* _le
 
 #endif // JLB_USE_CANSTRUCT
 
+uint32_t Unpack_measurements_6_jlb(measurements_6_t* _m, const uint8_t* _d, uint8_t dlc_)
+{
+  (void)dlc_;
+  _m->hv_battery_voltage_ro = (uint16_t) ( ((_d[1] & (0xFFU)) << 8U) | (_d[0] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->hv_battery_voltage_phys = (sigfloat_t)(JLB_hv_battery_voltage_ro_fromS(_m->hv_battery_voltage_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->lv_battery_voltage_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->lv_battery_voltage_phys = (sigfloat_t)(JLB_lv_battery_voltage_ro_fromS(_m->lv_battery_voltage_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->deadman_switch = (uint8_t) ( (_d[4] & (0x01U)) );
+
+#ifdef JLB_USE_DIAG_MONITORS
+  _m->mon1.dlc_error = (dlc_ < measurements_6_DLC);
+  _m->mon1.last_cycle = GetSystemTick();
+  _m->mon1.frame_cnt++;
+
+  FMon_measurements_6_jlb(&_m->mon1, measurements_6_CANID);
+#endif // JLB_USE_DIAG_MONITORS
+
+  return measurements_6_CANID;
+}
+
+#ifdef JLB_USE_CANSTRUCT
+
+uint32_t Pack_measurements_6_jlb(measurements_6_t* _m, __CoderDbcCanFrame_t__* cframe)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_6_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
+  _m->hv_battery_voltage_ro = (uint16_t) JLB_hv_battery_voltage_ro_toS(_m->hv_battery_voltage_phys);
+  _m->lv_battery_voltage_ro = (uint16_t) JLB_lv_battery_voltage_ro_toS(_m->lv_battery_voltage_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  cframe->Data[0] |= (uint8_t) ( (_m->hv_battery_voltage_ro & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( ((_m->hv_battery_voltage_ro >> 8U) & (0xFFU)) );
+  cframe->Data[2] |= (uint8_t) ( (_m->lv_battery_voltage_ro & (0xFFU)) );
+  cframe->Data[3] |= (uint8_t) ( ((_m->lv_battery_voltage_ro >> 8U) & (0xFFU)) );
+  cframe->Data[4] |= (uint8_t) ( (_m->deadman_switch & (0x01U)) );
+
+  cframe->MsgId = (uint32_t) measurements_6_CANID;
+  cframe->DLC = (uint8_t) measurements_6_DLC;
+  cframe->IDE = (uint8_t) measurements_6_IDE;
+  return measurements_6_CANID;
+}
+
+#else
+
+uint32_t Pack_measurements_6_jlb(measurements_6_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(measurements_6_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
+  _m->hv_battery_voltage_ro = (uint16_t) JLB_hv_battery_voltage_ro_toS(_m->hv_battery_voltage_phys);
+  _m->lv_battery_voltage_ro = (uint16_t) JLB_lv_battery_voltage_ro_toS(_m->lv_battery_voltage_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  _d[0] |= (uint8_t) ( (_m->hv_battery_voltage_ro & (0xFFU)) );
+  _d[1] |= (uint8_t) ( ((_m->hv_battery_voltage_ro >> 8U) & (0xFFU)) );
+  _d[2] |= (uint8_t) ( (_m->lv_battery_voltage_ro & (0xFFU)) );
+  _d[3] |= (uint8_t) ( ((_m->lv_battery_voltage_ro >> 8U) & (0xFFU)) );
+  _d[4] |= (uint8_t) ( (_m->deadman_switch & (0x01U)) );
+
+  *_len = (uint8_t) measurements_6_DLC;
+  *_ide = (uint8_t) measurements_6_IDE;
+  return measurements_6_CANID;
+}
+
+#endif // JLB_USE_CANSTRUCT
+
 uint32_t Unpack_odometry_1_jlb(odometry_1_t* _m, const uint8_t* _d, uint8_t dlc_)
 {
   (void)dlc_;
@@ -879,6 +952,97 @@ uint32_t Pack_logic_3_jlb(logic_3_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _i
   *_len = (uint8_t) logic_3_DLC;
   *_ide = (uint8_t) logic_3_IDE;
   return logic_3_CANID;
+}
+
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_logic_4_jlb(logic_4_t* _m, const uint8_t* _d, uint8_t dlc_)
+{
+  (void)dlc_;
+  _m->best_laptime_ro = (uint8_t) ( (_d[0] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->best_laptime_phys = (sigfloat_t)(JLB_best_laptime_ro_fromS(_m->best_laptime_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->current_laptime_ro = (uint8_t) ( (_d[1] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->current_laptime_phys = (sigfloat_t)(JLB_current_laptime_ro_fromS(_m->current_laptime_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->target_distance_ro = (uint16_t) ( ((_d[3] & (0xFFU)) << 8U) | (_d[2] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->target_distance_phys = (sigfloat_t)(JLB_target_distance_ro_fromS(_m->target_distance_ro));
+#endif // JLB_USE_SIGFLOAT
+
+  _m->mission_switch_state = (uint8_t) ( (_d[4] & (0xFFU)) );
+  _m->goal_node = (uint8_t) ( (_d[5] & (0xFFU)) );
+  _m->last_laptime_ro = (uint8_t) ( (_d[6] & (0xFFU)) );
+#ifdef JLB_USE_SIGFLOAT
+  _m->last_laptime_phys = (sigfloat_t)(JLB_last_laptime_ro_fromS(_m->last_laptime_ro));
+#endif // JLB_USE_SIGFLOAT
+
+#ifdef JLB_USE_DIAG_MONITORS
+  _m->mon1.dlc_error = (dlc_ < logic_4_DLC);
+  _m->mon1.last_cycle = GetSystemTick();
+  _m->mon1.frame_cnt++;
+
+  FMon_logic_4_jlb(&_m->mon1, logic_4_CANID);
+#endif // JLB_USE_DIAG_MONITORS
+
+  return logic_4_CANID;
+}
+
+#ifdef JLB_USE_CANSTRUCT
+
+uint32_t Pack_logic_4_jlb(logic_4_t* _m, __CoderDbcCanFrame_t__* cframe)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_4_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
+  _m->best_laptime_ro = (uint8_t) JLB_best_laptime_ro_toS(_m->best_laptime_phys);
+  _m->current_laptime_ro = (uint8_t) JLB_current_laptime_ro_toS(_m->current_laptime_phys);
+  _m->target_distance_ro = (uint16_t) JLB_target_distance_ro_toS(_m->target_distance_phys);
+  _m->last_laptime_ro = (uint8_t) JLB_last_laptime_ro_toS(_m->last_laptime_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  cframe->Data[0] |= (uint8_t) ( (_m->best_laptime_ro & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( (_m->current_laptime_ro & (0xFFU)) );
+  cframe->Data[2] |= (uint8_t) ( (_m->target_distance_ro & (0xFFU)) );
+  cframe->Data[3] |= (uint8_t) ( ((_m->target_distance_ro >> 8U) & (0xFFU)) );
+  cframe->Data[4] |= (uint8_t) ( (_m->mission_switch_state & (0xFFU)) );
+  cframe->Data[5] |= (uint8_t) ( (_m->goal_node & (0xFFU)) );
+  cframe->Data[6] |= (uint8_t) ( (_m->last_laptime_ro & (0xFFU)) );
+
+  cframe->MsgId = (uint32_t) logic_4_CANID;
+  cframe->DLC = (uint8_t) logic_4_DLC;
+  cframe->IDE = (uint8_t) logic_4_IDE;
+  return logic_4_CANID;
+}
+
+#else
+
+uint32_t Pack_logic_4_jlb(logic_4_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_4_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
+
+#ifdef JLB_USE_SIGFLOAT
+  _m->best_laptime_ro = (uint8_t) JLB_best_laptime_ro_toS(_m->best_laptime_phys);
+  _m->current_laptime_ro = (uint8_t) JLB_current_laptime_ro_toS(_m->current_laptime_phys);
+  _m->target_distance_ro = (uint16_t) JLB_target_distance_ro_toS(_m->target_distance_phys);
+  _m->last_laptime_ro = (uint8_t) JLB_last_laptime_ro_toS(_m->last_laptime_phys);
+#endif // JLB_USE_SIGFLOAT
+
+  _d[0] |= (uint8_t) ( (_m->best_laptime_ro & (0xFFU)) );
+  _d[1] |= (uint8_t) ( (_m->current_laptime_ro & (0xFFU)) );
+  _d[2] |= (uint8_t) ( (_m->target_distance_ro & (0xFFU)) );
+  _d[3] |= (uint8_t) ( ((_m->target_distance_ro >> 8U) & (0xFFU)) );
+  _d[4] |= (uint8_t) ( (_m->mission_switch_state & (0xFFU)) );
+  _d[5] |= (uint8_t) ( (_m->goal_node & (0xFFU)) );
+  _d[6] |= (uint8_t) ( (_m->last_laptime_ro & (0xFFU)) );
+
+  *_len = (uint8_t) logic_4_DLC;
+  *_ide = (uint8_t) logic_4_IDE;
+  return logic_4_CANID;
 }
 
 #endif // JLB_USE_CANSTRUCT

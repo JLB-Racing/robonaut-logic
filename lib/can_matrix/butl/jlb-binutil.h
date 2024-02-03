@@ -15,11 +15,13 @@ typedef struct
   measurements_3_t measurements_3;
   measurements_4_t measurements_4;
   measurements_5_t measurements_5;
+  measurements_6_t measurements_6;
   odometry_1_t odometry_1;
   odometry_2_t odometry_2;
   logic_1_t logic_1;
   logic_2_t logic_2;
   logic_3_t logic_3;
+  logic_4_t logic_4;
 } jlb_rx_t;
 
 // There is no any TX mapped massage.

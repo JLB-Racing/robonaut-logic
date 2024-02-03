@@ -40,7 +40,6 @@ extern "C" {
 #endif
 
 
-// This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.
 // def @measurements_1 CAN Message (1    0x1)
 #define measurements_1_IDE (0U)
 #define measurements_1_DLC (8U)
@@ -562,6 +561,63 @@ typedef struct
 
 } measurements_5_t;
 
+// def @measurements_6 CAN Message (6    0x6)
+#define measurements_6_IDE (0U)
+#define measurements_6_DLC (8U)
+#define measurements_6_CANID (0x6U)
+// signal: @hv_battery_voltage_ro
+#define JLB_hv_battery_voltage_ro_CovFactor (0.00025)
+#define JLB_hv_battery_voltage_ro_toS(x) ( (uint16_t) (((x) - (0.0)) / (0.00025)) )
+#define JLB_hv_battery_voltage_ro_fromS(x) ( (((x) * (0.00025)) + (0.0)) )
+// signal: @lv_battery_voltage_ro
+#define JLB_lv_battery_voltage_ro_CovFactor (0.00025)
+#define JLB_lv_battery_voltage_ro_toS(x) ( (uint16_t) (((x) - (0.0)) / (0.00025)) )
+#define JLB_lv_battery_voltage_ro_fromS(x) ( (((x) * (0.00025)) + (0.0)) )
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint16_t hv_battery_voltage_ro;            //      Bits=16 Factor= 0.00025         Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t hv_battery_voltage_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t lv_battery_voltage_ro;            //      Bits=16 Factor= 0.00025         Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t lv_battery_voltage_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint8_t deadman_switch : 1;                //      Bits= 1
+
+#else
+
+  uint16_t hv_battery_voltage_ro;            //      Bits=16 Factor= 0.00025         Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t hv_battery_voltage_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t lv_battery_voltage_ro;            //      Bits=16 Factor= 0.00025         Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t lv_battery_voltage_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint8_t deadman_switch;                    //      Bits= 1
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} measurements_6_t;
+
 // def @odometry_1 CAN Message (17   0x11)
 #define odometry_1_IDE (0U)
 #define odometry_1_DLC (8U)
@@ -771,8 +827,8 @@ typedef struct
 #define logic_2_CANID (0x22U)
 // signal: @distance_traveled_ro
 #define JLB_distance_traveled_ro_CovFactor (0.01)
-#define JLB_distance_traveled_ro_toS(x) ( (uint16_t) (((x) - (0.0)) / (0.01)) )
-#define JLB_distance_traveled_ro_fromS(x) ( (((x) * (0.01)) + (0.0)) )
+#define JLB_distance_traveled_ro_toS(x) ( (uint16_t) (((x) - (-327.675)) / (0.01)) )
+#define JLB_distance_traveled_ro_fromS(x) ( (((x) * (0.01)) + (-327.675)) )
 
 typedef struct
 {
@@ -790,7 +846,7 @@ typedef struct
 
   uint8_t previous_node;                     //      Bits= 8 Unit:'char'
 
-  uint16_t distance_traveled_ro;             //      Bits=16 Factor= 0.01            Unit:'m'
+  uint16_t distance_traveled_ro;             //      Bits=16 Offset= -327.675           Factor= 0.01            Unit:'m'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t distance_traveled_phys;
@@ -810,7 +866,7 @@ typedef struct
 
   uint8_t previous_node;                     //      Bits= 8 Unit:'char'
 
-  uint16_t distance_traveled_ro;             //      Bits=16 Factor= 0.01            Unit:'m'
+  uint16_t distance_traveled_ro;             //      Bits=16 Offset= -327.675           Factor= 0.01            Unit:'m'
 
 #ifdef JLB_USE_SIGFLOAT
   sigfloat_t distance_traveled_phys;
@@ -919,6 +975,99 @@ typedef struct
 
 } logic_3_t;
 
+// def @logic_4 CAN Message (36   0x24)
+#define logic_4_IDE (0U)
+#define logic_4_DLC (8U)
+#define logic_4_CANID (0x24U)
+// signal: @best_laptime_ro
+#define JLB_best_laptime_ro_CovFactor (0.01)
+#define JLB_best_laptime_ro_toS(x) ( (uint8_t) (((x) - (0.0)) / (0.01)) )
+#define JLB_best_laptime_ro_fromS(x) ( (((x) * (0.01)) + (0.0)) )
+// signal: @current_laptime_ro
+#define JLB_current_laptime_ro_CovFactor (0.01)
+#define JLB_current_laptime_ro_toS(x) ( (uint8_t) (((x) - (0.0)) / (0.01)) )
+#define JLB_current_laptime_ro_fromS(x) ( (((x) * (0.01)) + (0.0)) )
+// signal: @target_distance_ro
+#define JLB_target_distance_ro_CovFactor (0.01)
+#define JLB_target_distance_ro_toS(x) ( (uint16_t) (((x) - (-327.675)) / (0.01)) )
+#define JLB_target_distance_ro_fromS(x) ( (((x) * (0.01)) + (-327.675)) )
+// signal: @last_laptime_ro
+#define JLB_last_laptime_ro_CovFactor (0.01)
+#define JLB_last_laptime_ro_toS(x) ( (uint8_t) (((x) - (0.0)) / (0.01)) )
+#define JLB_last_laptime_ro_fromS(x) ( (((x) * (0.01)) + (0.0)) )
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint8_t best_laptime_ro;                   //      Bits= 8 Factor= 0.01            Unit:'s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t best_laptime_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint8_t current_laptime_ro;                //      Bits= 8 Factor= 0.01            Unit:'s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t current_laptime_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t target_distance_ro;               //      Bits=16 Offset= -327.675           Factor= 0.01            Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t target_distance_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint8_t mission_switch_state;              //      Bits= 8 Unit:'enum'
+
+  uint8_t goal_node;                         //      Bits= 8 Unit:'char'
+
+  uint8_t last_laptime_ro;                   //      Bits= 8 Factor= 0.01            Unit:'s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t last_laptime_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#else
+
+  uint8_t best_laptime_ro;                   //      Bits= 8 Factor= 0.01            Unit:'s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t best_laptime_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint8_t current_laptime_ro;                //      Bits= 8 Factor= 0.01            Unit:'s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t current_laptime_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint16_t target_distance_ro;               //      Bits=16 Offset= -327.675           Factor= 0.01            Unit:'m'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t target_distance_phys;
+#endif // JLB_USE_SIGFLOAT
+
+  uint8_t mission_switch_state;              //      Bits= 8 Unit:'enum'
+
+  uint8_t goal_node;                         //      Bits= 8 Unit:'char'
+
+  uint8_t last_laptime_ro;                   //      Bits= 8 Factor= 0.01            Unit:'s'
+
+#ifdef JLB_USE_SIGFLOAT
+  sigfloat_t last_laptime_phys;
+#endif // JLB_USE_SIGFLOAT
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} logic_4_t;
+
 // Function signatures
 
 uint32_t Unpack_measurements_1_jlb(measurements_1_t* _m, const uint8_t* _d, uint8_t dlc_);
@@ -956,6 +1105,13 @@ uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, __CoderDbcCanFrame_t__* c
 uint32_t Pack_measurements_5_jlb(measurements_5_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
 #endif // JLB_USE_CANSTRUCT
 
+uint32_t Unpack_measurements_6_jlb(measurements_6_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_measurements_6_jlb(measurements_6_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_measurements_6_jlb(measurements_6_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
 uint32_t Unpack_odometry_1_jlb(odometry_1_t* _m, const uint8_t* _d, uint8_t dlc_);
 #ifdef JLB_USE_CANSTRUCT
 uint32_t Pack_odometry_1_jlb(odometry_1_t* _m, __CoderDbcCanFrame_t__* cframe);
@@ -989,6 +1145,13 @@ uint32_t Unpack_logic_3_jlb(logic_3_t* _m, const uint8_t* _d, uint8_t dlc_);
 uint32_t Pack_logic_3_jlb(logic_3_t* _m, __CoderDbcCanFrame_t__* cframe);
 #else
 uint32_t Pack_logic_3_jlb(logic_3_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_logic_4_jlb(logic_4_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_logic_4_jlb(logic_4_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_logic_4_jlb(logic_4_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
 #endif // JLB_USE_CANSTRUCT
 
 #ifdef __cplusplus
