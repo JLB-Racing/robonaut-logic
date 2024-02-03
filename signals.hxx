@@ -18,13 +18,9 @@
 #include "stm32l5xx_hal.h"
 #include "cmsis_os.h"
 extern UART_HandleTypeDef huart2;
-bool uart_complete = true;
+bool                      uart_complete = true;
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-	uart_complete = true;
-}
-
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) { uart_complete = true; }
 
 #endif
 
@@ -78,11 +74,13 @@ namespace jlb
             measurements_3();
             measurements_4();
             measurements_5();
+            measurements_6();
             odometry_1();
             odometry_2();
             logic_1();
             logic_2();
-            logic3();
+            logic_3();
+            logic_4();
 
 #ifndef SIMULATION
             uint32_t timestamp = HAL_GetTick();
@@ -96,7 +94,6 @@ namespace jlb
             telemetry_data.push_back((timestamp >> 8u) & 0xFF);
             telemetry_data.push_back(timestamp & 0xFF);
             send(telemetry_data.data(), telemetry_data.size());
-
         }
 
     private:
@@ -109,11 +106,11 @@ namespace jlb
         int send([[maybe_unused]] char *msg, [[maybe_unused]] size_t max_size)
         {
 #ifndef SIMULATION
-        	if(uart_complete)
-        	{
+            if (uart_complete)
+            {
                 HAL_UART_Transmit_DMA(&huart2, reinterpret_cast<uint8_t *>(msg), max_size);
                 uart_complete = false;
-        	}
+            }
             return 0;
 #else
             return client.send(msg, max_size);
@@ -138,16 +135,22 @@ namespace jlb
                 6 == controller.selected_front ? controller.detection_front[6] + 2.0f : controller.detection_front[6];
             jlb_rx.measurements_1.line_sensor_8 =
                 7 == controller.selected_front ? controller.detection_front[7] + 2.0f : controller.detection_front[7];
-             jlb_rx.measurements_1.line_sensor_9  = 8 == controller.selected_front ? controller.detection_front[8] + 2.0f :
-             controller.detection_front[8]; jlb_rx.measurements_1.line_sensor_10 = 9 == controller.selected_front ? controller.detection_front[9]
-             + 2.0f : controller.detection_front[9]; jlb_rx.measurements_1.line_sensor_11 = 10 == controller.selected_front ?
-             controller.detection_front[10] + 2.0f : controller.detection_front[10]; jlb_rx.measurements_1.line_sensor_12 = 11 ==
-             controller.selected_front ? controller.detection_front[11] + 2.0f : controller.detection_front[11];
-             jlb_rx.measurements_1.line_sensor_13 = 12 == controller.selected_front ? controller.detection_front[12] + 2.0f :
-             controller.detection_front[12]; jlb_rx.measurements_1.line_sensor_14 = 13 == controller.selected_front ? controller.detection_front[13]
-             + 2.0f : controller.detection_front[13]; jlb_rx.measurements_1.line_sensor_15 = 14 == controller.selected_front ?
-             controller.detection_front[14] + 2.0f : controller.detection_front[14]; jlb_rx.measurements_1.line_sensor_16 = 15 ==
-             controller.selected_front ? controller.detection_front[15] + 2.0f : controller.detection_front[15];
+            jlb_rx.measurements_1.line_sensor_9 =
+                8 == controller.selected_front ? controller.detection_front[8] + 2.0f : controller.detection_front[8];
+            jlb_rx.measurements_1.line_sensor_10 =
+                9 == controller.selected_front ? controller.detection_front[9] + 2.0f : controller.detection_front[9];
+            jlb_rx.measurements_1.line_sensor_11 =
+                10 == controller.selected_front ? controller.detection_front[10] + 2.0f : controller.detection_front[10];
+            jlb_rx.measurements_1.line_sensor_12 =
+                11 == controller.selected_front ? controller.detection_front[11] + 2.0f : controller.detection_front[11];
+            jlb_rx.measurements_1.line_sensor_13 =
+                12 == controller.selected_front ? controller.detection_front[12] + 2.0f : controller.detection_front[12];
+            jlb_rx.measurements_1.line_sensor_14 =
+                13 == controller.selected_front ? controller.detection_front[13] + 2.0f : controller.detection_front[13];
+            jlb_rx.measurements_1.line_sensor_15 =
+                14 == controller.selected_front ? controller.detection_front[14] + 2.0f : controller.detection_front[14];
+            jlb_rx.measurements_1.line_sensor_16 =
+                15 == controller.selected_front ? controller.detection_front[15] + 2.0f : controller.detection_front[15];
 #ifndef SIMULATION
             jlb_rx.measurements_1.line_sensor_17 =
                 16 == controller.selected_front ? controller.detection_front[16] + 2.0f : controller.detection_front[16];
@@ -194,24 +197,28 @@ namespace jlb
 
         void measurements_2()
         {
-            jlb_rx.measurements_2.line_sensor_1 = 0 == controller.selected_rear ? controller.detection_rear[0] + 2.0f : controller.detection_rear[0];
-            jlb_rx.measurements_2.line_sensor_2 = 1 == controller.selected_rear ? controller.detection_rear[1] + 2.0f : controller.detection_rear[1];
-            jlb_rx.measurements_2.line_sensor_3 = 2 == controller.selected_rear ? controller.detection_rear[2] + 2.0f : controller.detection_rear[2];
-            jlb_rx.measurements_2.line_sensor_4 = 3 == controller.selected_rear ? controller.detection_rear[3] + 2.0f : controller.detection_rear[3];
-            jlb_rx.measurements_2.line_sensor_5 = 4 == controller.selected_rear ? controller.detection_rear[4] + 2.0f : controller.detection_rear[4];
-            jlb_rx.measurements_2.line_sensor_6 = 5 == controller.selected_rear ? controller.detection_rear[5] + 2.0f : controller.detection_rear[5];
-            jlb_rx.measurements_2.line_sensor_7 = 6 == controller.selected_rear ? controller.detection_rear[6] + 2.0f : controller.detection_rear[6];
-            jlb_rx.measurements_2.line_sensor_8 = 7 == controller.selected_rear ? controller.detection_rear[7] + 2.0f : controller.detection_rear[7];
-             jlb_rx.measurements_2.line_sensor_9  = 8 == controller.selected_rear ? controller.detection_rear[8] + 2.0f :
-             controller.detection_rear[8]; jlb_rx.measurements_2.line_sensor_10 = 9 == controller.selected_rear ? controller.detection_rear[9]
-             + 2.0f : controller.detection_rear[9]; jlb_rx.measurements_2.line_sensor_11 = 10 == controller.selected_rear ?
-             controller.detection_rear[10] + 2.0f : controller.detection_rear[10]; jlb_rx.measurements_2.line_sensor_12 = 11 ==
-             controller.selected_rear ? controller.detection_rear[11] + 2.0f : controller.detection_rear[11]; jlb_rx.measurements_2.line_sensor_13 =
-             12 == controller.selected_rear ? controller.detection_rear[12] + 2.0f : controller.detection_rear[12];
-             jlb_rx.measurements_2.line_sensor_14 = 13 == controller.selected_rear ? controller.detection_rear[13] + 2.0f :
-             controller.detection_rear[13]; jlb_rx.measurements_2.line_sensor_15 = 14 == controller.selected_rear ? controller.detection_rear[14]
-             + 2.0f : controller.detection_rear[14]; jlb_rx.measurements_2.line_sensor_16 = 15 == controller.selected_rear ?
-             controller.detection_rear[15] + 2.0f : controller.detection_rear[15];
+            jlb_rx.measurements_2.line_sensor_1  = 0 == controller.selected_rear ? controller.detection_rear[0] + 2.0f : controller.detection_rear[0];
+            jlb_rx.measurements_2.line_sensor_2  = 1 == controller.selected_rear ? controller.detection_rear[1] + 2.0f : controller.detection_rear[1];
+            jlb_rx.measurements_2.line_sensor_3  = 2 == controller.selected_rear ? controller.detection_rear[2] + 2.0f : controller.detection_rear[2];
+            jlb_rx.measurements_2.line_sensor_4  = 3 == controller.selected_rear ? controller.detection_rear[3] + 2.0f : controller.detection_rear[3];
+            jlb_rx.measurements_2.line_sensor_5  = 4 == controller.selected_rear ? controller.detection_rear[4] + 2.0f : controller.detection_rear[4];
+            jlb_rx.measurements_2.line_sensor_6  = 5 == controller.selected_rear ? controller.detection_rear[5] + 2.0f : controller.detection_rear[5];
+            jlb_rx.measurements_2.line_sensor_7  = 6 == controller.selected_rear ? controller.detection_rear[6] + 2.0f : controller.detection_rear[6];
+            jlb_rx.measurements_2.line_sensor_8  = 7 == controller.selected_rear ? controller.detection_rear[7] + 2.0f : controller.detection_rear[7];
+            jlb_rx.measurements_2.line_sensor_9  = 8 == controller.selected_rear ? controller.detection_rear[8] + 2.0f : controller.detection_rear[8];
+            jlb_rx.measurements_2.line_sensor_10 = 9 == controller.selected_rear ? controller.detection_rear[9] + 2.0f : controller.detection_rear[9];
+            jlb_rx.measurements_2.line_sensor_11 =
+                10 == controller.selected_rear ? controller.detection_rear[10] + 2.0f : controller.detection_rear[10];
+            jlb_rx.measurements_2.line_sensor_12 =
+                11 == controller.selected_rear ? controller.detection_rear[11] + 2.0f : controller.detection_rear[11];
+            jlb_rx.measurements_2.line_sensor_13 =
+                12 == controller.selected_rear ? controller.detection_rear[12] + 2.0f : controller.detection_rear[12];
+            jlb_rx.measurements_2.line_sensor_14 =
+                13 == controller.selected_rear ? controller.detection_rear[13] + 2.0f : controller.detection_rear[13];
+            jlb_rx.measurements_2.line_sensor_15 =
+                14 == controller.selected_rear ? controller.detection_rear[14] + 2.0f : controller.detection_rear[14];
+            jlb_rx.measurements_2.line_sensor_16 =
+                15 == controller.selected_rear ? controller.detection_rear[15] + 2.0f : controller.detection_rear[15];
 #ifndef SIMULATION
             jlb_rx.measurements_2.line_sensor_9  = 8 == controller.selected_rear ? controller.detection_rear[8] + 2.0f : controller.detection_rear[8];
             jlb_rx.measurements_2.line_sensor_10 = 9 == controller.selected_rear ? controller.detection_rear[9] + 2.0f : controller.detection_rear[9];
@@ -316,6 +323,21 @@ namespace jlb
             telemetry_data.insert(telemetry_data.end(), data, data + measurements_5_DLC + 2);
         }
 
+        void measurements_6()
+        {
+            jlb_rx.measurements_6.deadman_switch          = controller.deadman_switch;
+            jlb_rx.measurements_6.lv_battery_voltage_phys = measurements.lv_battery_voltage;
+            jlb_rx.measurements_6.hv_battery_voltage_phys = measurements.hv_battery_voltage;
+
+            char    data[measurements_4_DLC + 2] = {0};
+            uint8_t ide                          = measurements_6_IDE;
+            uint8_t dlc                          = measurements_6_DLC;
+            data[0]                              = measurements_6_CANID;
+            data[1]                              = measurements_6_DLC;
+            Pack_measurements_6_jlb(&jlb_rx.measurements_6, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
+            telemetry_data.insert(telemetry_data.end(), data, data + measurements_6_DLC + 2);
+        }
+
         void odometry_1()
         {
             jlb_rx.odometry_1.position_x_phys  = odometry.x_t;
@@ -380,7 +402,7 @@ namespace jlb
             telemetry_data.insert(telemetry_data.end(), data, data + logic_2_DLC + 2);
         }
 
-        void logic3()
+        void logic_3()
         {
             jlb_rx.logic_3.ang_error_norm_phys      = controller.ang_error_norm;
             jlb_rx.logic_3.dist_error_norm_phys     = controller.dist_error_norm;
@@ -396,6 +418,24 @@ namespace jlb
             data[1]                       = logic_3_DLC;
             Pack_logic_3_jlb(&jlb_rx.logic_3, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             telemetry_data.insert(telemetry_data.end(), data, data + logic_3_DLC + 2);
+        }
+
+        void logic_4()
+        {
+            jlb_rx.logic_4.last_laptime_phys    = as_state.last_laptime;
+            jlb_rx.logic_4.goal_node            = as_state.goal_node;
+            jlb_rx.logic_4.mission_switch_state = static_cast<uint8_t>(as_state.mission_switch_state);
+            jlb_rx.logic_4.target_distance_phys = as_state.target_distance;
+            jlb_rx.logic_4.current_laptime_phys = as_state.current_laptime;
+            jlb_rx.logic_4.best_laptime_phys    = as_state.best_laptime;
+
+            char    data[logic_4_DLC + 2] = {0};
+            uint8_t ide                   = logic_4_IDE;
+            uint8_t dlc                   = logic_4_DLC;
+            data[0]                       = logic_4_CANID;
+            data[1]                       = logic_4_DLC;
+            Pack_logic_4_jlb(&jlb_rx.logic_4, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
+            telemetry_data.insert(telemetry_data.end(), data, data + logic_4_DLC + 2);
         }
     };
 

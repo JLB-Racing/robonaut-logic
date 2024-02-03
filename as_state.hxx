@@ -70,11 +70,12 @@ namespace jlb
         uint32_t tick_counter             = 0u;
         uint32_t tick_counter_prev        = 0u;
 
-        char          at_node       = START_GATE;
-        char          previous_node = START_GATE;
-        char          next_node     = START_GATE;
-        char          goal_node     = START_GATE;
-        unsigned long selected_edge = 0u;
+        char          at_node         = START_GATE;
+        char          previous_node   = START_GATE;
+        char          next_node       = START_GATE;
+        char          goal_node       = START_GATE;
+        unsigned long selected_edge   = 0u;
+        float         target_distance = 0.0f;
 
         Direction reverse_saved_dir = Direction::STRAIGHT;
 
@@ -89,6 +90,10 @@ namespace jlb
         float mission_switch_arc_length     = 0.0f;
 
         int collected_valid_gates = 0;
+
+        float last_laptime;
+        float best_laptime;
+        float current_laptime;
 
         bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
@@ -643,16 +648,16 @@ namespace jlb
             {
                 case Mission::LABYRINTH:
                 {
-                    auto distance = graph[previous_node].edges[selected_edge].distance;
+                    target_distance = graph[previous_node].edges[selected_edge].distance;
 
                     if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
-                        distance = graph[at_node].edges[selected_edge].distance;
+                        target_distance = graph[at_node].edges[selected_edge].distance;
                         // if (-WHEELBASE < odometry.distance_local && odometry.distance_local < distance / 2.0f) { controller.set_passed_half(true);
                         // } else { controller.set_passed_half(false); }
                     }
 
-                    if (odometry.distance_local > distance / 2.0f) { controller.set_passed_half(true); }
+                    if (odometry.distance_local > target_distance / 2.0f) { controller.set_passed_half(true); }
                     else { controller.set_passed_half(false); }
 
                     bool at_decision_point = under_gate || at_cross_section;
@@ -666,7 +671,7 @@ namespace jlb
                         // std::cout << "target: " << distance << " actual: " << odometry.distance_local << std::endl;
 
                         bool  decide = false;
-                        float delta  = distance - std::fabs(odometry.distance_local);
+                        float delta  = target_distance - std::fabs(odometry.distance_local);
                         switch (labyrinth_state)
                         {
                             case LabyrinthState::START:

@@ -7,6 +7,8 @@ struct Measurements
     float motor_current;
     float object_range;
     float wheel_rpm;
+    float lv_battery_voltage;
+    float hv_battery_voltage;
 };
 
 #endif  // MEASUREMENTS_HXX
