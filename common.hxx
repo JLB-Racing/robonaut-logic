@@ -62,16 +62,16 @@ namespace jlb
     /* OBJECT PID CONTROLLER PARAMETERS */
     namespace obj
     {
-        PARAM float kP                      = 4.20f;
-        PARAM float kI                      = 0.69f;
+        PARAM float kP                      = 8.420f;
+        PARAM float kI                      = 6.20f;
         PARAM float kD                      = 0.0f;
-        PARAM float TAU                     = 0.05f;
-        PARAM float T                       = 0.005f;
+        PARAM float TAU                     = 0.01f;
+        PARAM float T                       = 0.01f;
         PARAM float LIM_MIN                 = 0.0f;
         PARAM float LIM_MAX                 = 1.0f;
-        PARAM float DEADBAND                = 0.05f;
+        PARAM float DEADBAND                = 0.00f;
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.1f;
-        PARAM float FOLLOW_DISTANCE         = 0.3f;
+        PARAM float FOLLOW_DISTANCE         = 0.45f;
     }  // namespace obj
 
     /* LATERAL PID CONTROLLER PARAMETERS */
@@ -91,9 +91,10 @@ namespace jlb
     PARAM float OFFSET  = -4.625f;
     PARAM float SLOPE   = 3.5f;
     PARAM float DAMPING = 0.95f;
-    PARAM float D5_MIN = 1.5f;
-    PARAM float OFFSET_EXP1  = 4.0f;
+    PARAM float D5_MIN = 1.55f;
+    PARAM float OFFSET_EXP1  = 4.4f;
     PARAM float OFFSET_EXP2  = -1.38f;
+    PARAM float D5_REVERSE = 0.240f;
 
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
@@ -103,13 +104,16 @@ namespace jlb
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 0.9f;  // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.69f;  // m/s
     PARAM float BALANCER_SPEED          = 0.5f;  // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 4.0f;  // m/s
-    PARAM float FAST_SPEED_TURN         = 0.9f;  // m/s
+    PARAM float FAST_SPEED              = 10.0f;  // m/s
+    PARAM float FAST_SPEED_TURN         = 1.25f;  // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
+
+    PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f; // m/s
+    PARAM float SAFETY_CAR_THRESHOLD = 1.50f; // m
 
     ///////////////////////////////////////////////////////////////////////////
     //

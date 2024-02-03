@@ -166,6 +166,11 @@ namespace jlb
 
 #ifndef SIMULATION
             float d5 = OFFSET_EXP1 + std::log2(std::fabs(current_velocity) + OFFSET_EXP2);
+
+            if(target_speed < 0.0f)
+            {
+            	d5 = D5_REVERSE;
+            }
 #else
             float d5 = OFFSET + SLOPE * std::fabs(current_velocity);
 #endif
@@ -190,13 +195,18 @@ namespace jlb
                 std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; }) || line_positions_front.size() == 0 ||
                 line_positions_rear.size() == 0)
             {
-                // if (target_speed <= FAST_SPEED_TURN || target_speed <= LABYRINTH_SPEED || target_speed <= LABYRINTH_SPEED_REVERSE)
-                // {
-                //     if (target_angle < 0) { target_angle = -deg2rad(MAX_WHEEL_ANGLE); }
-                //     else if (target_angle == 0) { target_angle = 0; }
-                //     else if (target_angle > 0) { target_angle = deg2rad(MAX_WHEEL_ANGLE); }
-                // }
-                return;
+#ifndef SIMULATION
+                 if (target_speed <= FAST_SPEED_TURN || target_speed <= LABYRINTH_SPEED || target_speed <= LABYRINTH_SPEED_REVERSE)
+                 {
+                     if (target_angle < 0) { target_angle = -deg2rad(MAX_WHEEL_ANGLE); }
+                     else if (target_angle == 0) { target_angle = 0; }
+                     else if (target_angle > 0) { target_angle = deg2rad(MAX_WHEEL_ANGLE); }
+                 }
+#endif
+                if(target_speed >= 0.0f)
+                {
+                	return;
+                }
             }
 
             if (line_positions_front.size() > 4 || line_positions_rear.size() > 4) { return; }
@@ -236,6 +246,11 @@ namespace jlb
             target_speed = std::min(reference_speed, reference_speed * (1.0f - (0.1666667f * x) - (0.8333333f * x * x)));
             */
 
+			if(follow_car && object_range < SAFETY_CAR_THRESHOLD && reference_speed > SPEED_SAFETY_CAR_FOLLOW)
+			{
+				reference_speed = SPEED_SAFETY_CAR_FOLLOW;
+			}
+
 #ifndef SIMULATION
             if (!((usWidth_throttle > 1800) && (usWidth_throttle < 2800))) { reference_speed = 0.0f; }
             target_speed = reference_speed;
@@ -249,7 +264,7 @@ namespace jlb
             {
                 // reference_speed_prev = reference_speed;
                 float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
-                //target_speed *= std::pow((1 - object_rate), 2);
+                target_speed *= (1 - object_rate);
             }
         }
 
