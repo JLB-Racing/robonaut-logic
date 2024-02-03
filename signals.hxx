@@ -385,7 +385,7 @@ namespace jlb
 
         void logic_2()
         {
-            jlb_rx.logic_2.distance_traveled_phys = odometry.distance_local;
+            jlb_rx.logic_2.distance_traveled_phys = std::fabs(odometry.distance_local);
             jlb_rx.logic_2.labyrinth_state        = static_cast<uint8_t>(as_state.labyrinth_state);
             jlb_rx.logic_2.fast_state             = static_cast<uint8_t>(as_state.fast_state);
             jlb_rx.logic_2.next_node              = as_state.next_node;

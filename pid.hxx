@@ -53,6 +53,12 @@ public:
         kd_ = kd;
     }
 
+    void update_limits(float min, float max)
+    {
+    	minOutput_ = min;
+    	maxOutput_ = max;
+    }
+
     float update(float setpoint, float processVariable, float dt)
     {
         // Small value to avoid division by zero
