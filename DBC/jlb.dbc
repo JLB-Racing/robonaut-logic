@@ -36,10 +36,18 @@ BS_:
 BU_:
 
 
-BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
- SG_ current_laptime : 0|8@1+ (0.01,0) [0|2.55] "s" Vector__XXX
+BO_ 6 measurements_6: 8 Vector__XXX
+ SG_ deadman_switch : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ lv_battery_voltage : 16|16@1+ (0.00025,0) [0|16.38375] "m" Vector__XXX
+ SG_ hv_battery_voltage : 0|16@1+ (0.00025,0) [0|16.38375] "m" Vector__XXX
+
+BO_ 36 logic_4: 8 Vector__XXX
+ SG_ last_laptime : 48|8@1+ (0.01,0) [0|2.55] "s" Vector__XXX
+ SG_ goal_node : 40|8@1+ (1,0) [0|255] "char" Vector__XXX
+ SG_ mission_switch_state : 32|8@1+ (1,0) [0|255] "enum" Vector__XXX
+ SG_ target_distance : 16|16@1+ (0.01,-327.675) [-327.675|327.675] "m" Vector__XXX
+ SG_ current_laptime : 8|8@1+ (0.01,0) [0|2.55] "s" Vector__XXX
  SG_ best_laptime : 0|8@1+ (0.01,0) [0|2.55] "s" Vector__XXX
- SG_ last_laptime : 0|8@1+ (0.01,0) [0|2.55] "s" Vector__XXX
 
 BO_ 35 logic_3: 8 Vector__XXX
  SG_ ang_error_norm : 0|8@1+ (0.004,0) [0|1.02] "" Vector__XXX
@@ -50,7 +58,7 @@ BO_ 35 logic_3: 8 Vector__XXX
  SG_ under_gate : 49|1@1+ (1,0) [0|1] "" Vector__XXX
 
 BO_ 34 logic_2: 8 Vector__XXX
- SG_ distance_traveled : 48|16@1+ (0.01,0) [0|655.35] "m" Vector__XXX
+ SG_ distance_traveled : 48|16@1+ (0.01,-327.675) [-327.675|327.675] "m" Vector__XXX
  SG_ labyrinth_state : 24|8@1+ (1,0) [0|255] "enum" Vector__XXX
  SG_ fast_state : 16|8@1+ (1,0) [0|255] "enum" Vector__XXX
  SG_ next_node : 32|8@1+ (1,0) [0|255] "char" Vector__XXX
@@ -159,7 +167,6 @@ BO_ 1 measurements_1: 8 Vector__XXX
 
 
 
-CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
 BA_DEF_  "MultiplexExtEnabled" ENUM  "No","Yes";
 BA_DEF_  "BusType" STRING ;
 BA_DEF_DEF_  "MultiplexExtEnabled" "No";
