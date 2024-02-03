@@ -101,10 +101,10 @@ namespace jlb
                 }
                 case Mission::FAST:
                 {
-                	//controller.swap_front_rear();
-                	//controller.reference_speed = -LABYRINTH_SPEED_REVERSE;
+                    // controller.swap_front_rear();
+                    // controller.reference_speed = -LABYRINTH_SPEED_REVERSE;
 
-                	controller.set_direction(Direction::STRAIGHT);
+                    controller.set_direction(Direction::STRAIGHT);
                     auto [target_angle, target_speed] = controller.update(as_state.follow_car);
                     return ControlSignal{target_angle, target_speed};
                     break;
@@ -156,7 +156,7 @@ namespace jlb
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
         void start_signal()
         {
-            if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::FAST; }
+            if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
         }
         void reset_signal(const CompositeState state_)
         {

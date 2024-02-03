@@ -8,7 +8,7 @@
 //      DEFINES
 //
 
-#define Q2
+// #define Q2
 
 namespace jlb
 {
@@ -72,9 +72,9 @@ namespace jlb
     PARAM float START_ORIENTATION = 0.0f;
     PARAM char  START_GATE        = 'A';
 
-    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.6f;   // m
-    PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.3f;   // m
-    PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 30.0f;  // deg
+    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 1.5f;   // m
+    PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.6f;   // m
+    PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
     PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.4f;   // m
     PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::LEFT;
 #endif

@@ -9,7 +9,7 @@
 //      DEFINES
 //
 
-//#define SIMULATION
+#define SIMULATION
 
 namespace jlb
 {
@@ -88,13 +88,13 @@ namespace jlb
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
     }  // namespace lat
 
-    PARAM float OFFSET  = -4.625f;
-    PARAM float SLOPE   = 3.5f;
-    PARAM float DAMPING = 0.95f;
-    PARAM float D5_MIN = 1.55f;
-    PARAM float OFFSET_EXP1  = 4.4f;
-    PARAM float OFFSET_EXP2  = -1.38f;
-    PARAM float D5_REVERSE = 0.240f;
+    PARAM float OFFSET      = -4.625f;
+    PARAM float SLOPE       = 3.5f;
+    PARAM float DAMPING     = 0.95f;
+    PARAM float D5_MIN      = 1.55f;
+    PARAM float OFFSET_EXP1 = 4.4f;
+    PARAM float OFFSET_EXP2 = -1.38f;
+    PARAM float D5_REVERSE  = 0.240f;
 
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
@@ -103,17 +103,17 @@ namespace jlb
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 0.9f;  // m/s
+    PARAM float LABYRINTH_SPEED         = 0.9f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.69f;  // m/s
-    PARAM float BALANCER_SPEED          = 0.5f;  // m/s
-    PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
+    PARAM float BALANCER_SPEED          = 0.5f;   // m/s
+    PARAM float MISSION_SWITCH_SPEED    = 0.5f;   // m/s
     PARAM float FAST_SPEED              = 10.0f;  // m/s
     PARAM float FAST_SPEED_TURN         = 1.25f;  // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
+    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
 
-    PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f; // m/s
-    PARAM float SAFETY_CAR_THRESHOLD = 1.50f; // m
+    PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f;   // m/s
+    PARAM float SAFETY_CAR_THRESHOLD    = 1.50f;  // m
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -188,6 +188,7 @@ namespace jlb
     PARAM float D5_MIN      = 0.0f;
     PARAM float OFFSET_EXP1 = 4.5f;
     PARAM float OFFSET_EXP2 = -1.38f;
+    PARAM float D5_REVERSE  = 0.240f;
 
     PARAM float MAX_ACCELERATION = 5.0f;  // m/s^2
     PARAM float MAX_DECELERATION = 7.5f;  // m/s^2
@@ -205,6 +206,9 @@ namespace jlb
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 0.6f;   // m/s
 
+    PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f;   // m/s
+    PARAM float SAFETY_CAR_THRESHOLD    = 1.50f;  // m
+
     ///////////////////////////////////////////////////////////////////////////
     //
     //      SIGNALS
@@ -214,6 +218,148 @@ namespace jlb
     PARAM const char *RECEIVER_ADDRESS = "0.0.0.0";
     PARAM int         SENDER_PORT      = 9750;
     PARAM const char *SENDER_ADDRESS   = "255.255.255.255";
+
+    std::ostream &operator<<(std::ostream &os, const Direction &direction)
+    {
+        switch (direction)
+        {
+            case Direction::LEFT:
+                os << "LEFT";
+                break;
+            case Direction::RIGHT:
+                os << "RIGHT";
+                break;
+            case Direction::STRAIGHT:
+                os << "STRAIGHT";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
+
+    std::ostream &operator<<(std::ostream &os, const Mission &mission)
+    {
+        switch (mission)
+        {
+            case Mission::STANDBY:
+                os << "STANDBY";
+                break;
+            case Mission::LABYRINTH:
+                os << "LABYRINTH";
+                break;
+            case Mission::FAST:
+                os << "FAST";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
+
+    std::ostream &operator<<(std::ostream &os, const LabyrinthState &state)
+    {
+        switch (state)
+        {
+            case LabyrinthState::START:
+                os << "START";
+                break;
+            case LabyrinthState::EXPLORING:
+                os << "EXPLORING";
+                break;
+            case LabyrinthState::STANDBY:
+                os << "STANDBY";
+                break;
+            case LabyrinthState::ESCAPE:
+                os << "ESCAPE";
+                break;
+            case LabyrinthState::REVERSE_ESCAPE:
+                os << "REVERSE_ESCAPE";
+                break;
+            case LabyrinthState::FLOOD_TO_BALANCER:
+                os << "FLOOD_TO_BALANCER";
+                break;
+            case LabyrinthState::FLOOD_SOLVING:
+                os << "FLOOD_SOLVING";
+                break;
+            case LabyrinthState::FLOOD_TO_LABYRINTH:
+                os << "FLOOD_TO_LABYRINTH";
+                break;
+            case LabyrinthState::FINISHED:
+                os << "FINISHED";
+                break;
+            case LabyrinthState::MISSION_SWITCH:
+                os << "MISSION_SWITCH";
+                break;
+            case LabyrinthState::ERROR:
+                os << "ERROR";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
+
+    std::ostream &operator<<(std::ostream &os, const MissionSwitchState &state)
+    {
+        switch (state)
+        {
+            case MissionSwitchState::STANDBY:
+                os << "STANDBY";
+                break;
+            case MissionSwitchState::FIRST_FORWARD:
+                os << "FIRST_FORWARD";
+                break;
+            case MissionSwitchState::FIRST_TURN:
+                os << "FIRST_TURN";
+                break;
+            case MissionSwitchState::SECOND_TURN:
+                os << "SECOND_TURN";
+                break;
+            case MissionSwitchState::SECOND_FORWARD:
+                os << "SECOND_FORWARD";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
+
+    std::ostream &operator<<(std::ostream &os, const FastState &state)
+    {
+        switch (state)
+        {
+            case FastState::FOLLOW_SAFETY_CAR:
+                os << "FOLLOW_SAFETY_CAR";
+                break;
+            case FastState::OVERTAKE_SAFETY_CAR_START:
+                os << "OVERTAKE_SAFETY_CAR_START";
+                break;
+            case FastState::OVERTAKE_SAFETY_CAR_END:
+                os << "OVERTAKE_SAFETY_CAR_END";
+                break;
+            case FastState::IN_ACCEL_ZONE:
+                os << "IN_ACCEL_ZONE";
+                break;
+            case FastState::OUT_ACCEL_ZONE:
+                os << "OUT_ACCEL_ZONE";
+                break;
+            case FastState::IN_BRAKE_ZONE:
+                os << "IN_BRAKE_ZONE";
+                break;
+            case FastState::OUT_BRAKE_ZONE:
+                os << "OUT_BRAKE_ZONE";
+                break;
+            default:
+                os << "UNKNOWN";
+                break;
+        }
+        return os;
+    }
 
 #endif
 

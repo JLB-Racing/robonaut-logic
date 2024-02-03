@@ -88,6 +88,8 @@ namespace jlb
         float mission_switch_steering_angle = deg2rad(MAX_WHEEL_ANGLE) * 2.0f;
         float mission_switch_arc_length     = 0.0f;
 
+        int collected_valid_gates = 0;
+
         bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
@@ -191,7 +193,19 @@ namespace jlb
             if (std::find(std::begin(GATE_NAMES), std::end(GATE_NAMES), at_node) != std::end(GATE_NAMES) &&
                 std::find(graph.collected_nodes.begin(), graph.collected_nodes.end(), at_node) == graph.collected_nodes.end() && !flood)
             {
+                if (Edge::stolen_gates[static_cast<int>(at_node - 'A')] < 2) { collected_valid_gates++; }
                 graph.collected_nodes.push_back(at_node);
+
+#ifdef Q2
+                if (collected_valid_gates >= 10)
+                {
+                    Edge::finished       = true;
+                    prev_labyrinth_state = labyrinth_state;
+                    labyrinth_state      = LabyrinthState::FINISHED;
+                    finished_callback();
+                    return;
+                }
+#endif
             }
 
             auto result = graph.Dijkstra(previous_node, at_node);
@@ -643,7 +657,8 @@ namespace jlb
 
                     bool at_decision_point = under_gate || at_cross_section;
 
-                    if ((!prev_at_decision_point && at_decision_point) || (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
+                    if ((!prev_at_decision_point && at_decision_point) ||
+                        (labyrinth_state == LabyrinthState::REVERSat_decision_pointE_ESCAPE && at_decision_point) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
