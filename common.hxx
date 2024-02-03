@@ -62,24 +62,24 @@ namespace jlb
     /* OBJECT PID CONTROLLER PARAMETERS */
     namespace obj
     {
-        PARAM float kP                      = 8.420f;
-        PARAM float kI                      = 6.20f;
+        PARAM float kP                      = 4.0f;
+        PARAM float kI                      = 1.69f;
         PARAM float kD                      = 0.0f;
         PARAM float TAU                     = 0.01f;
         PARAM float T                       = 0.01f;
         PARAM float LIM_MIN                 = 0.0f;
         PARAM float LIM_MAX                 = 1.0f;
-        PARAM float DEADBAND                = 0.00f;
-        PARAM float DERIVATIVE_FILTER_ALPHA = 0.1f;
-        PARAM float FOLLOW_DISTANCE         = 0.45f;
+        PARAM float DEADBAND                = 0.1f;
+        PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
+        PARAM float FOLLOW_DISTANCE         = 0.40f;
     }  // namespace obj
 
     /* LATERAL PID CONTROLLER PARAMETERS */
     namespace lat
     {
-        PARAM float kP                      = 6.9f;
-        PARAM float kI                      = 4.20f;
-        PARAM float kD                      = 0.0f;
+        PARAM float kP                      = 5.12f;
+        PARAM float kI                      = 0.25f;
+        PARAM float kD                      = 4.0f;
         PARAM float TAU                     = 0.05f;
         PARAM float T                       = 0.005f;
         PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
@@ -91,10 +91,14 @@ namespace jlb
     PARAM float OFFSET  = -4.625f;
     PARAM float SLOPE   = 3.5f;
     PARAM float DAMPING = 0.95f;
-    PARAM float D5_MIN = 1.55f;
+    PARAM float DAMPING_TURN = 0.85f;
+    PARAM float D5_MIN = 1.50f;
     PARAM float OFFSET_EXP1  = 4.4f;
     PARAM float OFFSET_EXP2  = -1.38f;
-    PARAM float D5_REVERSE = 0.240f;
+    PARAM float D5_REVERSE = 0.15f;
+    PARAM float DAMPING_REVERSE = 0.85f;
+    PARAM float MULTIPLIER_REVERSE = 1.0f;
+
 
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
@@ -103,14 +107,17 @@ namespace jlb
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 0.9f;  // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.69f;  // m/s
+    PARAM float LABYRINTH_SPEED         = 1.20f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
     PARAM float BALANCER_SPEED          = 0.5f;  // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
-    PARAM float FAST_SPEED              = 10.0f;  // m/s
-    PARAM float FAST_SPEED_TURN         = 1.25f;  // m/s
+    //PARAM float FAST_SPEED              = 5.0f;  // m/s
+    //PARAM float FAST_SPEED_TURN         = 1.20f;  // m/s
+    PARAM float FAST_SPEED              = 1.5f;  // m/s
+	PARAM float FAST_SPEED_TURN         = 1.5f;  // m/s
     PARAM float FAST_SPEED_OVERTAKE     = 1.0f;  // m/s
     PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;  // m/s
+    PARAM float LOW_SPEED_EPSILON		= 0.20f;  // m/s
 
     PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f; // m/s
     PARAM float SAFETY_CAR_THRESHOLD = 1.50f; // m

@@ -166,19 +166,26 @@ namespace jlb
 
 #ifndef SIMULATION
             float d5 = OFFSET_EXP1 + std::log2(std::fabs(current_velocity) + OFFSET_EXP2);
-
+            float damping = DAMPING;
             if(target_speed < 0.0f)
             {
             	d5 = D5_REVERSE;
+            	damping = DAMPING_REVERSE;
+            }
+
+            if((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
+            {
+            	damping = DAMPING_TURN;
+            	d5 = D5_MIN;
             }
 #else
             float d5 = OFFSET + SLOPE * std::fabs(current_velocity);
 #endif
-            if ((d5 < D5_MIN) || std::isnan(d5)) d5 = D5_MIN;
+            //if ((d5 < D5_MIN) || std::isnan(d5)) d5 = D5_MIN;
             float               t5  = d5 / std::fabs(current_velocity);
-            float               T   = t5 / 3.0f * DAMPING;
-            float               wp  = (1.0f / T) * sqrt(1.0f - DAMPING * DAMPING);
-            float               phi = acosf(DAMPING);
+            float               T   = t5 / 3.0f * damping;
+            float               wp  = (1.0f / T) * sqrt(1.0f - damping * damping);
+            float               phi = acosf(damping);
             float               x   = wp / tan(phi);
             std::complex<float> s1  = std::complex<float>(x, wp);
             std::complex<float> s2  = std::complex<float>(x, -wp);
@@ -186,11 +193,16 @@ namespace jlb
             std::complex<float> kP     = -SENSOR_BASE / (std::fabs(current_velocity) * std::fabs(current_velocity)) * s1 * s2;
             std::complex<float> kDelta = -SENSOR_BASE / std::fabs(current_velocity) * ((s1 + s2) - std::fabs(current_velocity) * kP);
 
+            if(target_speed < 0.0f)
+            {
+                return {kP.real(), kDelta.real() * MULTIPLIER_REVERSE};
+            }
             return {kP.real(), kDelta.real()};
         }
 
         void lateral_control([[maybe_unused]] const float dt)
         {
+        	/*
             if (std::all_of(std::begin(detection_front), std::end(detection_front), [](bool b) { return b; }) ||
                 std::all_of(std::begin(detection_rear), std::end(detection_rear), [](bool b) { return b; }) || line_positions_front.size() == 0 ||
                 line_positions_rear.size() == 0)
@@ -208,13 +220,30 @@ namespace jlb
                 	return;
                 }
             }
+            */
 
-            if (line_positions_front.size() > 4 || line_positions_rear.size() > 4) { return; }
+            //if (line_positions_front.size() > 4 || line_positions_rear.size() > 4) { return; }
 
-            line_position_front      = select_control_point(line_positions_front, prev_line_position_front);
-            line_position_rear       = select_control_point(line_positions_rear, prev_line_position_rear);
-            prev_line_position_front = line_position_front;
-            prev_line_position_rear  = line_position_rear;
+        	if(line_positions_front.size() != 0)
+			{
+				line_position_front      = select_control_point(line_positions_front, prev_line_position_front);
+				prev_line_position_front = line_position_front;
+			}
+        	else
+        	{
+        		line_position_front = prev_line_position_front;
+        	}
+
+        	if(line_positions_rear.size() != 0)
+			{
+				line_position_rear       = select_control_point(line_positions_rear, prev_line_position_rear);
+				prev_line_position_rear  = line_position_rear;
+			}
+        	else
+        	{
+        		line_position_rear = prev_line_position_rear;
+        	}
+
 
             float sensor_rate   = SENSOR_WIDTH / SENSOR_COUNT;
             float sensor_center = SENSOR_COUNT / 2.0f;
@@ -222,10 +251,14 @@ namespace jlb
             selected_rear       = static_cast<unsigned long>(line_position_rear / sensor_rate + sensor_center);
 
             cross_track_error = line_position_front;
+
+
             heading_error     = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
             auto [kP, kDelta] = get_control_params();
-            target_angle      = -kP * cross_track_error - kDelta * heading_error;
+            //target_angle      = -kP * cross_track_error - kDelta * heading_error;
+
+            target_angle = -lateral_pid.update(0, cross_track_error, dt);
 
             if (target_angle > deg2rad(MAX_WHEEL_ANGLE)) target_angle = deg2rad(MAX_WHEEL_ANGLE);
             if (target_angle < -deg2rad(MAX_WHEEL_ANGLE)) target_angle = -deg2rad(MAX_WHEEL_ANGLE);
@@ -246,7 +279,7 @@ namespace jlb
             target_speed = std::min(reference_speed, reference_speed * (1.0f - (0.1666667f * x) - (0.8333333f * x * x)));
             */
 
-			if(follow_car && object_range < SAFETY_CAR_THRESHOLD && reference_speed > SPEED_SAFETY_CAR_FOLLOW)
+			if(follow_car && target_speed >= 0 && object_range < SAFETY_CAR_THRESHOLD && reference_speed > SPEED_SAFETY_CAR_FOLLOW)
 			{
 				reference_speed = SPEED_SAFETY_CAR_FOLLOW;
 			}
@@ -260,12 +293,14 @@ namespace jlb
             else { target_speed = reference_speed; }
 #endif
 
-            if (follow_car)
+            if (follow_car && target_speed >= 0.0f)
             {
                 // reference_speed_prev = reference_speed;
-                float object_rate = object_pid.update(obj::FOLLOW_DISTANCE, object_range, dt);
-                target_speed *= (1 - object_rate);
+            	object_pid.update_limits(0.0f, target_speed);
+                float safety_car_speed = object_pid.update(object_range, obj::FOLLOW_DISTANCE, dt);
+                target_speed = safety_car_speed;
             }
+
         }
 
         ControlSignal update(bool follow_car = false)
@@ -312,30 +347,39 @@ namespace jlb
 
         void set_detection_front(bool *detection_front_, std::vector<float> line_positions_front_)
         {
-            for (unsigned long i = 0; i < SENSOR_COUNT; i++) detection_front[i] = detection_front_[i];
-            line_positions_front = line_positions_front_;
+        	//if (line_positions_front_.size() != 0)
+        	//{
+        		for (unsigned long i = 0; i < SENSOR_COUNT; i++) detection_front[i] = detection_front_[i];
+				line_positions_front = line_positions_front_;
+        	//}
         }
 
         void set_detection_rear(bool *detection_rear_, std::vector<float> line_positions_rear_)
         {
-            for (unsigned long i = 0; i < SENSOR_COUNT; i++) detection_rear[i] = detection_rear_[i];
-            line_positions_rear = line_positions_rear_;
+        	//if (line_positions_rear_.size() != 0)
+			//{
+        		for (unsigned long i = 0; i < SENSOR_COUNT; i++) detection_rear[i] = detection_rear_[i];
+				line_positions_rear = line_positions_rear_;
+			//}
         }
 
         void swap_front_rear()
         {
             std::swap(detection_front, detection_rear);
             std::swap(line_positions_front, line_positions_rear);
+
             std::reverse(std::begin(detection_front), std::end(detection_front));
             std::reverse(std::begin(detection_rear), std::end(detection_rear));
             std::reverse(std::begin(line_positions_front), std::end(line_positions_front));
             std::reverse(std::begin(line_positions_rear), std::end(line_positions_rear));
 
             // use multiplication lambda with -1 on line positions
+
             std::transform(
                 std::begin(line_positions_front), std::end(line_positions_front), std::begin(line_positions_front), [](float f) { return -f; });
             std::transform(
                 std::begin(line_positions_rear), std::end(line_positions_rear), std::begin(line_positions_rear), [](float f) { return -f; });
+
         }
 
         void set_current_velocity(const float current_velocity_) { current_velocity = current_velocity_; }
@@ -366,6 +410,7 @@ namespace jlb
     private:
         float current_velocity = 0.0f;
         PID   object_pid{obj::kP, obj::kI, obj::kD, obj::TAU, obj::T, obj::LIM_MIN, obj::LIM_MAX, obj::DEADBAND, obj::DERIVATIVE_FILTER_ALPHA};
+        PID lateral_pid{lat::kP, lat::kI, lat::kD, lat::TAU, lat::T, lat::LIM_MIN, lat::LIM_MAX, lat::DEADBAND, lat::DERIVATIVE_FILTER_ALPHA};
 
 #ifdef SIMULATION
         std::chrono::time_point<std::chrono::steady_clock> prev_control_timestamp_ = std::chrono::steady_clock::now();
