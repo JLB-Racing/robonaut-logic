@@ -178,7 +178,6 @@ namespace jlb
             odometry         = Odometry{START_X, START_Y, START_ORIENTATION};
         }
 
-    private:
         Odometry     odometry;
         Controller   controller;
         Graph        graph;

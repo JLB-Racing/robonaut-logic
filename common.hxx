@@ -10,7 +10,7 @@
 //
 
 // #define SIMULATION
-#define TEST_FAST
+// #define TEST_FAST
 
 namespace jlb
 {
@@ -116,7 +116,7 @@ namespace jlb
 
     PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f;   // m/s
     PARAM float SAFETY_CAR_THRESHOLD    = 1.50f;  // m
-
+    PARAM float CROSS_SECTION_THRESHOLD = 0.20f;  // %/100
     ///////////////////////////////////////////////////////////////////////////
     //
     //      SIGNALS
