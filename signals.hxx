@@ -81,6 +81,7 @@ namespace jlb
             logic_2();
             logic_3();
             logic_4();
+            logic_5();
 
 #ifndef SIMULATION
             uint32_t timestamp = HAL_GetTick();
@@ -436,6 +437,25 @@ namespace jlb
             data[1]                       = logic_4_DLC;
             Pack_logic_4_jlb(&jlb_rx.logic_4, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
             telemetry_data.insert(telemetry_data.end(), data, data + logic_4_DLC + 2);
+        }
+
+        void logic_5()
+        {
+            jlb_rx.logic_5.pirate_after_next     = as_state.pirate_after_next_node;
+            jlb_rx.logic_5.pirate_next           = as_state.pirate_next_node;
+            jlb_rx.logic_5.pirate_previous       = as_state.pirate_previous_node;
+            jlb_rx.logic_5.follow_car            = as_state.follow_car;
+            jlb_rx.logic_5.flood                 = as_state.flood;
+            jlb_rx.logic_5.collected_valid_gates = as_state.collected_valid_gates;
+            jlb_rx.logic_5.collected_gates       = graph.collected_nodes.size();
+
+            char    data[logic_5_DLC + 2] = {0};
+            uint8_t ide                   = logic_5_IDE;
+            uint8_t dlc                   = logic_5_DLC;
+            data[0]                       = logic_5_CANID;
+            data[1]                       = logic_5_DLC;
+            Pack_logic_5_jlb(&jlb_rx.logic_5, reinterpret_cast<uint8_t *>(data + 2), &dlc, &ide);
+            telemetry_data.insert(telemetry_data.end(), data, data + logic_5_DLC + 2);
         }
     };
 

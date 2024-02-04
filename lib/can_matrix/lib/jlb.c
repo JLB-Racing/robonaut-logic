@@ -1047,3 +1047,62 @@ uint32_t Pack_logic_4_jlb(logic_4_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _i
 
 #endif // JLB_USE_CANSTRUCT
 
+uint32_t Unpack_logic_5_jlb(logic_5_t* _m, const uint8_t* _d, uint8_t dlc_)
+{
+  (void)dlc_;
+  _m->pirate_after_next = (uint8_t) ( (_d[0] & (0xFFU)) );
+  _m->pirate_next = (uint8_t) ( (_d[1] & (0xFFU)) );
+  _m->pirate_previous = (uint8_t) ( (_d[2] & (0xFFU)) );
+  _m->follow_car = (uint8_t) ( (_d[3] & (0x01U)) );
+  _m->flood = (uint8_t) ( ((_d[3] >> 1U) & (0x01U)) );
+  _m->collected_valid_gates = (uint8_t) ( ((_d[3] >> 2U) & (0x1FU)) );
+  _m->collected_gates = (uint8_t) ( (_d[4] & (0x1FU)) );
+
+#ifdef JLB_USE_DIAG_MONITORS
+  _m->mon1.dlc_error = (dlc_ < logic_5_DLC);
+  _m->mon1.last_cycle = GetSystemTick();
+  _m->mon1.frame_cnt++;
+
+  FMon_logic_5_jlb(&_m->mon1, logic_5_CANID);
+#endif // JLB_USE_DIAG_MONITORS
+
+  return logic_5_CANID;
+}
+
+#ifdef JLB_USE_CANSTRUCT
+
+uint32_t Pack_logic_5_jlb(logic_5_t* _m, __CoderDbcCanFrame_t__* cframe)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_5_DLC); cframe->Data[i++] = JLB_INITIAL_BYTE_VALUE);
+
+  cframe->Data[0] |= (uint8_t) ( (_m->pirate_after_next & (0xFFU)) );
+  cframe->Data[1] |= (uint8_t) ( (_m->pirate_next & (0xFFU)) );
+  cframe->Data[2] |= (uint8_t) ( (_m->pirate_previous & (0xFFU)) );
+  cframe->Data[3] |= (uint8_t) ( (_m->follow_car & (0x01U)) | ((_m->flood & (0x01U)) << 1U) | ((_m->collected_valid_gates & (0x1FU)) << 2U) );
+  cframe->Data[4] |= (uint8_t) ( (_m->collected_gates & (0x1FU)) );
+
+  cframe->MsgId = (uint32_t) logic_5_CANID;
+  cframe->DLC = (uint8_t) logic_5_DLC;
+  cframe->IDE = (uint8_t) logic_5_IDE;
+  return logic_5_CANID;
+}
+
+#else
+
+uint32_t Pack_logic_5_jlb(logic_5_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide)
+{
+  uint8_t i; for (i = 0u; i < JLB_VALIDATE_DLC(logic_5_DLC); _d[i++] = JLB_INITIAL_BYTE_VALUE);
+
+  _d[0] |= (uint8_t) ( (_m->pirate_after_next & (0xFFU)) );
+  _d[1] |= (uint8_t) ( (_m->pirate_next & (0xFFU)) );
+  _d[2] |= (uint8_t) ( (_m->pirate_previous & (0xFFU)) );
+  _d[3] |= (uint8_t) ( (_m->follow_car & (0x01U)) | ((_m->flood & (0x01U)) << 1U) | ((_m->collected_valid_gates & (0x1FU)) << 2U) );
+  _d[4] |= (uint8_t) ( (_m->collected_gates & (0x1FU)) );
+
+  *_len = (uint8_t) logic_5_DLC;
+  *_ide = (uint8_t) logic_5_IDE;
+  return logic_5_CANID;
+}
+
+#endif // JLB_USE_CANSTRUCT
+

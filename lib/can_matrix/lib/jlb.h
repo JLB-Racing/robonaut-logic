@@ -1068,6 +1068,55 @@ typedef struct
 
 } logic_4_t;
 
+// def @logic_5 CAN Message (37   0x25)
+#define logic_5_IDE (0U)
+#define logic_5_DLC (8U)
+#define logic_5_CANID (0x25U)
+
+typedef struct
+{
+#ifdef JLB_USE_BITS_SIGNAL
+
+  uint8_t pirate_after_next;                 //      Bits= 8 Unit:'char'
+
+  uint8_t pirate_next;                       //      Bits= 8 Unit:'char'
+
+  uint8_t pirate_previous;                   //      Bits= 8 Unit:'char'
+
+  uint8_t follow_car : 1;                    //      Bits= 1
+
+  uint8_t flood : 1;                         //      Bits= 1
+
+  uint8_t collected_valid_gates : 5;         //      Bits= 5
+
+  uint8_t collected_gates : 5;               //      Bits= 5
+
+#else
+
+  uint8_t pirate_after_next;                 //      Bits= 8 Unit:'char'
+
+  uint8_t pirate_next;                       //      Bits= 8 Unit:'char'
+
+  uint8_t pirate_previous;                   //      Bits= 8 Unit:'char'
+
+  uint8_t follow_car;                        //      Bits= 1
+
+  uint8_t flood;                             //      Bits= 1
+
+  uint8_t collected_valid_gates;             //      Bits= 5
+
+  uint8_t collected_gates;                   //      Bits= 5
+
+#endif // JLB_USE_BITS_SIGNAL
+
+#ifdef JLB_USE_DIAG_MONITORS
+
+  FrameMonitor_t mon1;
+
+#endif // JLB_USE_DIAG_MONITORS
+
+} logic_5_t;
+
 // Function signatures
 
 uint32_t Unpack_measurements_1_jlb(measurements_1_t* _m, const uint8_t* _d, uint8_t dlc_);
@@ -1152,6 +1201,13 @@ uint32_t Unpack_logic_4_jlb(logic_4_t* _m, const uint8_t* _d, uint8_t dlc_);
 uint32_t Pack_logic_4_jlb(logic_4_t* _m, __CoderDbcCanFrame_t__* cframe);
 #else
 uint32_t Pack_logic_4_jlb(logic_4_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
+#endif // JLB_USE_CANSTRUCT
+
+uint32_t Unpack_logic_5_jlb(logic_5_t* _m, const uint8_t* _d, uint8_t dlc_);
+#ifdef JLB_USE_CANSTRUCT
+uint32_t Pack_logic_5_jlb(logic_5_t* _m, __CoderDbcCanFrame_t__* cframe);
+#else
+uint32_t Pack_logic_5_jlb(logic_5_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _ide);
 #endif // JLB_USE_CANSTRUCT
 
 #ifdef __cplusplus

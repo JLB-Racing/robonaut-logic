@@ -36,6 +36,7 @@ void _FMon_MONO_jlb(FrameMonitor_t* _mon, uint32_t msgid);
 #define FMon_logic_2_jlb(x, y) _FMon_MONO_jlb((x), (y))
 #define FMon_logic_3_jlb(x, y) _FMon_MONO_jlb((x), (y))
 #define FMon_logic_4_jlb(x, y) _FMon_MONO_jlb((x), (y))
+#define FMon_logic_5_jlb(x, y) _FMon_MONO_jlb((x), (y))
 
 #else
 
@@ -51,6 +52,7 @@ void _FMon_logic_1_jlb(FrameMonitor_t* _mon, uint32_t msgid);
 void _FMon_logic_2_jlb(FrameMonitor_t* _mon, uint32_t msgid);
 void _FMon_logic_3_jlb(FrameMonitor_t* _mon, uint32_t msgid);
 void _FMon_logic_4_jlb(FrameMonitor_t* _mon, uint32_t msgid);
+void _FMon_logic_5_jlb(FrameMonitor_t* _mon, uint32_t msgid);
 
 #define FMon_measurements_1_jlb(x, y) _FMon_measurements_1_jlb((x), (y))
 #define FMon_measurements_2_jlb(x, y) _FMon_measurements_2_jlb((x), (y))
@@ -64,6 +66,7 @@ void _FMon_logic_4_jlb(FrameMonitor_t* _mon, uint32_t msgid);
 #define FMon_logic_2_jlb(x, y) _FMon_logic_2_jlb((x), (y))
 #define FMon_logic_3_jlb(x, y) _FMon_logic_3_jlb((x), (y))
 #define FMon_logic_4_jlb(x, y) _FMon_logic_4_jlb((x), (y))
+#define FMon_logic_5_jlb(x, y) _FMon_logic_5_jlb((x), (y))
 
 #endif
 

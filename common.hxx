@@ -27,7 +27,8 @@ namespace jlb
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.5f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.2f;  // m
+    PARAM float LOCALIZATION_INACCURACY     = 0.2f;    // m
+    PARAM float LOCALIZATION_FALLBACK       = -0.05f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
 
@@ -135,7 +136,8 @@ namespace jlb
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.25f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.2f;  // m
+    PARAM float LOCALIZATION_INACCURACY     = 0.2f;    // m
+    PARAM float LOCALIZATION_FALLBACK       = -0.05f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
 

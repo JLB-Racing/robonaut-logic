@@ -48,13 +48,17 @@ uint32_t jlb_Receive(jlb_rx_t* _m, const uint8_t* _d, uint32_t _id, uint8_t dlc_
     }
    }
   } else {
-   if (_id == 0x22U) {
-    recid = Unpack_logic_2_jlb(&(_m->logic_2), _d, dlc_);
-   } else {
-    if (_id == 0x23U) {
+   if ((_id >= 0x22U) && (_id < 0x24U)) {
+    if (_id == 0x22U) {
+     recid = Unpack_logic_2_jlb(&(_m->logic_2), _d, dlc_);
+    } else if (_id == 0x23U) {
      recid = Unpack_logic_3_jlb(&(_m->logic_3), _d, dlc_);
-    } else if (_id == 0x24U) {
+    }
+   } else {
+    if (_id == 0x24U) {
      recid = Unpack_logic_4_jlb(&(_m->logic_4), _d, dlc_);
+    } else if (_id == 0x25U) {
+     recid = Unpack_logic_5_jlb(&(_m->logic_5), _d, dlc_);
     }
    }
   }

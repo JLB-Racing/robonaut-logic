@@ -72,8 +72,8 @@ namespace jlb
 
         char          at_node         = START_GATE;
         char          previous_node   = START_GATE;
-        char          next_node       = START_GATE;
-        char          goal_node       = START_GATE;
+        char          next_node       = START_NEXT_GATE;
+        char          goal_node       = START_NEXT_GATE;
         unsigned long selected_edge   = 0u;
         float         target_distance = 0.0f;
 
@@ -123,8 +123,8 @@ namespace jlb
 
             at_node       = START_GATE;
             previous_node = START_GATE;
-            next_node     = START_GATE;
-            goal_node     = START_GATE;
+            next_node     = START_NEXT_GATE;
+            goal_node     = START_NEXT_GATE;
             selected_edge = 0u;
 
             reverse_saved_dir = Direction::STRAIGHT;
@@ -662,7 +662,7 @@ namespace jlb
 
                     bool at_decision_point = under_gate || at_cross_section;
 
-                    if ((!prev_at_decision_point && at_decision_point) || delta < 0.01f ||
+                    if ((!prev_at_decision_point && at_decision_point) || delta < LOCALIZATION_FALLBACK ||
                         (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||

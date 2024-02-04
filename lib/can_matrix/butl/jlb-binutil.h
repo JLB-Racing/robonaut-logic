@@ -22,6 +22,7 @@ typedef struct
   logic_2_t logic_2;
   logic_3_t logic_3;
   logic_4_t logic_4;
+  logic_5_t logic_5;
 } jlb_rx_t;
 
 // There is no any TX mapped massage.
