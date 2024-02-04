@@ -653,8 +653,6 @@ namespace jlb
                     if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
                         target_distance = graph[at_node].edges[selected_edge].distance;
-                        // if (-WHEELBASE < odometry.distance_local && odometry.distance_local < distance / 2.0f) { controller.set_passed_half(true);
-                        // } else { controller.set_passed_half(false); }
                     }
 
                     if (odometry.distance_local > target_distance / 2.0f) { controller.set_passed_half(true); }
@@ -856,11 +854,11 @@ namespace jlb
                     }
                     else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
-                        if (controller.target_speed < 0.0f && odometry.distance_local < WHEELBASE)
+                        if (controller.target_speed < 0.0f && odometry.vx_t < 0.0f && odometry.distance_local < WHEELBASE)
                         {
                             controller.set_direction(graph[at_node].edges[selected_edge].direction);
                         }
-                        if (controller.target_speed < 0.0f && odometry.distance_local >= WHEELBASE)
+                        if (controller.target_speed < 0.0f && odometry.vx_t < 0.0f && odometry.distance_local >= WHEELBASE)
                         {
                             controller.set_direction(reverse_saved_dir, true);
                         }

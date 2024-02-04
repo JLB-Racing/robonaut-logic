@@ -12,10 +12,11 @@ namespace jlb
 {
     struct Odom
     {
-        float vx    = 0.0f;
-        float x     = 0.0f;
-        float y     = 0.0f;
-        float theta = 0.0f;
+        float vx             = 0.0f;
+        float x              = 0.0f;
+        float y              = 0.0f;
+        float theta          = 0.0f;
+        float distance_local = 0.0f;
     };
 
     class Odometry
@@ -116,7 +117,7 @@ namespace jlb
 #ifdef SIMULATION
             odom_timestamp_ = update_timestamp > odom_timestamp_ ? update_timestamp : odom_timestamp_;
 #endif
-            return {vx_t, x_t, y_t, theta_t};
+            return {vx_t, x_t, y_t, theta_t, distance_local};
         }
 
         float normalize_angle(float angle)

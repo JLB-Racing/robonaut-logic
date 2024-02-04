@@ -20,11 +20,11 @@ namespace jlb
 
         ControlSignal update()
         {
-            auto [vx, x, y, theta] = odometry.update_odom();
+            auto [vx, x, y, theta, distance_local] = odometry.update_odom();
             controller.set_current_velocity(vx);
 
             auto [mission, labyrinth_state, mission_switch_state, fast_state, reference_speed] = as_state.update();
-            controller.set_reference_speed(reference_speed);
+            controller.set_target_speed(reference_speed);
 
             switch (mission)
             {
@@ -34,7 +34,7 @@ namespace jlb
                     {
                         if (mission_switch_state == MissionSwitchState::STANDBY)
                         {
-                            controller.set_reference_speed(0.0f);
+                            controller.set_target_speed(0.0f);
                             auto [target_angle, target_speed] = controller.update(as_state.follow_car);
                             return ControlSignal{target_angle, target_speed};
                         }
@@ -81,14 +81,14 @@ namespace jlb
                     }
                     else if (labyrinth_state == LabyrinthState::STANDBY || labyrinth_state == LabyrinthState::ERROR)
                     {
-                        controller.set_reference_speed(0.0f);
+                        controller.set_target_speed(0.0f);
                         auto [target_angle, target_speed] = controller.update(as_state.follow_car);
 
                         return ControlSignal{target_angle, target_speed};
                     }
                     else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
-                        if (controller.target_speed < 0.0f) { controller.swap_front_rear(); }
+                        if (controller.target_speed < 0.0f && odometry.vx_t < 0.0f) { controller.swap_front_rear(); }
                         auto [target_angle, target_speed] = controller.update(as_state.follow_car);
                         return ControlSignal{target_angle, target_speed};
                     }
@@ -101,12 +101,19 @@ namespace jlb
                 }
                 case Mission::FAST:
                 {
-                    // controller.swap_front_rear();
-                    // controller.reference_speed = -LABYRINTH_SPEED_REVERSE;
-
                     controller.set_direction(Direction::STRAIGHT);
-                    auto [target_angle, target_speed] = controller.update(as_state.follow_car, true);
-                    return ControlSignal{target_angle, target_speed};
+
+                    if (fast_state == FastState::OUT_BRAKE_ZONE)
+                    {
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car, false);
+                        return ControlSignal{target_angle, target_speed};
+                    }
+                    else
+                    {
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car, true);
+                        return ControlSignal{target_angle, target_speed};
+                    }
+
                     break;
                 }
                 case Mission::STANDBY:
@@ -153,7 +160,7 @@ namespace jlb
             Edge::flood    = flood_;
             as_state.flood = flood_;
         }
-        Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
+        Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t, odometry.distance_local}; }
         void start_signal()
         {
             if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }

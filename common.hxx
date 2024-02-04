@@ -102,9 +102,6 @@ namespace jlb
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
 
-    PARAM float DIST_ERROR_MAX = 1.0f;   // m
-    PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
-
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.3f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.75f;  // m/s
@@ -211,9 +208,6 @@ namespace jlb
 
     PARAM float MAX_ACCELERATION = 5.0f;  // m/s^2
     PARAM float MAX_DECELERATION = 7.5f;  // m/s^2
-
-    PARAM float DIST_ERROR_MAX = 1.0f;   // m
-    PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 2.0f;   // m/s
