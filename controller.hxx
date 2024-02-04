@@ -199,7 +199,7 @@ namespace jlb
             return {kP.real(), kDelta.real()};
         }
 
-        void lateral_control([[maybe_unused]] const float dt)
+        void lateral_control([[maybe_unused]] const float dt, bool state_space = false)
         {
             /*
             if (std::all_of(std::begin(detection_front), std::end(detection_front), [](bool b) { return b; }) ||
@@ -244,9 +244,14 @@ namespace jlb
             heading_error = std::atan2(line_position_front - line_position_rear, SENSOR_BASE);
 
             [[maybe_unused]] auto [kP, kDelta] = get_control_params();
-            // target_angle      = -kP * cross_track_error - kDelta * heading_error;
-
-            target_angle = -lateral_pid.update(0, cross_track_error, dt);
+            if(target_speed < 0.0f || state_space)
+            {
+                target_angle = -kP * cross_track_error - kDelta * heading_error;
+            }
+            else
+            {
+                target_angle = -lateral_pid.update(0, cross_track_error, dt);
+            }
 
             if (target_angle > deg2rad(MAX_WHEEL_ANGLE)) target_angle = deg2rad(MAX_WHEEL_ANGLE);
             if (target_angle < -deg2rad(MAX_WHEEL_ANGLE)) target_angle = -deg2rad(MAX_WHEEL_ANGLE);
@@ -295,7 +300,7 @@ namespace jlb
             }
         }
 
-        ControlSignal update(bool follow_car = false)
+        ControlSignal update(bool follow_car = false, bool state_space = false)
         {
 #ifndef SIMULATION
             tick_counter_prev = tick_counter;
@@ -308,7 +313,7 @@ namespace jlb
             prev_control_timestamp_ = control_timestamp_;
 #endif
 
-            lateral_control(dt);
+            lateral_control(dt, state_space);
             longitudinal_control(dt, follow_car);
 
             return {target_angle, target_speed};

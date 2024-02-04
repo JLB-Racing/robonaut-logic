@@ -9,7 +9,7 @@
 //      DEFINES
 //
 
-#define SIMULATION
+//#define SIMULATION
 
 namespace jlb
 {
@@ -77,14 +77,14 @@ namespace jlb
     /* LATERAL PID CONTROLLER PARAMETERS */
     namespace lat
     {
-        PARAM float kP                      = 5.12f;
-        PARAM float kI                      = 0.25f;
-        PARAM float kD                      = 4.0f;
+        PARAM float kP                      = 4.275f;//5.12f;
+        PARAM float kI                      = 0.0f; //0.25f;
+        PARAM float kD                      = 4.75f; //4.0f;
         PARAM float TAU                     = 0.05f;
         PARAM float T                       = 0.005f;
         PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
         PARAM float LIM_MAX                 = MAX_WHEEL_ANGLE;
-        PARAM float DEADBAND                = 0.5f;
+        PARAM float DEADBAND                = 0.0f;
         PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
     }  // namespace lat
 
@@ -106,14 +106,12 @@ namespace jlb
     PARAM float ANG_ERROR_MAX  = 90.0f;  // deg
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.20f;  // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
+    PARAM float LABYRINTH_SPEED         = 1.3f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.75f;   // m/s
     PARAM float BALANCER_SPEED          = 0.5f;   // m/s
-    PARAM float MISSION_SWITCH_SPEED    = 0.5f;   // m/s
-    // PARAM float FAST_SPEED              = 5.0f;  // m/s
-    // PARAM float FAST_SPEED_TURN         = 1.20f;  // m/s
-    PARAM float FAST_SPEED            = 1.5f;   // m/s
-    PARAM float FAST_SPEED_TURN       = 1.5f;   // m/s
+    PARAM float MISSION_SWITCH_SPEED    = 0.75f;   // m/s
+    PARAM float FAST_SPEED            = 5.0f;   // m/s
+    PARAM float FAST_SPEED_TURN       = 1.2f;   // m/s
     PARAM float FAST_SPEED_OVERTAKE   = 1.0f;   // m/s
     PARAM float FAST_SPEED_SAFETY_CAR = 1.0f;   // m/s
     PARAM float LOW_SPEED_EPSILON     = 0.20f;  // m/s
