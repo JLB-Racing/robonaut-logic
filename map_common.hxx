@@ -67,10 +67,10 @@ namespace jlb
     PARAM cross CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
         cross(pcc('F', 'I'), pcc('H', 'G')), cross(pcc('K', 'N'), pcc('M', 'L')), cross(pcc('P', 'S'), pcc('R', 'Q'))};
 
-    PARAM float START_X           = px_to_m(320.0f);
-    PARAM float START_Y           = px_to_m(724.0f);
-    PARAM float START_ORIENTATION = 0.0f;
-    PARAM char  START_GATE        = 'A';
+    PARAM float START_X           = px_to_m(1812.0f);
+    PARAM float START_Y           = px_to_m(128.0f);
+    PARAM float START_ORIENTATION = M_PI;
+    PARAM char  START_GATE        = 'Y';
 
     PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 1.5f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.6f;   // m

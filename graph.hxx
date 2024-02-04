@@ -210,7 +210,7 @@ namespace jlb
             nodes.push_back(Node{static_cast<char>('['), px_to_m(1920.0f), px_to_m(224.0f)});
 
 #ifndef SIMULATION
-            this->operator[]('A').add_edge('C', Direction::RIGHT, {'A'}, 3.6455f);
+            // this->operator[]('A').add_edge('C', Direction::RIGHT, {'A'}, 3.6455f);
             this->operator[]('B').add_edge('C', Direction::LEFT, {'D'}, 2.1818f);
             this->operator[]('B').add_edge('D', Direction::STRAIGHT, {'C'}, 4.5223f);
             // this->operator[]('C').add_edge('A', Direction::LEFT, {'E'}, 3.6455f);
@@ -288,7 +288,7 @@ namespace jlb
             this->operator[]('X').add_edge('V', Direction::STRAIGHT, {'W', 'Z'}, 1.4863f);
             this->operator[]('X').add_edge('W', Direction::LEFT, {'V'}, 3.7654f);
             this->operator[]('X').add_edge('Z', Direction::RIGHT, {'V'}, 2.1500f);
-            // this->operator[]('Y').add_edge('W', Direction::RIGHT, {'Y'}, 2.6399f);
+            this->operator[]('Y').add_edge('W', Direction::RIGHT, {'Y'}, 2.6399f);
             this->operator[]('Z').add_edge('X', Direction::LEFT, {'['}, 2.1500f);
             this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 2.0400f);
             this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 2.0400f);
@@ -298,7 +298,7 @@ namespace jlb
             const auto CROSS_UNIT      = 3.65f;
             const auto HALF_CROSS_UNIT = 2.7f;
 
-            this->operator[]('A').add_edge('C', Direction::RIGHT, {'A'}, 2.0f * UNIT);
+            // this->operator[]('A').add_edge('C', Direction::RIGHT, {'A'}, 2.0f * UNIT);
             this->operator[]('B').add_edge('C', Direction::LEFT, {'D'}, QUARTER_CIRCLE);
             this->operator[]('B').add_edge('D', Direction::STRAIGHT, {'C'}, QUARTER_CIRCLE + UNIT);
             // this->operator[]('C').add_edge('A', Direction::LEFT, {'E'}, 2.0f * UNIT);
@@ -376,7 +376,7 @@ namespace jlb
             this->operator[]('X').add_edge('V', Direction::STRAIGHT, {'W', 'Z'}, UNIT);
             this->operator[]('X').add_edge('W', Direction::LEFT, {'V'}, 2.0f * QUARTER_CIRCLE);
             this->operator[]('X').add_edge('Z', Direction::RIGHT, {'V'}, 2.8f);
-            // this->operator[]('Y').add_edge('W', Direction::RIGHT, {'Y'}, 2.0f * UNIT);
+            this->operator[]('Y').add_edge('W', Direction::RIGHT, {'Y'}, 2.0f * UNIT);
             this->operator[]('Z').add_edge('X', Direction::LEFT, {'['}, 2.8f);
             this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 2.0f * UNIT);
             this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 2.0f * UNIT);

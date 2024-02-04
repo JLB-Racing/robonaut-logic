@@ -660,7 +660,8 @@ namespace jlb
 
                     bool at_decision_point = under_gate || at_cross_section;
 
-                    if ((!prev_at_decision_point && at_decision_point) || (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
+                    if ((!prev_at_decision_point && at_decision_point) || target_distance - std::fabs(odometry.distance_local) < 0.01f ||
+                        (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&

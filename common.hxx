@@ -9,8 +9,8 @@
 //      DEFINES
 //
 
-// #define SIMULATION
-#define TEST_FAST
+#define SIMULATION
+// #define TEST_FAST
 
 namespace jlb
 {
