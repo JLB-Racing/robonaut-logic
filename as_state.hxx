@@ -655,12 +655,14 @@ namespace jlb
                         target_distance = graph[at_node].edges[selected_edge].distance;
                     }
 
+                    float delta = target_distance - std::fabs(odometry.distance_local);
+
                     if (odometry.distance_local > target_distance / 2.0f) { controller.set_passed_half(true); }
                     else { controller.set_passed_half(false); }
 
                     bool at_decision_point = under_gate || at_cross_section;
 
-                    if ((!prev_at_decision_point && at_decision_point) || target_distance - std::fabs(odometry.distance_local) < 0.01f ||
+                    if ((!prev_at_decision_point && at_decision_point) || delta < 0.01f ||
                         (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||
@@ -669,8 +671,7 @@ namespace jlb
                     {
                         // std::cout << "target: " << distance << " actual: " << odometry.distance_local << std::endl;
 
-                        bool  decide = false;
-                        float delta  = target_distance - std::fabs(odometry.distance_local);
+                        bool decide = false;
                         switch (labyrinth_state)
                         {
                             case LabyrinthState::START:

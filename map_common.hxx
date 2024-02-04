@@ -72,10 +72,10 @@ namespace jlb
     PARAM float START_ORIENTATION = M_PI;
     PARAM char  START_GATE        = 'Y';
 
-    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 1.5f;   // m
+    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 2.2f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.6f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
-    PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.4f;   // m
+    PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.8f;   // m
     PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::LEFT;
 #endif
 
