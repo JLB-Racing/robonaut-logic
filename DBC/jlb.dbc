@@ -36,6 +36,15 @@ BS_:
 BU_:
 
 
+BO_ 37 logic_5: 8 Vector__XXX
+ SG_ collected_valid_gates : 26|5@1+ (1,0) [0|31] "" Vector__XXX
+ SG_ collected_gates : 32|5@1+ (1,0) [0|31] "" Vector__XXX
+ SG_ flood : 25|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ follow_car : 24|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pirate_previous : 16|8@1+ (1,0) [0|255] "char" Vector__XXX
+ SG_ pirate_next : 8|8@1+ (1,0) [0|255] "char" Vector__XXX
+ SG_ pirate_after_next : 0|8@1+ (1,0) [0|255] "char" Vector__XXX
+
 BO_ 6 measurements_6: 8 Vector__XXX
  SG_ deadman_switch : 32|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ lv_battery_voltage : 16|16@1+ (0.00025,0) [0|16.38375] "m" Vector__XXX
