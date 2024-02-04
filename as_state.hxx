@@ -81,9 +81,9 @@ namespace jlb
 
         bool  follow_car                = false;
         bool  flood                     = false;
-        char  pirate_previous_node      = 'P';
-        char  pirate_next_node          = 'M';
-        char  pirate_after_next_node    = 'H';
+        char  pirate_previous_node      = '@';
+        char  pirate_next_node          = '@';
+        char  pirate_after_next_node    = '@';
         float pirate_section_percentage = 0.0f;
 
         float mission_switch_steering_angle = deg2rad(MAX_WHEEL_ANGLE) * 2.0f;
@@ -131,9 +131,9 @@ namespace jlb
 
             follow_car                = false;
             flood                     = false;
-            pirate_previous_node      = 'P';
-            pirate_next_node          = 'M';
-            pirate_after_next_node    = 'H';
+            pirate_previous_node      = '@';
+            pirate_next_node          = '@';
+            pirate_after_next_node    = '@';
             pirate_section_percentage = 0.0f;
         }
 

@@ -156,7 +156,7 @@ namespace jlb
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t}; }
         void start_signal()
         {
-            if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::FAST; }
+            if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
         }
         void reset_signal(const CompositeState state_)
         {
