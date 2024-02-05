@@ -110,6 +110,13 @@ namespace jlb
                 }
                 case Mission::FAST:
                 {
+#ifdef TEST_REVERSE
+                    controller.set_direction(Direction::STRAIGHT);
+                	controller.swap_front_rear();
+					controller.target_speed = -LABYRINTH_SPEED_REVERSE;
+					auto [target_angle, target_speed] = controller.update(as_state.follow_car, true);
+					return ControlSignal{target_angle, target_speed};
+#endif
                     controller.set_direction(Direction::STRAIGHT);
 
                     if (fast_state == FastState::OUT_BRAKE_ZONE)
@@ -172,7 +179,7 @@ namespace jlb
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t, odometry.distance_local}; }
         void start_signal()
         {
-#ifdef TEST_FAST
+#if defined(TEST_FAST) || defined(TEST_REVERSE)
             if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::FAST; }
 #else
             if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
