@@ -18,6 +18,7 @@ namespace jlb
     PARAM float    SQUARE_LENGTH                                                              = 0.6f;                                           // m
     PARAM unsigned BITMAP_SIZE                                                                = 64;                                             // px
     PARAM char     MISSION_SWITCH_NODE                                                        = 'V';                                            // -
+    PARAM char     MISSION_SWITCH_NEXT_NODE                                                   = 'W';                                            // -
     PARAM int      NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES                                  = 3;                                              // -
     PARAM pcc      MISSION_SWITCH_PROHIBITED_EDGES[NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES] = {pcc('S', 'V'), pcc('W', 'V'), pcc('R', 'Q')};  // -
     PARAM int      NUMBER_OF_MISSION_SWITCH_PREV_NODES                                        = 1;                                              // -
@@ -53,6 +54,7 @@ namespace jlb
     PARAM float    SQUARE_LENGTH                                                              = 0.6f;  // m
     PARAM unsigned BITMAP_SIZE                                                                = 64;    // px
     PARAM char     MISSION_SWITCH_NODE                                                        = 'N';   // -
+    PARAM char     MISSION_SWITCH_NEXT_NODE                                                   = 'Q';   // -
     PARAM int      NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES                                  = 5;     // -
     PARAM pcc      MISSION_SWITCH_PROHIBITED_EDGES[NUMBER_OF_MISSION_SWITCH_PROHIBITED_EDGES] = {
         pcc('Q', 'N'), pcc('S', 'Q'), pcc('R', 'Q'), pcc('O', 'N'), pcc('M', 'L')};  // -

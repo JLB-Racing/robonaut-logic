@@ -388,6 +388,9 @@ namespace jlb
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::MISSION_SWITCH;
 
+                previous_node = MISSION_SWITCH_NODE;
+                next_node     = MISSION_SWITCH_NEXT_NODE;
+
                 float h             = MISSION_SWITCH_LATERAL_DIST / 2.0f;
                 float R             = WHEELBASE / std::tan(deg2rad(MISSION_SWITCH_STEERING_ANGLE));
                 float alpha_per_two = std::acos(1.0f - (h / R));
@@ -560,7 +563,7 @@ namespace jlb
 
         void reverse_escape_callback()
         {
-            auto result = graph.Dijkstra(previous_node, at_node, '@', true);
+            auto result = graph.Dijkstra(previous_node, at_node, '@', true, true);
 
             if (result.weight == std::numeric_limits<float>::infinity())
             {
@@ -874,7 +877,9 @@ namespace jlb
 
                     if ((next_node == pirate_next_node || (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
                          (next_node == pirate_previous_node && previous_node == pirate_next_node)) &&
-                        labyrinth_state != LabyrinthState::REVERSE_ESCAPE && labyrinth_state != LabyrinthState::FLOOD_TO_LABYRINTH)
+                        labyrinth_state != LabyrinthState::REVERSE_ESCAPE && labyrinth_state != LabyrinthState::FLOOD_TO_LABYRINTH &&
+                        mission_switch_state != MissionSwitchState::FIRST_TURN && mission_switch_state != MissionSwitchState::SECOND_TURN &&
+                        mission_switch_state != MissionSwitchState::SECOND_FORWARD)
                     {
                         if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
                             labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER)
@@ -905,7 +910,8 @@ namespace jlb
                              labyrinth_state == LabyrinthState::ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER ||
                              labyrinth_state == LabyrinthState::START)
                     {
-                        reference_speed = LABYRINTH_SPEED;
+                        if (graph[at_node].edges[selected_edge].fast) { reference_speed = LABYRINTH_SPEED_FAST; }
+                        else { reference_speed = LABYRINTH_SPEED; }
                     }
                     else if (labyrinth_state == LabyrinthState::MISSION_SWITCH) { reference_speed = MISSION_SWITCH_SPEED; }
                     else if (labyrinth_state == LabyrinthState::FLOOD_SOLVING)
