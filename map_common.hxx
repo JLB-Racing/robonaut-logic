@@ -28,18 +28,19 @@ namespace jlb
     PARAM int      NUMBER_OF_BALANCER_PROHIBITED_EDGES                                        = 1;                // -
     PARAM pcc      BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES]             = {pcc('V', 'Q')};  // -
 
-    PARAM int   NUMBER_OF_NODES 						 = 25; // -
-    PARAM int   NUMBER_OF_GATES                          = 17; // -
+    PARAM int   NUMBER_OF_NODES                          = 25;  // -
+    PARAM int   NUMBER_OF_GATES                          = 17;  // -
     PARAM char  GATE_NAMES[NUMBER_OF_GATES]              = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
     PARAM int   NUMBER_OF_CROSS_SECTIONS                 = 3;
     PARAM cross CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
         cross(pcc('K', 'L'), pcc('N', 'I')), cross(pcc('F', 'G'), pcc('I', 'D')), cross(pcc('T', 'U'), pcc('W', 'O'))};
 
-    PARAM float START_X           = px_to_m(320.0f);
-    PARAM float START_Y           = px_to_m(724.0f);
-    PARAM float START_ORIENTATION = -M_PI / 2.0f;
-    PARAM char  START_GATE        = 'U';
-    PARAM char  START_NEXT_GATE   = 'O';
+    PARAM float     START_X           = px_to_m(320.0f);
+    PARAM float     START_Y           = px_to_m(724.0f);
+    PARAM float     START_ORIENTATION = -M_PI / 2.0f;
+    PARAM char      START_GATE        = 'U';
+    PARAM char      START_NEXT_GATE   = 'O';
+    PARAM Direction START_DIRECTION   = Direction::RIGHT;
 
     PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.3f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.3f;   // m
@@ -63,18 +64,19 @@ namespace jlb
     PARAM int  NUMBER_OF_BALANCER_PROHIBITED_EDGES                            = 1;                // -
     PARAM pcc  BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES] = {pcc('W', 'X')};  // -
 
-    PARAM int   NUMBER_OF_NODES 						 = 27; // -
+    PARAM int   NUMBER_OF_NODES                          = 27;  // -
     PARAM int   NUMBER_OF_GATES                          = 17;  // -
     PARAM char  GATE_NAMES[NUMBER_OF_GATES]              = {'B', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'};
     PARAM int   NUMBER_OF_CROSS_SECTIONS                 = 3;
     PARAM cross CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
         cross(pcc('F', 'I'), pcc('H', 'G')), cross(pcc('K', 'N'), pcc('M', 'L')), cross(pcc('P', 'S'), pcc('R', 'Q'))};
 
-    PARAM float START_X           = px_to_m(1812.0f);
-    PARAM float START_Y           = px_to_m(128.0f);
-    PARAM float START_ORIENTATION = M_PI;
-    PARAM char  START_GATE        = 'Y';
-    PARAM char  START_NEXT_GATE   = 'W';
+    PARAM float     START_X           = px_to_m(1812.0f);
+    PARAM float     START_Y           = px_to_m(128.0f);
+    PARAM float     START_ORIENTATION = M_PI;
+    PARAM char      START_GATE        = 'Y';
+    PARAM char      START_NEXT_GATE   = 'W';
+    PARAM Direction START_DIRECTION   = Direction::RIGHT;
 
     PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 2.0f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.9f;   // m

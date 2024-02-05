@@ -52,8 +52,8 @@ namespace jlb
         std::vector<float> line_positions_rear;
         float              distance_local = 0.0f;
 
-        Direction direction      = Direction::STRAIGHT;
-        Direction prev_direction = Direction::STRAIGHT;
+        Direction direction      = START_DIRECTION;
+        Direction prev_direction = START_DIRECTION;
 
         uint32_t tick_counter      = 0u;
         uint32_t tick_counter_prev = 0u;
@@ -61,7 +61,7 @@ namespace jlb
         bool passed_half    = false;
         bool deadman_switch = false;
 
-        Controller() : direction{} {}
+        Controller() {}
 
         ~Controller() {}
 
@@ -250,10 +250,7 @@ namespace jlb
             }
 
 #ifndef SIMULATION
-            if (((usWidth_throttle > 1600) && (usWidth_throttle < 2800)))
-            {
-                deadman_switch = true;
-            }
+            if (((usWidth_throttle > 1600) && (usWidth_throttle < 2800))) { deadman_switch = true; }
             else { deadman_switch = false; }
 #endif
 

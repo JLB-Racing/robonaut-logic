@@ -61,10 +61,10 @@ namespace jlb
                         {
                             auto [target_angle, target_speed] = controller.update(as_state.follow_car);
 
-                            if(controller.line_positions_front.size() > 0)
+                            if (controller.line_positions_front.size() > 0)
                             {
-                            	auto [target_angle, target_speed] = controller.update(as_state.follow_car);
-								return ControlSignal{target_angle, target_speed};
+                                auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                                return ControlSignal{target_angle, target_speed};
                             }
 
                             if (MISSION_SWITCH_DIRECTION == Direction::RIGHT)
