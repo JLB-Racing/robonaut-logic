@@ -9,7 +9,7 @@
 //      DEFINES
 //
 
-#define SIMULATION
+//#define SIMULATION
 // #define TEST_FAST
 
 namespace jlb
@@ -28,7 +28,7 @@ namespace jlb
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.5f;
     PARAM float LOCALIZATION_INACCURACY     = 0.2f;    // m
-    PARAM float LOCALIZATION_FALLBACK       = -0.05f;  // m
+    PARAM float LOCALIZATION_FALLBACK       = -0.01f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
 
@@ -105,7 +105,7 @@ namespace jlb
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.3f;   // m/s
+    PARAM float LABYRINTH_SPEED         = 1.15f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.75f;  // m/s
     PARAM float BALANCER_SPEED          = 0.5f;   // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.75f;  // m/s

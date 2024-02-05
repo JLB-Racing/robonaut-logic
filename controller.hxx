@@ -84,13 +84,13 @@ namespace jlb
                     {
                         if (direction == prev_direction)
                         {
-                            tmp = std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position)
+                            tmp = std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position)
                                       ? line_positions[0]
                                       : line_positions[1];
                         }
                         else
                         {
-                            tmp = std::fabs(line_positions[0] - prev_line_position) < std::fabs(line_positions[1] - prev_line_position)
+                            tmp = std::fabs(line_positions[0] - prev_line_position) > std::fabs(line_positions[1] - prev_line_position)
                                       ? line_positions[0]
                                       : line_positions[1];
                         }
@@ -250,9 +250,8 @@ namespace jlb
             }
 
 #ifndef SIMULATION
-            if (!((usWidth_throttle > 1800) && (usWidth_throttle < 2800)))
+            if (((usWidth_throttle > 1600) && (usWidth_throttle < 2800)))
             {
-                target_speed   = 0.0f;
                 deadman_switch = true;
             }
             else { deadman_switch = false; }

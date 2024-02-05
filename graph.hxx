@@ -30,7 +30,7 @@ namespace jlb
         static char  pirate_next_node;
         static char  pirate_after_next_node;
         static float pirate_section_percentage;
-        static int   stolen_gates[NUMBER_OF_GATES];
+        static int   stolen_gates[NUMBER_OF_NODES];
         static bool  flood;
         static bool  finished;
 
@@ -135,7 +135,7 @@ namespace jlb
     char  Edge::pirate_next_node              = '@';
     char  Edge::pirate_after_next_node        = '@';
     float Edge::pirate_section_percentage     = 0.0f;
-    int   Edge::stolen_gates[NUMBER_OF_GATES] = {0};
+    int   Edge::stolen_gates[NUMBER_OF_NODES] = {0};
     bool  Edge::flood                         = false;
     bool  Edge::finished                      = false;
 
@@ -287,11 +287,11 @@ namespace jlb
             // this->operator[]('W').add_edge('Y', Direction::LEFT, {'U'}, 2.6399f);
             this->operator[]('X').add_edge('V', Direction::STRAIGHT, {'W', 'Z'}, 1.4863f);
             this->operator[]('X').add_edge('W', Direction::LEFT, {'V'}, 3.7654f);
-            this->operator[]('X').add_edge('Z', Direction::RIGHT, {'V'}, 2.1500f);
+            this->operator[]('X').add_edge('Z', Direction::RIGHT, {'V'}, 2.1200f);
             this->operator[]('Y').add_edge('W', Direction::RIGHT, {'Y'}, 2.6399f);
-            this->operator[]('Z').add_edge('X', Direction::LEFT, {'['}, 2.1500f);
-            this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 2.0400f);
-            this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 2.0400f);
+            this->operator[]('Z').add_edge('X', Direction::LEFT, {'['}, 2.1200f);
+            this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 2.100f);
+            this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 2.100f);
 #else
             const auto UNIT            = SQUARE_LENGTH * 2.0f;
             const auto QUARTER_CIRCLE  = 2 * UNIT * M_PI / 4.0f;

@@ -89,7 +89,7 @@ namespace jlb
         float mission_switch_steering_angle = deg2rad(MAX_WHEEL_ANGLE) * 2.0f;
         float mission_switch_arc_length     = 0.0f;
 
-        int collected_valid_gates = 0;
+        uint8_t collected_valid_gates = 0;
 
         float last_laptime;
         float best_laptime;
@@ -560,7 +560,7 @@ namespace jlb
             {
                 case MissionSwitchState::STANDBY:
                 {
-                    if (std::fabs(odometry.vx_t) < 0.1f)
+                    if (std::fabs(odometry.vx_t) < 0.05f)
                     {
                         odometry.reset_local(true);
                         mission_switch_state = MissionSwitchState::FIRST_FORWARD;
@@ -568,7 +568,6 @@ namespace jlb
                     }
 
                     follow_car = false;
-                    controller.set_direction(Direction::STRAIGHT);
                     break;
                 }
                 case MissionSwitchState::FIRST_FORWARD:
@@ -581,7 +580,6 @@ namespace jlb
                     }
 
                     follow_car = false;
-                    controller.set_direction(Direction::STRAIGHT);
                     break;
                 }
                 case MissionSwitchState::FIRST_TURN:

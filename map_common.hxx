@@ -28,7 +28,8 @@ namespace jlb
     PARAM int      NUMBER_OF_BALANCER_PROHIBITED_EDGES                                        = 1;                // -
     PARAM pcc      BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES]             = {pcc('V', 'Q')};  // -
 
-    PARAM int   NUMBER_OF_GATES                          = 17;  // -
+    PARAM int   NUMBER_OF_NODES 						 = 25; // -
+    PARAM int   NUMBER_OF_GATES                          = 17; // -
     PARAM char  GATE_NAMES[NUMBER_OF_GATES]              = {'M', 'H', 'C', 'R', 'K', 'F', 'A', 'N', 'I', 'D', 'T', 'L', 'G', 'B', 'O', 'J', 'E'};
     PARAM int   NUMBER_OF_CROSS_SECTIONS                 = 3;
     PARAM cross CROSS_SECTIONS[NUMBER_OF_CROSS_SECTIONS] = {
@@ -62,6 +63,7 @@ namespace jlb
     PARAM int  NUMBER_OF_BALANCER_PROHIBITED_EDGES                            = 1;                // -
     PARAM pcc  BALANCER_PROHIBITED_EDGES[NUMBER_OF_BALANCER_PROHIBITED_EDGES] = {pcc('W', 'X')};  // -
 
+    PARAM int   NUMBER_OF_NODES 						 = 27; // -
     PARAM int   NUMBER_OF_GATES                          = 17;  // -
     PARAM char  GATE_NAMES[NUMBER_OF_GATES]              = {'B', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'};
     PARAM int   NUMBER_OF_CROSS_SECTIONS                 = 3;
@@ -74,8 +76,8 @@ namespace jlb
     PARAM char  START_GATE        = 'Y';
     PARAM char  START_NEXT_GATE   = 'W';
 
-    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 2.2f;   // m
-    PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.6f;   // m
+    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 2.0f;   // m
+    PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.9f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
     PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.8f;   // m
     PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::LEFT;

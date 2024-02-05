@@ -32,6 +32,8 @@ namespace jlb
                 {
                     if (labyrinth_state == LabyrinthState::MISSION_SWITCH)
                     {
+                        controller.set_direction(Direction::STRAIGHT);
+
                         if (mission_switch_state == MissionSwitchState::STANDBY)
                         {
                             controller.set_target_speed(0.0f);
@@ -58,6 +60,13 @@ namespace jlb
                         else if (mission_switch_state == MissionSwitchState::SECOND_TURN)
                         {
                             auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+
+                            if(controller.line_positions_front.size() > 0)
+                            {
+                            	auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+								return ControlSignal{target_angle, target_speed};
+                            }
+
                             if (MISSION_SWITCH_DIRECTION == Direction::RIGHT)
                             {
                                 return ControlSignal{-as_state.mission_switch_steering_angle, target_speed};
