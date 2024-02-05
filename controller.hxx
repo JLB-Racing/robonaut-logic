@@ -195,7 +195,7 @@ namespace jlb
             std::complex<float> kP     = -SENSOR_BASE / (std::fabs(current_velocity) * std::fabs(current_velocity)) * s1 * s2;
             std::complex<float> kDelta = -SENSOR_BASE / std::fabs(current_velocity) * ((s1 + s2) - std::fabs(current_velocity) * kP);
 
-            if (target_speed < 0.0f) { return {kP.real(), kDelta.real() * MULTIPLIER_REVERSE}; }
+            if (target_speed < 0.0f) { return {kP.real() * MULTIPLIER_REVERSE, kDelta.real()}; }
             return {kP.real(), kDelta.real()};
         }
 

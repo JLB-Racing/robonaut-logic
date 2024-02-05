@@ -98,16 +98,16 @@ namespace jlb
     PARAM float D5_MIN             = 1.50f;
     PARAM float OFFSET_EXP1        = 4.4f;
     PARAM float OFFSET_EXP2        = -1.38f;
-    PARAM float D5_REVERSE         = 0.25f;
-    PARAM float DAMPING_REVERSE    = 0.85f;
-    PARAM float MULTIPLIER_REVERSE = 1.0f;
+    PARAM float D5_REVERSE         = 0.02f;
+    PARAM float DAMPING_REVERSE    = 0.75f;
+    PARAM float MULTIPLIER_REVERSE = 1.55f;
 
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
 
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.75f;  // m/s
     PARAM float BALANCER_SPEED          = 1.0f;   // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.75f;  // m/s
     PARAM float FAST_SPEED              = 5.0f;   // m/s
