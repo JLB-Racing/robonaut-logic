@@ -128,9 +128,6 @@ namespace jlb
     PARAM float OVERTAKE_SECOND_RIGHT_TIME   = 1.0f;   // s
     PARAM float OVERTAKE_STEERING_ANGLE      = 12.5f;  // deg
 
-    PARAM int   NUMBER_OF_SAFETYCAR_SECTIONS                     = 2;
-    PARAM scsec SAFETYCAR_SECTIONS[NUMBER_OF_SAFETYCAR_SECTIONS] = {scsec(2u, FastState::FIRST_FAST), scsec(2u, FastState::THIRD_FAST)};
-
     ///////////////////////////////////////////////////////////////////////////
     //
     //      SIGNALS
@@ -252,9 +249,6 @@ namespace jlb
     PARAM float OVERTAKE_SECOND_LEFT_TIME    = 0.35f;  // s
     PARAM float OVERTAKE_SECOND_RIGHT_TIME   = 0.35f;  // s
     PARAM float OVERTAKE_STEERING_ANGLE      = 12.5f;  // deg
-
-    PARAM int   NUMBER_OF_SAFETYCAR_SECTIONS                     = 2;
-    PARAM scsec SAFETYCAR_SECTIONS[NUMBER_OF_SAFETYCAR_SECTIONS] = {scsec(2u, FastState::FIRST_FAST), scsec(2u, FastState::THIRD_FAST)};
 
     ///////////////////////////////////////////////////////////////////////////
     //

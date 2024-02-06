@@ -988,19 +988,15 @@ namespace jlb
                     float delta               = target_distance - std::fabs(odometry.distance_local);
                     float safety_car_distance = controller.object_range;
 
-                    if (safety_car_distance < SAFETY_CAR_THRESHOLD)
+                    if (safety_car_distance < SAFETY_CAR_THRESHOLD && (safety_car || (completed_laps == 2u && fast_state == FastState::FIRST_FAST) ||
+                                                                       (completed_laps == 2u && fast_state == FastState::THIRD_FAST)))
                     {
-                        // IF IN THRESHOLD, RESET TIMEOUT
                         safety_car_time = 0.0;
-                    }
-                    else
-                    {
-                        // IF OUT OF THRESHOLD, INCREMENT TIMEOUT
-                        safety_car_time += dt;
                     }
 
                     if (safety_car_time >= SAFETY_CAR_TIMEOUT) { safety_car = false; }
                     else { safety_car = true; }
+                    safety_car_time += dt;
 
                     if (completed_laps == 0u && (fast_state == FastState::FIRST_FAST || fast_state == FastState::FIRST_SLOW ||
                                                  fast_state == FastState::SECOND_FAST || fast_state == FastState::SECOND_SLOW))
@@ -1008,15 +1004,13 @@ namespace jlb
                         safety_car = true;
                     }
 
-                    std::cout << "completed_laps: " << static_cast<int>(completed_laps)
-                              << " completed_overtakes: " << static_cast<int>(completed_overtakes) << std::endl;
-
                     switch (fast_state)
                     {
                         case FastState::FIRST_FAST:
                         {
                             target_distance = FIRST_FAST_DIST;
                             if (prev_mission == Mission::LABYRINTH || safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else if (completed_laps == 6u) { target_speed = FAST_SPEED[completed_laps - 1]; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
                             if (num_lines >= 3 && (delta < LOCALIZATION_INACCURACY || prev_mission == Mission::LABYRINTH))
