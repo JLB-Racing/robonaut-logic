@@ -6,12 +6,12 @@
 //      LOGIC DEFINES
 //
 
-// #define Q2
-#define SIMULATION
+#define Q2
+//#define SIMULATION
 #define OVERTAKE
-#define TEST_FAST
-// #define TEST_REVERSE
-// #define FAST_V0
+//#define TEST_FAST
+#define TEST_REVERSE
+//#define FAST_V0
 
 ///////////////////////////////////////////////////////////////////////////
 //

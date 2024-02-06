@@ -101,7 +101,7 @@ namespace jlb
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_FAST    = 1.5f;   // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 0.75f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.4f;  // m/s
     PARAM float BALANCER_SPEED          = 1.5f;   // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.75f;  // m/s
 

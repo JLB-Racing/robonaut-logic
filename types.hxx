@@ -73,7 +73,6 @@ namespace jlb
 
     typedef std::pair<char, char>         pcc;
     typedef std::pair<pcc, pcc>           cross;
-    typedef std::pair<uint8_t, FastState> scsec;
 
 }  // namespace jlb
 

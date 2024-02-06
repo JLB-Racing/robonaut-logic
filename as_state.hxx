@@ -952,7 +952,7 @@ namespace jlb
                         {
                             controller.set_direction(reverse_saved_dir, true);
                         }
-                        if (next_node == BALANCER_START_NODE) { target_speed = -BALANCER_SPEED; }
+                        if (next_node == BALANCER_START_NODE) { target_speed = -LABYRINTH_SPEED_REVERSE; }
                         else { target_speed = -LABYRINTH_SPEED_REVERSE; }
                     }
                     else if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
@@ -1204,21 +1204,6 @@ namespace jlb
 
                     switch (fast_state)
                     {
-                        case FastState::FOLLOW_SAFETY_CAR:
-                        {
-                            target_speed = FAST_SPEED_SAFETY_CAR;
-                            break;
-                        }
-                        case FastState::OVERTAKE_SAFETY_CAR_START:
-                        {
-                            target_speed = FAST_SPEED_OVERTAKE;
-                            break;
-                        }
-                        case FastState::OVERTAKE_SAFETY_CAR_END:
-                        {
-                            target_speed = FAST_SPEED;
-                            break;
-                        }
                         case FastState::IN_ACCEL_ZONE:
                         {
                             if (num_lines == 1u && !started_state_transition)

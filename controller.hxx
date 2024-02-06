@@ -175,11 +175,11 @@ namespace jlb
                 damping = DAMPING_REVERSE;
             }
 
-            if ((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
-            {
-                damping = DAMPING_TURN;
-                d5      = D5_MIN;
-            }
+            //if ((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
+            //{
+            //    damping = DAMPING_TURN;
+            //    d5      = D5_MIN;
+            //}
 #else
             float d5 = OFFSET + SLOPE * std::fabs(current_velocity);
 #endif
