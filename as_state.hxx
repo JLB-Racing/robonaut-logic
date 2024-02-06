@@ -17,35 +17,38 @@ namespace jlb
         Mission            mission              = Mission::STANDBY;
         LabyrinthState     labyrinth_state      = LabyrinthState::START;
         MissionSwitchState mission_switch_state = MissionSwitchState::STANDBY;
-        FastState          fast_state           = FastState::OUT_ACCEL_ZONE;
-        float              reference_speed      = 0.0f;
+
+#ifdef FAST_V0
+        FastState fast_state = FastState::OUT_ACCEL_ZONE;
+#else
+        FastState fast_state = FastState::FIRST_FAST;
+#endif
+
+        float target_speed = 0.0f;
 
         CompositeState(FastState fast_state_)
             : mission{Mission::FAST},
               labyrinth_state{LabyrinthState::START},
               mission_switch_state{MissionSwitchState::STANDBY},
               fast_state{fast_state_},
-              reference_speed{0.0f}
+              target_speed{0.0f}
         {
         }
         CompositeState(LabyrinthState labyrinth_state_)
             : mission{Mission::LABYRINTH},
               labyrinth_state{labyrinth_state_},
               mission_switch_state{MissionSwitchState::STANDBY},
-              fast_state{FastState::FOLLOW_SAFETY_CAR},
-              reference_speed{0.0f}
+              fast_state{FastState::FIRST_FAST},
+              target_speed{0.0f}
         {
         }
-        CompositeState(Mission            mission_,
-                       LabyrinthState     labyrinth_state_,
-                       MissionSwitchState mission_switch_state_,
-                       FastState          fast_state_,
-                       float              reference_speed_)
+        CompositeState(
+            Mission mission_, LabyrinthState labyrinth_state_, MissionSwitchState mission_switch_state_, FastState fast_state_, float target_speed_)
             : mission{mission_},
               labyrinth_state{labyrinth_state_},
               mission_switch_state{mission_switch_state_},
               fast_state{fast_state_},
-              reference_speed{reference_speed_}
+              target_speed{target_speed_}
         {
         }
     };
@@ -53,27 +56,37 @@ namespace jlb
     class ASState
     {
     public:
+        Mission            prev_mission         = Mission::STANDBY;
         Mission            mission              = Mission::STANDBY;
         LabyrinthState     labyrinth_state      = LabyrinthState::START;
         LabyrinthState     prev_labyrinth_state = LabyrinthState::START;
         MissionSwitchState mission_switch_state = MissionSwitchState::STANDBY;
-        FastState          fast_state           = FastState::OUT_ACCEL_ZONE;
-        float              reference_speed      = 0.0f;
+#ifdef FAST_V0
+        FastState fast_state = FastState::OUT_ACCEL_ZONE;
+#else
+        FastState fast_state = FastState::FIRST_FAST;
+#endif
+        float target_speed = 0.0f;
 
         bool     under_gate               = false;
         bool     at_cross_section         = false;
         bool     prev_at_decision_point   = false;
-        uint8_t  current_number_of_lines  = 0u;
+        uint8_t  num_lines                = 0u;
         float    state_time               = 0.0f;
         float    state_transition_time    = 0.0f;
         bool     started_state_transition = false;
         uint32_t tick_counter             = 0u;
         uint32_t tick_counter_prev        = 0u;
 
-        char          at_node         = START_GATE;
-        char          previous_node   = START_GATE;
-        char          next_node       = START_NEXT_GATE;
-        char          goal_node       = START_NEXT_GATE;
+        char at_node       = START_GATE;
+        char previous_node = START_GATE;
+#ifndef SIMULATION
+        char next_node = START_NEXT_GATE;
+        char goal_node = START_NEXT_GATE;
+#else
+        char next_node = START_GATE;
+        char goal_node = START_GATE;
+#endif
         unsigned long selected_edge   = 0u;
         float         target_distance = 0.0f;
 
@@ -96,6 +109,14 @@ namespace jlb
         float best_laptime;
         float current_laptime;
 
+        bool    safety_car              = true;
+        float   safety_car_time         = 0.0f;
+        uint8_t completed_laps          = 0;
+        uint8_t completed_overtakes     = 0;
+        bool    overtake_started        = false;
+        float   overtake_time           = 0.0f;
+        float   overtake_steering_angle = 0.0f;
+
         bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
         ASState(Odometry& odometry_, Controller& controller_, Graph& graph_) : odometry{odometry_}, controller{controller_}, graph{graph_} {}
@@ -115,7 +136,7 @@ namespace jlb
             under_gate               = false;
             at_cross_section         = false;
             prev_at_decision_point   = false;
-            current_number_of_lines  = 0u;
+            num_lines                = 0u;
             state_time               = 0.0f;
             state_transition_time    = 0.0f;
             started_state_transition = false;
@@ -124,8 +145,13 @@ namespace jlb
 
             at_node       = START_GATE;
             previous_node = START_GATE;
-            next_node     = START_NEXT_GATE;
-            goal_node     = START_NEXT_GATE;
+#ifndef SIMULATION
+            next_node = START_NEXT_GATE;
+            goal_node = START_NEXT_GATE;
+#else
+            next_node = START_GATE;
+            goal_node = START_GATE;
+#endif
             selected_edge = 0u;
 
             reverse_saved_dir = Direction::STRAIGHT;
@@ -302,7 +328,7 @@ namespace jlb
 
         void flood_solving_callback()
         {
-            reference_speed = BALANCER_SPEED;
+            target_speed = BALANCER_SPEED;
 
             if (at_node == BALANCER_END_NODE && !flood)
             {
@@ -315,7 +341,7 @@ namespace jlb
             }
             else if (at_node == BALANCER_END_NODE && flood)
             {
-                reference_speed = 0.0f;
+                target_speed = 0.0f;
                 return;
             }
 
@@ -631,12 +657,15 @@ namespace jlb
                     {
                         odometry.reset_local(true);
                         mission_switch_state = MissionSwitchState::STANDBY;
-                        mission              = Mission::STANDBY;
+                        prev_mission         = mission;
+#ifndef Q2
+                        mission = Mission::FAST;
+#else
+                        mission = Mission::STANDBY;
+#endif
+                        target_distance = FIRST_FAST_DIST;
                         break;
                     }
-
-                    follow_car = true;
-                    break;
                 }
                 default:
                 {
@@ -679,14 +708,20 @@ namespace jlb
 
                     bool at_decision_point = under_gate || at_cross_section;
 
-                    if (delta < LOCALIZATION_FALLBACK) {}
-
+#ifndef SIMULATION
                     if ((!prev_at_decision_point && at_decision_point) || delta < LOCALIZATION_FALLBACK ||
                         (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
                          (next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE)))
+#else
+                    if ((!prev_at_decision_point && at_decision_point) || (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
+                        (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
+                        (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||
+                        (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH &&
+                         (next_node == BALANCER_START_NODE || next_node == BALANCER_PREV_NODE)))
+#endif
                     {
                         // std::cout << "target: " << distance << " actual: " << odometry.distance_local << std::endl;
 
@@ -787,7 +822,7 @@ namespace jlb
                                         labyrinth_state = LabyrinthState::REVERSE_ESCAPE;
                                         reverse_escape_callback();
 
-                                        reference_speed   = -LABYRINTH_SPEED_REVERSE;
+                                        target_speed      = -LABYRINTH_SPEED_REVERSE;
                                         reverse_saved_dir = controller.direction;
                                         break;
                                     }
@@ -891,10 +926,11 @@ namespace jlb
                         odometry.distance_local -= WHEELBASE;
                         reverse_escape_callback();
 
-                        reference_speed   = -LABYRINTH_SPEED_REVERSE;
+                        target_speed      = -LABYRINTH_SPEED_REVERSE;
                         reverse_saved_dir = controller.direction;
                     }
-                    else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+
+                    if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE)
                     {
                         if (controller.target_speed < 0.0f && odometry.vx_t < 0.0f && odometry.distance_local < WHEELBASE)
                         {
@@ -904,17 +940,33 @@ namespace jlb
                         {
                             controller.set_direction(reverse_saved_dir, true);
                         }
-                        reference_speed = -LABYRINTH_SPEED_REVERSE;
+                        target_speed = -LABYRINTH_SPEED_REVERSE;
+                    }
+                    else if (labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
+                    {
+                        if (controller.target_speed < 0.0f && odometry.vx_t < 0.0f && odometry.distance_local < WHEELBASE)
+                        {
+                            controller.set_direction(graph[at_node].edges[selected_edge].direction);
+                        }
+                        if (controller.target_speed < 0.0f && odometry.vx_t < 0.0f && odometry.distance_local >= WHEELBASE)
+                        {
+                            controller.set_direction(reverse_saved_dir, true);
+                        }
+                        if (next_node == BALANCER_START_NODE) { target_speed = -BALANCER_SPEED; }
+                        else { target_speed = -LABYRINTH_SPEED_REVERSE; }
                     }
                     else if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
                              labyrinth_state == LabyrinthState::ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER ||
                              labyrinth_state == LabyrinthState::START)
                     {
-                        if (graph[at_node].edges[selected_edge].fast && reference_speed == LABYRINTH_SPEED_FAST) { reference_speed = LABYRINTH_SPEED_FAST; }
-                        else if (graph[at_node].edges[selected_edge].fast && reference_speed == LABYRINTH_SPEED && odometry.distance_local > 0.2f) { reference_speed = LABYRINTH_SPEED_FAST; }
-                        else { reference_speed = LABYRINTH_SPEED; }
+                        if (graph[at_node].edges[selected_edge].fast && target_speed == LABYRINTH_SPEED_FAST) { target_speed = LABYRINTH_SPEED_FAST; }
+                        else if (graph[at_node].edges[selected_edge].fast && target_speed == LABYRINTH_SPEED && odometry.distance_local > 0.2f)
+                        {
+                            target_speed = LABYRINTH_SPEED_FAST;
+                        }
+                        else { target_speed = LABYRINTH_SPEED; }
                     }
-                    else if (labyrinth_state == LabyrinthState::MISSION_SWITCH) { reference_speed = MISSION_SWITCH_SPEED; }
+                    else if (labyrinth_state == LabyrinthState::MISSION_SWITCH) { target_speed = MISSION_SWITCH_SPEED; }
                     else if (labyrinth_state == LabyrinthState::FLOOD_SOLVING)
                     { /*moved to flood_solving callback*/
                     }
@@ -924,39 +976,263 @@ namespace jlb
                     {
                         follow_car = true;
                     }
-                    else { follow_car = false; }
+                    else if (labyrinth_state != LabyrinthState::MISSION_SWITCH) { follow_car = false; }
 
                     break;
                 }
                 case Mission::FAST:
                 {
+#ifndef FAST_V0
+
+                    controller.set_direction(Direction::STRAIGHT);
+                    float delta               = target_distance - std::fabs(odometry.distance_local);
+                    float safety_car_distance = controller.object_range;
+
+                    if (safety_car_distance < SAFETY_CAR_THRESHOLD)
+                    {
+                        // IF IN THRESHOLD, RESET TIMEOUT
+                        safety_car_time = 0.0;
+                    }
+                    else
+                    {
+                        // IF OUT OF THRESHOLD, INCREMENT TIMEOUT
+                        safety_car_time += dt;
+                    }
+
+                    if (safety_car_time >= SAFETY_CAR_TIMEOUT) { safety_car = false; }
+                    else { safety_car = true; }
+
+                    if (completed_laps == 0u && (fast_state == FastState::FIRST_FAST || fast_state == FastState::FIRST_SLOW ||
+                                                 fast_state == FastState::SECOND_FAST || fast_state == FastState::SECOND_SLOW))
+                    {
+                        safety_car = true;
+                    }
+
+                    std::cout << "completed_laps: " << static_cast<int>(completed_laps)
+                              << " completed_overtakes: " << static_cast<int>(completed_overtakes) << std::endl;
+
+                    switch (fast_state)
+                    {
+                        case FastState::FIRST_FAST:
+                        {
+                            target_distance = FIRST_FAST_DIST;
+                            if (prev_mission == Mission::LABYRINTH || safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED[completed_laps]; }
+
+                            if (num_lines >= 3 && (delta < LOCALIZATION_INACCURACY || prev_mission == Mission::LABYRINTH))
+                            {
+                                if (prev_mission == Mission::LABYRINTH) { prev_mission = Mission::FAST; }
+                                fast_state = FastState::FIRST_SLOW;
+                                odometry.reset_local(true);
+                            }
+
+                            break;
+                        }
+                        case FastState::FIRST_SLOW:
+                        {
+                            target_distance = FIRST_SLOW_DIST;
+                            if (completed_laps == 6u && completed_overtakes == 2u) { target_speed = 0.0f; }
+                            else if (completed_laps == 5u && completed_overtakes < 2u) { target_speed = 0.0f; }
+                            else if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED_TURN[completed_laps]; }
+
+                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            {
+                                fast_state = FastState::SECOND_FAST;
+                                odometry.reset_local(true);
+                            }
+
+                            break;
+                        }
+                        case FastState::SECOND_FAST:
+                        {
+                            target_distance = SECOND_FAST_DIST;
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED[completed_laps]; }
+
+                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            {
+                                fast_state = FastState::SECOND_SLOW;
+                                odometry.reset_local(true);
+                            }
+
+                            break;
+                        }
+                        case FastState::SECOND_SLOW:
+                        {
+                            target_distance = SECOND_SLOW_DIST;
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED_TURN[completed_laps]; }
+
+                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            {
+                                fast_state = FastState::THIRD_FAST;
+                                odometry.reset_local(true);
+                            }
+
+                            break;
+                        }
+                        case FastState::THIRD_FAST:
+                        {
+                            target_distance = THIRD_FAST_DIST;
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED[completed_laps]; }
+
+#ifdef OVERTAKE
+                            if ((safety_car && (completed_laps == 0u || completed_laps == 2u) &&
+                                 safety_car_distance < obj::FOLLOW_DISTANCE * 1.25f) ||
+                                overtake_started)
+                            {
+                                if (!overtake_started)
+                                {
+                                    overtake_started = true;
+                                    overtake_time    = 0.0f;
+                                }
+                                else
+                                {
+                                    safety_car      = false;
+                                    safety_car_time = SAFETY_CAR_TIMEOUT;
+                                }
+
+                                if (overtake_time < OVERTAKE_FIRST_FORWARD_TIME)
+                                {
+                                    // GO FORWARD
+                                    overtake_steering_angle = 0.0f;
+                                    target_speed            = FAST_SPEED_SAFETY_CAR;
+                                }
+                                else if (overtake_time < OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME)
+                                {
+                                    // TURN LEFT
+                                    overtake_steering_angle = deg2rad(-OVERTAKE_STEERING_ANGLE);
+                                    target_speed            = FAST_SPEED_OVERTAKE_TURN;
+                                }
+                                else if (overtake_time < OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME)
+                                {
+                                    // TURN RIGHT
+                                    overtake_steering_angle = deg2rad(OVERTAKE_STEERING_ANGLE);
+                                    target_speed            = FAST_SPEED_OVERTAKE_TURN;
+                                }
+                                else if (overtake_time < OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME +
+                                                             OVERTAKE_SECOND_FORWARD_TIME)
+                                {
+                                    // GO FORWARD
+                                    overtake_steering_angle = 0.0f;
+                                    target_speed            = FAST_SPEED_OVERTAKE;
+                                }
+                                else if (overtake_time < OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME +
+                                                             OVERTAKE_SECOND_FORWARD_TIME + OVERTAKE_SECOND_RIGHT_TIME)
+                                {
+                                    // TURN RIGHT
+                                    overtake_steering_angle = deg2rad(OVERTAKE_STEERING_ANGLE);
+                                    target_speed            = FAST_SPEED_OVERTAKE_TURN;
+                                }
+                                else if (overtake_time < OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME +
+                                                             OVERTAKE_SECOND_FORWARD_TIME + OVERTAKE_SECOND_RIGHT_TIME + OVERTAKE_SECOND_LEFT_TIME)
+                                {
+                                    // TURN LEFT
+                                    overtake_steering_angle = deg2rad(-OVERTAKE_STEERING_ANGLE);
+                                    target_speed            = FAST_SPEED_OVERTAKE_TURN;
+                                }
+                                else
+                                {
+                                    safety_car       = false;
+                                    safety_car_time  = SAFETY_CAR_TIMEOUT;
+                                    overtake_started = false;
+                                    completed_overtakes++;
+                                }
+                                overtake_time += dt;
+                            }
+#endif
+
+                            if (num_lines >= 3 &&
+                                (delta < LOCALIZATION_INACCURACY || overtake_time > OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME +
+                                                                                        OVERTAKE_FIRST_RIGHT_TIME + OVERTAKE_SECOND_FORWARD_TIME +
+                                                                                        OVERTAKE_SECOND_RIGHT_TIME + OVERTAKE_SECOND_LEFT_TIME))
+                            {
+                                fast_state = FastState::THIRD_SLOW;
+                                odometry.reset_local(true);
+                                overtake_time = 0.0f;
+                            }
+
+                            break;
+                        }
+                        case FastState::THIRD_SLOW:
+                        {
+                            target_distance = THIRD_SLOW_DIST;
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED_TURN[completed_laps]; }
+
+                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            {
+                                fast_state = FastState::FOURTH_FAST;
+                                odometry.reset_local(true);
+                            }
+
+                            break;
+                        }
+                        case FastState::FOURTH_FAST:
+                        {
+                            target_distance = FOURTH_FAST_DIST;
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED[completed_laps]; }
+
+                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            {
+                                fast_state = FastState::FOURTH_SLOW;
+                                odometry.reset_local(true);
+                            }
+
+                            break;
+                        }
+                        case FastState::FOURTH_SLOW:
+                        {
+                            target_distance = FOURTH_SLOW_DIST;
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else { target_speed = FAST_SPEED_TURN[completed_laps]; }
+
+                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            {
+                                fast_state = FastState::FIRST_FAST;
+                                odometry.reset_local(true);
+                                completed_laps++;
+                            }
+
+                            break;
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                    }
+
+#else
                     follow_car = true;
 
                     switch (fast_state)
                     {
                         case FastState::FOLLOW_SAFETY_CAR:
                         {
-                            reference_speed = FAST_SPEED_SAFETY_CAR;
+                            target_speed = FAST_SPEED_SAFETY_CAR;
                             break;
                         }
                         case FastState::OVERTAKE_SAFETY_CAR_START:
                         {
-                            reference_speed = FAST_SPEED_OVERTAKE;
+                            target_speed = FAST_SPEED_OVERTAKE;
                             break;
                         }
                         case FastState::OVERTAKE_SAFETY_CAR_END:
                         {
-                            reference_speed = FAST_SPEED;
+                            target_speed = FAST_SPEED;
                             break;
                         }
                         case FastState::IN_ACCEL_ZONE:
                         {
-                            if (current_number_of_lines == 1u && !started_state_transition)
+                            if (num_lines == 1u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (current_number_of_lines != 1u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines != 1u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {
@@ -965,17 +1241,17 @@ namespace jlb
                                 break;
                             }
 
-                            reference_speed = FAST_SPEED;
+                            target_speed = FAST_SPEED;
                             break;
                         }
                         case FastState::OUT_ACCEL_ZONE:
                         {
-                            if (current_number_of_lines == 3u && !started_state_transition)
+                            if (num_lines == 3u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (current_number_of_lines != 3u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines != 3u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {
@@ -984,17 +1260,17 @@ namespace jlb
                                 break;
                             }
 
-                            reference_speed = FAST_SPEED;
+                            target_speed = FAST_SPEED;
                             break;
                         }
                         case FastState::IN_BRAKE_ZONE:
                         {
-                            if (current_number_of_lines == 1u && !started_state_transition)
+                            if (num_lines == 1u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (current_number_of_lines != 1u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines != 1u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {
@@ -1003,17 +1279,17 @@ namespace jlb
                                 break;
                             }
 
-                            reference_speed = FAST_SPEED_TURN;
+                            target_speed = FAST_SPEED_TURN;
                             break;
                         }
                         case FastState::OUT_BRAKE_ZONE:
                         {
-                            if (current_number_of_lines == 3u && !started_state_transition)
+                            if (num_lines == 3u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (current_number_of_lines != 3u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines != 3u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {
@@ -1022,7 +1298,7 @@ namespace jlb
                                 break;
                             }
 
-                            reference_speed = FAST_SPEED_TURN;
+                            target_speed = FAST_SPEED_TURN;
                             break;
                         }
                         default:
@@ -1033,6 +1309,7 @@ namespace jlb
                     }
 
                     break;
+#endif
                 }
                 default:
                 {
@@ -1041,7 +1318,7 @@ namespace jlb
                 }
             }
 
-            return CompositeState{mission, labyrinth_state, mission_switch_state, fast_state, reference_speed};
+            return CompositeState{mission, labyrinth_state, mission_switch_state, fast_state, target_speed};
         }
 
     private:

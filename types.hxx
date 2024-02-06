@@ -3,25 +3,6 @@
 
 #include <cmath>
 
-#define PARAM static constexpr
-
-#ifndef px_to_m
-#define px_to_m(px) (px * (jlb::SQUARE_LENGTH * 2.0f) / jlb::BITMAP_SIZE)
-#endif
-#ifndef m_to_px
-#define m_to_px(m) (m * jlb::BITMAP_SIZE / (jlb::SQUARE_LENGTH * 2.0f))
-#endif
-
-#ifndef rad2deg
-#define rad2deg(rad) (rad * 180.0f / static_cast<float>(M_PI))
-#endif
-#ifndef deg2rad
-#define deg2rad(deg) (deg * static_cast<float>(M_PI) / 180.0f)
-#endif
-
-typedef std::pair<char, char> pcc;
-typedef std::pair<pcc, pcc>   cross;
-
 namespace jlb
 {
 
@@ -71,9 +52,14 @@ namespace jlb
 
     enum class FastState
     {
-        FOLLOW_SAFETY_CAR,
-        OVERTAKE_SAFETY_CAR_START,
-        OVERTAKE_SAFETY_CAR_END,
+        FIRST_FAST,
+        FIRST_SLOW,
+        SECOND_FAST,
+        SECOND_SLOW,
+        THIRD_FAST,
+        THIRD_SLOW,
+        FOURTH_FAST,
+        FOURTH_SLOW,
         IN_ACCEL_ZONE,
         OUT_ACCEL_ZONE,
         IN_BRAKE_ZONE,
@@ -84,6 +70,10 @@ namespace jlb
     //      END ENUMS
     //
     ///////////////////////////////////////////////////////////////////////////
+
+    typedef std::pair<char, char>         pcc;
+    typedef std::pair<pcc, pcc>           cross;
+    typedef std::pair<uint8_t, FastState> scsec;
 
 }  // namespace jlb
 

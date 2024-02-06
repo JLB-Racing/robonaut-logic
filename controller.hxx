@@ -155,9 +155,9 @@ namespace jlb
             }
             else
             {
-                // this should never happen
-
-                return 0.0f;
+                float sum = 0.0f;
+                for (auto &i : line_positions) { sum += i; }
+                return sum / line_positions.size();
             }
         }
 
@@ -244,9 +244,9 @@ namespace jlb
 
         void longitudinal_control([[maybe_unused]] const float dt, [[maybe_unused]] bool follow_car)
         {
-            if (follow_car && target_speed >= 0 && object_range < SAFETY_CAR_THRESHOLD && target_speed > SPEED_SAFETY_CAR_FOLLOW)
+            if (follow_car && target_speed >= 0 && object_range < SAFETY_CAR_THRESHOLD && target_speed > FAST_SPEED_SAFETY_CAR)
             {
-                target_speed = SPEED_SAFETY_CAR_FOLLOW;
+                target_speed = FAST_SPEED_SAFETY_CAR;
             }
 
 #ifndef SIMULATION

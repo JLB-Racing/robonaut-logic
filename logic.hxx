@@ -47,7 +47,19 @@ namespace jlb
                         }
                         else if (mission_switch_state == MissionSwitchState::FIRST_TURN)
                         {
+#ifndef SIMULATION
+                            if (controller.line_positions_front.size() > 0 &&
+                                odometry.distance_local > 3.0f * MISSION_SWITCH_FIRST_FORWARD_DIST / 4.0f)
+#else
+                            if (false)
+#endif
+                            {
+                                auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                                return ControlSignal{target_angle, target_speed};
+                            }
+
                             auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+
                             if (MISSION_SWITCH_DIRECTION == Direction::RIGHT)
                             {
                                 return ControlSignal{as_state.mission_switch_steering_angle, target_speed};
@@ -59,13 +71,13 @@ namespace jlb
                         }
                         else if (mission_switch_state == MissionSwitchState::SECOND_TURN)
                         {
-                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
-
                             if (controller.line_positions_front.size() > 0)
                             {
                                 auto [target_angle, target_speed] = controller.update(as_state.follow_car);
                                 return ControlSignal{target_angle, target_speed};
                             }
+
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
 
                             if (MISSION_SWITCH_DIRECTION == Direction::RIGHT)
                             {
@@ -112,11 +124,40 @@ namespace jlb
                 {
 #ifdef TEST_REVERSE
                     controller.set_direction(Direction::STRAIGHT);
-                	controller.swap_front_rear();
-					controller.target_speed = -LABYRINTH_SPEED_REVERSE;
-					auto [target_angle, target_speed] = controller.update(as_state.follow_car, true);
-					return ControlSignal{target_angle, target_speed};
+                    controller.swap_front_rear();
+                    controller.target_speed           = -LABYRINTH_SPEED_REVERSE;
+                    auto [target_angle, target_speed] = controller.update(as_state.follow_car, true);
+                    return ControlSignal{target_angle, target_speed};
 #endif
+                    if (fast_state == FastState::FIRST_SLOW || fast_state == FastState::SECOND_SLOW || fast_state == FastState::THIRD_SLOW ||
+                        fast_state == FastState::FOURTH_SLOW)
+                    {
+                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, false);
+                        return ControlSignal{target_angle, target_speed};
+                    }
+                    else if (fast_state == FastState::THIRD_FAST && as_state.overtake_started)
+                    {
+                        if (as_state.overtake_time < OVERTAKE_FIRST_FORWARD_TIME ||
+                            (as_state.overtake_time >
+                                 OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME + OVERTAKE_SECOND_FORWARD_TIME &&
+                             as_state.num_lines > 0))
+                        {
+                            auto [target_angle, target_speed] = controller.update(true, false);
+                            return ControlSignal{target_angle, target_speed};
+                        }
+                        else
+                        {
+                            auto [target_angle, target_speed] = controller.update(false, false);
+                            return ControlSignal{as_state.overtake_steering_angle, target_speed};
+                        }
+                    }
+                    else
+                    {
+                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, true);
+                        return ControlSignal{target_angle, target_speed};
+                    }
+
+#ifdef FAST_V0
                     controller.set_direction(Direction::STRAIGHT);
 
                     if (fast_state == FastState::OUT_BRAKE_ZONE)
@@ -129,6 +170,7 @@ namespace jlb
                         auto [target_angle, target_speed] = controller.update(as_state.follow_car, true);
                         return ControlSignal{target_angle, target_speed};
                     }
+#endif
 
                     break;
                 }
@@ -148,7 +190,7 @@ namespace jlb
 
         void set_detection_front(bool *detection_front_, std::vector<float> line_positions_front_)
         {
-            as_state.current_number_of_lines = static_cast<uint8_t>(line_positions_front_.size());
+            as_state.num_lines = static_cast<uint8_t>(line_positions_front_.size());
             controller.set_detection_front(detection_front_, line_positions_front_);
         }
         void set_detection_rear(bool *detection_rear_, std::vector<float> line_positions_rear_)
@@ -180,7 +222,12 @@ namespace jlb
         void start_signal()
         {
 #if defined(TEST_FAST) || defined(TEST_REVERSE)
-            if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::FAST; }
+            if (as_state.mission == Mission::STANDBY)
+            {
+                as_state.prev_mission    = Mission::LABYRINTH;
+                as_state.mission         = Mission::FAST;
+                as_state.target_distance = FIRST_FAST_DIST;
+            }
 #else
             if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
 #endif
@@ -189,9 +236,10 @@ namespace jlb
         {
             graph.reset();
             as_state.reset(state_);
-            as_state.mission = Mission::STANDBY;
-            controller       = Controller{};
-            odometry         = Odometry{START_X, START_Y, START_ORIENTATION};
+            as_state.prev_mission = Mission::STANDBY;
+            as_state.mission      = Mission::STANDBY;
+            controller            = Controller{};
+            odometry              = Odometry{START_X, START_Y, START_ORIENTATION};
         }
 
         Odometry     odometry;

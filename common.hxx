@@ -1,17 +1,9 @@
 #ifndef COMMON_HXX
 #define COMMON_HXX
 
+#include "defines.hxx"
 #include "types.hxx"
 #include "map_common.hxx"
-
-///////////////////////////////////////////////////////////////////////////
-//
-//      DEFINES
-//
-
-// #define SIMULATION
-// #define TEST_FAST
-// #define TEST_REVERSE
 
 namespace jlb
 {
@@ -32,6 +24,7 @@ namespace jlb
     PARAM float LOCALIZATION_FALLBACK       = 0.0f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
+    PARAM float FAST_DISCOUNT               = 0.6f;
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -108,18 +101,36 @@ namespace jlb
     /* LATERAL CONTROLLER PARAMETERS */
     PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_FAST    = 1.5f;   // m/s
-	PARAM float LABYRINTH_SPEED_REVERSE = 0.75f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 0.75f;  // m/s
     PARAM float BALANCER_SPEED          = 1.5f;   // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.75f;  // m/s
-    PARAM float FAST_SPEED              = 5.0f;   // m/s
-    PARAM float FAST_SPEED_TURN         = 1.2f;   // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 1.0f;   // m/s
-    PARAM float LOW_SPEED_EPSILON       = 0.20f;  // m/s
 
-    PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f;   // m/s
-    PARAM float SAFETY_CAR_THRESHOLD    = 1.50f;  // m
-    PARAM float CROSS_SECTION_THRESHOLD = 0.20f;  // %/100
+#ifdef FAST_V0
+    PARAM float FAST_SPEED      = 5.0f;  // m/s
+    PARAM float FAST_SPEED_TURN = 1.2f;  // m/s
+#else
+    PARAM float FAST_SPEED[6]      = {5.0f, 5.0f, 5.0f, 5.5f, 6.0f, 6.5f};  // m/s
+    PARAM float FAST_SPEED_TURN[6] = {1.0f, 1.0f, 1.0f, 1.1f, 1.2f, 1.3f};  // m/s
+#endif
+    PARAM float FAST_SPEED_OVERTAKE      = 2.0f;   // m/s
+    PARAM float FAST_SPEED_OVERTAKE_TURN = 1.5f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR    = 1.5f;   // m/s
+    PARAM float LOW_SPEED_EPSILON        = 0.20f;  // m/s
+
+    PARAM float SAFETY_CAR_THRESHOLD         = 1.50f;  // m
+    PARAM float SAFETY_CAR_TIMEOUT           = 2.0f;   // s
+    PARAM float CROSS_SECTION_THRESHOLD      = 0.20f;  // %/100
+    PARAM float OVERTAKE_FIRST_FORWARD_TIME  = 2.0f;   // s
+    PARAM float OVERTAKE_FIRST_LEFT_TIME     = 1.0f;   // s
+    PARAM float OVERTAKE_FIRST_RIGHT_TIME    = 1.0f;   // s
+    PARAM float OVERTAKE_SECOND_FORWARD_TIME = 2.0f;   // s
+    PARAM float OVERTAKE_SECOND_LEFT_TIME    = 1.0f;   // s
+    PARAM float OVERTAKE_SECOND_RIGHT_TIME   = 1.0f;   // s
+    PARAM float OVERTAKE_STEERING_ANGLE      = 12.5f;  // deg
+
+    PARAM int   NUMBER_OF_SAFETYCAR_SECTIONS                     = 2;
+    PARAM scsec SAFETYCAR_SECTIONS[NUMBER_OF_SAFETYCAR_SECTIONS] = {scsec(2u, FastState::FIRST_FAST), scsec(2u, FastState::THIRD_FAST)};
+
     ///////////////////////////////////////////////////////////////////////////
     //
     //      SIGNALS
@@ -142,6 +153,7 @@ namespace jlb
     PARAM float LOCALIZATION_FALLBACK       = 0.0f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
+    PARAM float FAST_DISCOUNT               = 0.6f;
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -176,16 +188,16 @@ namespace jlb
     /* OBJECT PID CONTROLLER PARAMETERS */
     namespace obj
     {
-        PARAM float kP                      = 4.20f;
-        PARAM float kI                      = 0.69f;
+        PARAM float kP                      = 100.0f;
+        PARAM float kI                      = 0.0f;
         PARAM float kD                      = 0.0f;
         PARAM float TAU                     = 0.05f;
         PARAM float T                       = 0.005f;
         PARAM float LIM_MIN                 = 0.0f;
         PARAM float LIM_MAX                 = 1.0f;
-        PARAM float DEADBAND                = 0.05f;
-        PARAM float DERIVATIVE_FILTER_ALPHA = 0.1f;
-        PARAM float FOLLOW_DISTANCE         = 0.3f;
+        PARAM float DEADBAND                = 0.0f;
+        PARAM float DERIVATIVE_FILTER_ALPHA = 0.0f;
+        PARAM float FOLLOW_DISTANCE         = 0.4f;
     }  // namespace obj
 
     namespace lat
@@ -215,18 +227,34 @@ namespace jlb
     PARAM float MAX_DECELERATION = 7.5f;  // m/s^2
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
-    PARAM float LABYRINTH_SPEED_FAST    = 2.0f;   // m/s
-    PARAM float LABYRINTH_SPEED_REVERSE = 1.0f;   // m/s
-    PARAM float BALANCER_SPEED          = 1.0f;   // m/s
-    PARAM float MISSION_SWITCH_SPEED    = 0.5f;   // m/s
-    PARAM float FAST_SPEED              = 1.5f;   // m/s
-    PARAM float FAST_SPEED_TURN         = 0.75f;  // m/s
-    PARAM float FAST_SPEED_OVERTAKE     = 1.0f;   // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR   = 0.6f;   // m/s
+    PARAM float LABYRINTH_SPEED         = 2.0f;  // m/s
+    PARAM float LABYRINTH_SPEED_FAST    = 2.0f;  // m/s
+    PARAM float LABYRINTH_SPEED_REVERSE = 1.0f;  // m/s
+    PARAM float BALANCER_SPEED          = 1.5f;  // m/s
+    PARAM float MISSION_SWITCH_SPEED    = 0.5f;  // m/s
+#ifdef FAST_V0
+    PARAM float FAST_SPEED      = 3.5f;  // m/s
+    PARAM float FAST_SPEED_TURN = 3.0f;  // m/s
+#else
+    PARAM float FAST_SPEED[6]      = {6.5f, 6.5f, 6.5f, 6.75f, 7.0f, 7.25f};  // m/s
+    PARAM float FAST_SPEED_TURN[6] = {3.0f, 3.0f, 3.0f, 3.25f, 3.5f, 3.75f};  // m/s
+#endif
+    PARAM float FAST_SPEED_OVERTAKE      = 4.0f;  // m/s
+    PARAM float FAST_SPEED_OVERTAKE_TURN = 2.5f;  // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR    = 2.5f;  // m/s
 
-    PARAM float SPEED_SAFETY_CAR_FOLLOW = 1.3f;   // m/s
-    PARAM float SAFETY_CAR_THRESHOLD    = 1.50f;  // m
+    PARAM float SAFETY_CAR_THRESHOLD         = 1.50f;  // m
+    PARAM float SAFETY_CAR_TIMEOUT           = 2.0f;   // s
+    PARAM float OVERTAKE_FIRST_FORWARD_TIME  = 0.5f;   // s
+    PARAM float OVERTAKE_FIRST_LEFT_TIME     = 0.35f;  // s
+    PARAM float OVERTAKE_FIRST_RIGHT_TIME    = 0.35f;  // s
+    PARAM float OVERTAKE_SECOND_FORWARD_TIME = 0.75f;  // s
+    PARAM float OVERTAKE_SECOND_LEFT_TIME    = 0.35f;  // s
+    PARAM float OVERTAKE_SECOND_RIGHT_TIME   = 0.35f;  // s
+    PARAM float OVERTAKE_STEERING_ANGLE      = 12.5f;  // deg
+
+    PARAM int   NUMBER_OF_SAFETYCAR_SECTIONS                     = 2;
+    PARAM scsec SAFETYCAR_SECTIONS[NUMBER_OF_SAFETYCAR_SECTIONS] = {scsec(2u, FastState::FIRST_FAST), scsec(2u, FastState::THIRD_FAST)};
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -352,14 +380,29 @@ namespace jlb
     {
         switch (state)
         {
-            case FastState::FOLLOW_SAFETY_CAR:
-                os << "FOLLOW_SAFETY_CAR";
+            case FastState::FIRST_FAST:
+                os << "FIRST_FAST";
                 break;
-            case FastState::OVERTAKE_SAFETY_CAR_START:
-                os << "OVERTAKE_SAFETY_CAR_START";
+            case FastState::FIRST_SLOW:
+                os << "FIRST_SLOW";
                 break;
-            case FastState::OVERTAKE_SAFETY_CAR_END:
-                os << "OVERTAKE_SAFETY_CAR_END";
+            case FastState::SECOND_FAST:
+                os << "SECOND_FAST";
+                break;
+            case FastState::SECOND_SLOW:
+                os << "SECOND_SLOW";
+                break;
+            case FastState::THIRD_FAST:
+                os << "THIRD_FAST";
+                break;
+            case FastState::THIRD_SLOW:
+                os << "THIRD_SLOW";
+                break;
+            case FastState::FOURTH_FAST:
+                os << "FOURTH_FAST";
+                break;
+            case FastState::FOURTH_SLOW:
+                os << "FOURTH_SLOW";
                 break;
             case FastState::IN_ACCEL_ZONE:
                 os << "IN_ACCEL_ZONE";
