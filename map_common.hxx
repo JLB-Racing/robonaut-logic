@@ -76,11 +76,11 @@ namespace jlb
     PARAM float     START_X           = px_to_m(1812.0f);
     PARAM float     START_Y           = px_to_m(128.0f);
     PARAM float     START_ORIENTATION = M_PI;
-    PARAM char      START_GATE        = 'Y';
-    PARAM char      START_NEXT_GATE   = 'W';
+    PARAM char      START_GATE        = 'S';
+    PARAM char      START_NEXT_GATE   = 'V';
     PARAM Direction START_DIRECTION   = Direction::RIGHT;
 
-    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 2.0f;   // m
+    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 1.9f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.9f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
     PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.8f;   // m

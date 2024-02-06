@@ -610,7 +610,7 @@ namespace jlb
                         break;
                     }
 
-                    follow_car = false;
+                    follow_car = true;
                     break;
                 }
                 case MissionSwitchState::SECOND_TURN:
@@ -622,7 +622,7 @@ namespace jlb
                         break;
                     }
 
-                    follow_car = false;
+                    follow_car = true;
                     break;
                 }
                 case MissionSwitchState::SECOND_FORWARD:
@@ -910,7 +910,8 @@ namespace jlb
                              labyrinth_state == LabyrinthState::ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER ||
                              labyrinth_state == LabyrinthState::START)
                     {
-                        if (graph[at_node].edges[selected_edge].fast) { reference_speed = LABYRINTH_SPEED_FAST; }
+                        if (graph[at_node].edges[selected_edge].fast && reference_speed == LABYRINTH_SPEED_FAST) { reference_speed = LABYRINTH_SPEED_FAST; }
+                        else if (graph[at_node].edges[selected_edge].fast && reference_speed == LABYRINTH_SPEED && odometry.distance_local > 0.2f) { reference_speed = LABYRINTH_SPEED_FAST; }
                         else { reference_speed = LABYRINTH_SPEED; }
                     }
                     else if (labyrinth_state == LabyrinthState::MISSION_SWITCH) { reference_speed = MISSION_SWITCH_SPEED; }
