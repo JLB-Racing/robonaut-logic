@@ -51,6 +51,7 @@ namespace jlb
         std::vector<float> line_positions_front;
         std::vector<float> line_positions_rear;
         float              distance_local = 0.0f;
+        uint8_t current_lap = 0u;
 
         Direction direction      = START_DIRECTION;
         Direction prev_direction = START_DIRECTION;
@@ -65,11 +66,17 @@ namespace jlb
 
         ~Controller() {}
 
+        void set_current_lap(uint8_t current_lap_)
+        {
+        	current_lap = current_lap_ < 6 ? current_lap_ : 6;
+        }
+
         float select_control_point(std::vector<float> line_positions, float prev_line_position)
         {
             std::sort(line_positions.begin(), line_positions.end());
 
-            if (line_positions.size() == 1) { return line_positions[0]; }
+            if(line_positions.size() == 0) { return 0.0f; }
+            else if (line_positions.size() == 1) { return line_positions[0]; }
             else if (line_positions.size() == 2)
             {
                 float tmp;
@@ -131,7 +138,7 @@ namespace jlb
                         return 0.0f;
                 }
             }
-            else if (line_positions.size() == 4)
+            /*else if (line_positions.size() == 4)
             {
                 // switch (direction)
                 // {
@@ -152,6 +159,10 @@ namespace jlb
                 // }
 
                 return line_positions[1] + line_positions[2] / 2.0f;
+            }*/
+            else if(line_positions.size() > 5)
+            {
+            	return 0.0f;
             }
             else
             {
@@ -174,12 +185,19 @@ namespace jlb
                 d5      = D5_REVERSE;
                 damping = DAMPING_REVERSE;
             }
-
-            //if ((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
-            //{
-            //    damping = DAMPING_TURN;
-            //    d5      = D5_MIN;
-            //}
+#ifndef FAST_V0
+            else if ((current_velocity < (FAST_SPEED_TURN[current_lap] + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
+			{
+				damping = DAMPING_TURN;
+				d5      = D5_MIN;
+			}
+#else
+            else if ((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
+			{
+				damping = DAMPING_TURN;
+				d5      = D5_MIN;
+			}
+#endif
 #else
             float d5 = OFFSET + SLOPE * std::fabs(current_velocity);
 #endif

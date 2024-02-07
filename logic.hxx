@@ -25,6 +25,7 @@ namespace jlb
 
             auto [mission, labyrinth_state, mission_switch_state, fast_state, reference_speed] = as_state.update();
             controller.set_target_speed(reference_speed);
+            controller.set_current_lap(as_state.completed_laps);
 
             switch (mission)
             {
@@ -32,7 +33,7 @@ namespace jlb
                 {
                     if (labyrinth_state == LabyrinthState::MISSION_SWITCH)
                     {
-                        controller.set_direction(Direction::STRAIGHT);
+                        controller.set_direction(Direction::RIGHT);
 
                         if (mission_switch_state == MissionSwitchState::STANDBY)
                         {
@@ -229,7 +230,18 @@ namespace jlb
                 as_state.target_distance = FIRST_FAST_DIST;
             }
 #else
+#ifdef TEST_MISSION_SWITCH
+            if (as_state.mission == Mission::STANDBY)
+            {
+            	as_state.mission = Mission::LABYRINTH;
+            	as_state.labyrinth_state = LabyrinthState::FINISHED;
+            	as_state.target_distance = 2.5774f;
+            	as_state.selected_edge = 3;
+            }
+
+#else
             if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
+#endif
 #endif
         }
         void reset_signal(const CompositeState state_)

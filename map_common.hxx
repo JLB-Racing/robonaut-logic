@@ -38,6 +38,7 @@ namespace jlb
     PARAM Direction START_DIRECTION   = Direction::RIGHT;
 
 #ifndef SIMULATION
+    PARAM float     MISSION_SWITCH_MIN_FORWARD_DIST    = 1.2f;   // m
     PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.3f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.3f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
@@ -54,6 +55,7 @@ namespace jlb
     PARAM float FOURTH_SLOW_DIST = 100.0f;  // m
 
 #else
+    PARAM float     MISSION_SWITCH_MIN_FORWARD_DIST    = 1.2f;   // m
     PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.6f;    // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.3f;    // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;   // deg
@@ -97,32 +99,40 @@ namespace jlb
     PARAM float START_X           = px_to_m(1812.0f);
     PARAM float START_Y           = px_to_m(128.0f);
     PARAM float START_ORIENTATION = M_PI;
-    PARAM char      START_GATE        = 'S';
-    PARAM char      START_NEXT_GATE   = 'V';
-    //PARAM char      START_GATE      = 'Y';
-    //PARAM char      START_NEXT_GATE = 'W';
+    //PARAM char      START_GATE        = 'S';
+    //PARAM char      START_NEXT_GATE   = 'V';
+#ifdef TEST_MISSION_SWITCH
+    PARAM char      START_GATE      = 'L';
+    PARAM char      START_NEXT_GATE = 'N';
+#else
+    PARAM char      START_GATE      = 'Y';
+    PARAM char      START_NEXT_GATE = 'W';
+#endif
+
     PARAM Direction START_DIRECTION = Direction::RIGHT;
 
 #ifndef SIMULATION
+    PARAM float     MISSION_SWITCH_MIN_FORWARD_DIST    = 1.2f;   // m
     PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 1.9f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.9f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
     PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.8f;   // m
     PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::LEFT;
 
-    PARAM float FIRST_FAST_DIST  = 100.0f;  // m
-    PARAM float FIRST_SLOW_DIST  = 100.0f;  // m
-    PARAM float SECOND_FAST_DIST = 100.0f;  // m
-    PARAM float SECOND_SLOW_DIST = 100.0f;  // m
-    PARAM float THIRD_FAST_DIST  = 100.0f;  // m
-    PARAM float THIRD_SLOW_DIST  = 100.0f;  // m
-    PARAM float FOURTH_FAST_DIST = 100.0f;  // m
-    PARAM float FOURTH_SLOW_DIST = 100.0f;  // m
+    PARAM float FIRST_FAST_DIST  = 9.0f;  // m
+    PARAM float FIRST_SLOW_DIST  = 4.25f;  // m
+    PARAM float SECOND_FAST_DIST = 9.5f;  // m
+    PARAM float SECOND_SLOW_DIST = 8.0f;  // m
+    PARAM float THIRD_FAST_DIST  = 9.65f;  // m
+    PARAM float THIRD_SLOW_DIST  = 4.25f;  // m
+    PARAM float FOURTH_FAST_DIST = 9.0f;  // m
+    PARAM float FOURTH_SLOW_DIST = 9.65f;  // m
 #else
-    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 1.9f;   // m
+    PARAM float     MISSION_SWITCH_MIN_FORWARD_DIST    = 1.2f;   // m
+    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 1.8f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.9f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
-    PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.8f;   // m
+    PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.775f;   // m
     PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::LEFT;
 
     PARAM float FIRST_FAST_DIST  = 100.0f;  // m

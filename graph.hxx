@@ -296,8 +296,8 @@ namespace jlb
             this->operator[]('X').add_edge('Z', Direction::RIGHT, {'V'}, 2.1200f, false);
             this->operator[]('Y').add_edge('W', Direction::RIGHT, {'Y'}, 2.6399f, false);
             this->operator[]('Z').add_edge('X', Direction::LEFT, {'['}, 2.1200f, false);
-            this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 2.000f, false);
-            this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 2.000f, false);
+            this->operator[]('Z').add_edge('[', Direction::STRAIGHT, {'X'}, 1.950f, false);
+            this->operator[]('[').add_edge('Z', Direction::STRAIGHT, {'['}, 1.950f, false);
 #else
             const auto UNIT            = SQUARE_LENGTH * 2.0f;
             const auto QUARTER_CIRCLE  = 2 * UNIT * M_PI / 4.0f;

@@ -617,7 +617,7 @@ namespace jlb
                 }
                 case MissionSwitchState::FIRST_FORWARD:
                 {
-                    if (std::fabs(MISSION_SWITCH_FIRST_FORWARD_DIST - odometry.distance_local) < 0.01f)
+                    if (std::fabs(MISSION_SWITCH_FIRST_FORWARD_DIST - odometry.distance_local) < 0.01f || (odometry.distance_local > MISSION_SWITCH_MIN_FORWARD_DIST && num_lines >= 2u))
                     {
                         odometry.reset_local(true);
                         mission_switch_state = MissionSwitchState::FIRST_TURN;
@@ -703,7 +703,7 @@ namespace jlb
 
                     float delta = target_distance - std::fabs(odometry.distance_local);
 
-                    if (odometry.distance_local > target_distance / 2.0f) { controller.set_passed_half(true); }
+                    if (odometry.distance_local > target_distance / 4.0f) { controller.set_passed_half(true); }
                     else { controller.set_passed_half(false); }
 
                     bool at_decision_point = under_gate || at_cross_section;
@@ -952,7 +952,7 @@ namespace jlb
                         {
                             controller.set_direction(reverse_saved_dir, true);
                         }
-                        if (next_node == BALANCER_START_NODE) { target_speed = -LABYRINTH_SPEED_REVERSE; }
+                        if (next_node == BALANCER_START_NODE) { target_speed = -BALANCER_SPEED_REVERSE; }
                         else { target_speed = -LABYRINTH_SPEED_REVERSE; }
                     }
                     else if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
@@ -1003,6 +1003,8 @@ namespace jlb
                     {
                         safety_car = true;
                     }
+
+                    follow_car = safety_car;
 
                     switch (fast_state)
                     {
