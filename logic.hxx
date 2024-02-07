@@ -138,12 +138,15 @@ namespace jlb
                     }
                     else if (fast_state == FastState::THIRD_FAST && as_state.overtake_started)
                     {
-                        if (as_state.overtake_time < OVERTAKE_FIRST_FORWARD_TIME ||
-                            (as_state.overtake_time >
-                                 OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME + OVERTAKE_SECOND_FORWARD_TIME &&
-                             as_state.num_lines > 0))
+                        if (as_state.overtake_time < OVERTAKE_FIRST_FORWARD_TIME)
                         {
                             auto [target_angle, target_speed] = controller.update(true, false);
+                            return ControlSignal{target_angle, target_speed};
+                        }
+                        else if ((as_state.overtake_time > OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME &&
+                                  as_state.num_lines > 0))
+                        {
+                            auto [target_angle, target_speed] = controller.update(false, false);
                             return ControlSignal{target_angle, target_speed};
                         }
                         else
@@ -154,7 +157,7 @@ namespace jlb
                     }
                     else
                     {
-                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, true);
+                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, false);
                         return ControlSignal{target_angle, target_speed};
                     }
 
@@ -233,10 +236,10 @@ namespace jlb
 #ifdef TEST_MISSION_SWITCH
             if (as_state.mission == Mission::STANDBY)
             {
-            	as_state.mission = Mission::LABYRINTH;
-            	as_state.labyrinth_state = LabyrinthState::FINISHED;
-            	as_state.target_distance = 2.5774f;
-            	as_state.selected_edge = 3;
+                as_state.mission         = Mission::LABYRINTH;
+                as_state.labyrinth_state = LabyrinthState::FINISHED;
+                as_state.target_distance = 2.5774f;
+                as_state.selected_edge   = 3;
             }
 
 #else

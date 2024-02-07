@@ -617,7 +617,8 @@ namespace jlb
                 }
                 case MissionSwitchState::FIRST_FORWARD:
                 {
-                    if (std::fabs(MISSION_SWITCH_FIRST_FORWARD_DIST - odometry.distance_local) < 0.01f || (odometry.distance_local > MISSION_SWITCH_MIN_FORWARD_DIST && num_lines >= 2u))
+                    if (std::fabs(MISSION_SWITCH_FIRST_FORWARD_DIST - odometry.distance_local) < 0.01f ||
+                        (odometry.distance_local > MISSION_SWITCH_MIN_FORWARD_DIST && num_lines >= 2u))
                     {
                         odometry.reset_local(true);
                         mission_switch_state = MissionSwitchState::FIRST_TURN;
@@ -658,12 +659,8 @@ namespace jlb
                         odometry.reset_local(true);
                         mission_switch_state = MissionSwitchState::STANDBY;
                         prev_mission         = mission;
-#ifndef Q2
-                        mission = Mission::FAST;
-#else
-                        mission = Mission::STANDBY;
-#endif
-                        target_distance = FIRST_FAST_DIST;
+                        mission              = Mission::FAST;
+                        target_distance      = FIRST_FAST_DIST;
                         break;
                     }
                 }
@@ -777,8 +774,7 @@ namespace jlb
 
                             odometry.correction(graph[at_node].x, graph[at_node].y);
                             odometry.reset_local();
-
-                            if (fallback)
+                            nem tesztelt kó if (fallback)
                             {
                                 odometry.distance_local += -1.0f * LOCALIZATION_FALLBACK;
                                 odometry.x_t_local += -1.0f * LOCALIZATION_FALLBACK;
@@ -983,7 +979,6 @@ namespace jlb
                 case Mission::FAST:
                 {
 #ifndef FAST_V0
-
                     controller.set_direction(Direction::STRAIGHT);
                     float delta               = target_distance - std::fabs(odometry.distance_local);
                     float safety_car_distance = controller.object_range;
@@ -1003,6 +998,10 @@ namespace jlb
                     {
                         safety_car = true;
                     }
+
+#ifdef Q3
+                    if (completed_laps == 0u || completed_laps == 1u) { safety_car = true; }
+#endif
 
                     follow_car = safety_car;
 
@@ -1029,7 +1028,7 @@ namespace jlb
                             target_distance = FIRST_SLOW_DIST;
                             if (completed_laps == 6u && completed_overtakes == 2u) { target_speed = 0.0f; }
                             else if (completed_laps == 5u && completed_overtakes < 2u) { target_speed = 0.0f; }
-                            else if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            else if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
                             if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
@@ -1057,7 +1056,7 @@ namespace jlb
                         case FastState::SECOND_SLOW:
                         {
                             target_distance = SECOND_SLOW_DIST;
-                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
                             if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
@@ -1071,7 +1070,11 @@ namespace jlb
                         case FastState::THIRD_FAST:
                         {
                             target_distance = THIRD_FAST_DIST;
-                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            if (safety_car || (completed_laps == 0u && completed_overtakes == 1u) ||
+                                (completed_laps == 2u && completed_overtakes == 2u))
+                            {
+                                target_speed = FAST_SPEED_SAFETY_CAR;
+                            }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
 #ifdef OVERTAKE
@@ -1155,7 +1158,7 @@ namespace jlb
                         case FastState::THIRD_SLOW:
                         {
                             target_distance = THIRD_SLOW_DIST;
-                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
                             if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
@@ -1183,7 +1186,7 @@ namespace jlb
                         case FastState::FOURTH_SLOW:
                         {
                             target_distance = FOURTH_SLOW_DIST;
-                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
                             if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
