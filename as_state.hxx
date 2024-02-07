@@ -71,7 +71,8 @@ namespace jlb
         bool     under_gate               = false;
         bool     at_cross_section         = false;
         bool     prev_at_decision_point   = false;
-        uint8_t  num_lines                = 0u;
+        uint8_t  num_lines_front               = 0u;
+        uint8_t  num_lines_rear                = 0u;
         float    state_time               = 0.0f;
         float    state_transition_time    = 0.0f;
         bool     started_state_transition = false;
@@ -136,7 +137,7 @@ namespace jlb
             under_gate               = false;
             at_cross_section         = false;
             prev_at_decision_point   = false;
-            num_lines                = 0u;
+            num_lines_front                = 0u;
             state_time               = 0.0f;
             state_transition_time    = 0.0f;
             started_state_transition = false;
@@ -618,7 +619,7 @@ namespace jlb
                 case MissionSwitchState::FIRST_FORWARD:
                 {
                     if (std::fabs(MISSION_SWITCH_FIRST_FORWARD_DIST - odometry.distance_local) < 0.01f ||
-                        (odometry.distance_local > MISSION_SWITCH_MIN_FORWARD_DIST && num_lines >= 2u))
+                        (odometry.distance_local > MISSION_SWITCH_MIN_FORWARD_DIST && num_lines_front >= 2u))
                     {
                         odometry.reset_local(true);
                         mission_switch_state = MissionSwitchState::FIRST_TURN;
@@ -774,7 +775,7 @@ namespace jlb
 
                             odometry.correction(graph[at_node].x, graph[at_node].y);
                             odometry.reset_local();
-                            nem tesztelt kó if (fallback)
+                            if (fallback)
                             {
                                 odometry.distance_local += -1.0f * LOCALIZATION_FALLBACK;
                                 odometry.x_t_local += -1.0f * LOCALIZATION_FALLBACK;
@@ -993,17 +994,17 @@ namespace jlb
                     else { safety_car = true; }
                     safety_car_time += dt;
 
+                    /*
                     if (completed_laps == 0u && (fast_state == FastState::FIRST_FAST || fast_state == FastState::FIRST_SLOW ||
                                                  fast_state == FastState::SECOND_FAST || fast_state == FastState::SECOND_SLOW))
                     {
                         safety_car = true;
                     }
-
-#ifdef Q3
-                    if (completed_laps == 0u || completed_laps == 1u) { safety_car = true; }
-#endif
+                    */
 
                     follow_car = safety_car;
+
+                    safety_car = false;
 
                     switch (fast_state)
                     {
@@ -1014,7 +1015,7 @@ namespace jlb
                             else if (completed_laps == 6u) { target_speed = FAST_SPEED[completed_laps - 1]; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
-                            if (num_lines >= 3 && (delta < LOCALIZATION_INACCURACY || prev_mission == Mission::LABYRINTH))
+                            if (num_lines_rear >= 2 && num_lines_front < 3 && (delta < FAST_LOCALIZATION_INACCURACY || prev_mission == Mission::LABYRINTH))
                             {
                                 if (prev_mission == Mission::LABYRINTH) { prev_mission = Mission::FAST; }
                                 fast_state = FastState::FIRST_SLOW;
@@ -1031,7 +1032,7 @@ namespace jlb
                             else if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            if (num_lines_front >= 3 && num_lines_rear >= 3 && delta < FAST_LOCALIZATION_INACCURACY)
                             {
                                 fast_state = FastState::SECOND_FAST;
                                 odometry.reset_local(true);
@@ -1045,7 +1046,7 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
-                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            if (num_lines_rear >= 2 && num_lines_front < 3 && delta < FAST_LOCALIZATION_INACCURACY)
                             {
                                 fast_state = FastState::SECOND_SLOW;
                                 odometry.reset_local(true);
@@ -1059,7 +1060,7 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            if (num_lines_front >= 3 && num_lines_rear >= 3 && delta < FAST_LOCALIZATION_INACCURACY)
                             {
                                 fast_state = FastState::THIRD_FAST;
                                 odometry.reset_local(true);
@@ -1143,8 +1144,8 @@ namespace jlb
                             }
 #endif
 
-                            if (num_lines >= 3 &&
-                                (delta < LOCALIZATION_INACCURACY || overtake_time > OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME +
+                            if (num_lines_rear >= 2 && num_lines_front < 3 &&
+                                (delta < FAST_LOCALIZATION_INACCURACY || overtake_time > OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME +
                                                                                         OVERTAKE_FIRST_RIGHT_TIME + OVERTAKE_SECOND_FORWARD_TIME +
                                                                                         OVERTAKE_SECOND_RIGHT_TIME + OVERTAKE_SECOND_LEFT_TIME))
                             {
@@ -1161,7 +1162,7 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            if (num_lines_front >= 3 && num_lines_rear >= 3 && delta < FAST_LOCALIZATION_INACCURACY)
                             {
                                 fast_state = FastState::FOURTH_FAST;
                                 odometry.reset_local(true);
@@ -1175,7 +1176,7 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
-                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            if (num_lines_rear >= 2 && num_lines_front < 3 && delta < FAST_LOCALIZATION_INACCURACY)
                             {
                                 fast_state = FastState::FOURTH_SLOW;
                                 odometry.reset_local(true);
@@ -1189,7 +1190,7 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (num_lines >= 3 && delta < LOCALIZATION_INACCURACY)
+                            if (num_lines_front >= 3 && num_lines_rear >= 3 && delta < FAST_LOCALIZATION_INACCURACY)
                             {
                                 fast_state = FastState::FIRST_FAST;
                                 odometry.reset_local(true);
@@ -1211,12 +1212,12 @@ namespace jlb
                     {
                         case FastState::IN_ACCEL_ZONE:
                         {
-                            if (num_lines == 1u && !started_state_transition)
+                            if (num_lines_front == 1u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (num_lines != 1u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines_front != 1u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {
@@ -1230,12 +1231,12 @@ namespace jlb
                         }
                         case FastState::OUT_ACCEL_ZONE:
                         {
-                            if (num_lines == 3u && !started_state_transition)
+                            if (num_lines_front == 3u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (num_lines != 3u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines_front != 3u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {
@@ -1249,12 +1250,12 @@ namespace jlb
                         }
                         case FastState::IN_BRAKE_ZONE:
                         {
-                            if (num_lines == 1u && !started_state_transition)
+                            if (num_lines_front == 1u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (num_lines != 1u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines_front != 1u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {
@@ -1268,12 +1269,12 @@ namespace jlb
                         }
                         case FastState::OUT_BRAKE_ZONE:
                         {
-                            if (num_lines == 3u && !started_state_transition)
+                            if (num_lines_front == 3u && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
-                            else if (num_lines != 3u && started_state_transition) { started_state_transition = false; }
+                            else if (num_lines_front != 3u && started_state_transition) { started_state_transition = false; }
 
                             if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
                             {

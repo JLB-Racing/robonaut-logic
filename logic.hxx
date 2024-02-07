@@ -144,7 +144,7 @@ namespace jlb
                             return ControlSignal{target_angle, target_speed};
                         }
                         else if ((as_state.overtake_time > OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME &&
-                                  as_state.num_lines > 0))
+                                  as_state.num_lines_front > 0))
                         {
                             auto [target_angle, target_speed] = controller.update(false, false);
                             return ControlSignal{target_angle, target_speed};
@@ -157,7 +157,7 @@ namespace jlb
                     }
                     else
                     {
-                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, false);
+                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, !as_state.safety_car);
                         return ControlSignal{target_angle, target_speed};
                     }
 
@@ -194,11 +194,12 @@ namespace jlb
 
         void set_detection_front(bool *detection_front_, std::vector<float> line_positions_front_)
         {
-            as_state.num_lines = static_cast<uint8_t>(line_positions_front_.size());
+            as_state.num_lines_front = static_cast<uint8_t>(line_positions_front_.size());
             controller.set_detection_front(detection_front_, line_positions_front_);
         }
         void set_detection_rear(bool *detection_rear_, std::vector<float> line_positions_rear_)
         {
+            as_state.num_lines_rear = static_cast<uint8_t>(line_positions_rear_.size());
             controller.set_detection_rear(detection_rear_, line_positions_rear_);
         }
         void set_under_gate(const bool under_gate_) { as_state.under_gate = under_gate_; }
@@ -223,29 +224,32 @@ namespace jlb
             as_state.flood = flood_;
         }
         Odom get_odometry() { return {odometry.vx_t, odometry.x_t, odometry.y_t, odometry.theta_t, odometry.distance_local}; }
-        void start_signal()
+        void start_signal(bool fast = false)
         {
-#if defined(TEST_FAST) || defined(TEST_REVERSE)
-            if (as_state.mission == Mission::STANDBY)
-            {
-                as_state.prev_mission    = Mission::LABYRINTH;
-                as_state.mission         = Mission::FAST;
-                as_state.target_distance = FIRST_FAST_DIST;
-            }
-#else
+			if(fast)
+			{
+				if (as_state.mission == Mission::STANDBY)
+				{
+					as_state.prev_mission    = Mission::LABYRINTH;
+					as_state.mission         = Mission::FAST;
+					as_state.target_distance = FIRST_FAST_DIST;
+				}
+			}
+			else
+			{
 #ifdef TEST_MISSION_SWITCH
-            if (as_state.mission == Mission::STANDBY)
-            {
-                as_state.mission         = Mission::LABYRINTH;
-                as_state.labyrinth_state = LabyrinthState::FINISHED;
-                as_state.target_distance = 2.5774f;
-                as_state.selected_edge   = 3;
-            }
+				if (as_state.mission == Mission::STANDBY)
+				{
+					as_state.mission         = Mission::LABYRINTH;
+					as_state.labyrinth_state = LabyrinthState::FINISHED;
+					as_state.target_distance = 2.5774f;
+					as_state.selected_edge   = 3;
+				}
 
 #else
-            if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
+				if (as_state.mission == Mission::STANDBY) { as_state.mission = Mission::LABYRINTH; }
 #endif
-#endif
+			}
         }
         void reset_signal(const CompositeState state_)
         {

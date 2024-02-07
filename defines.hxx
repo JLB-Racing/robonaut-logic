@@ -7,13 +7,11 @@
 //
 
 #define Q2
-#define Q3
-#define SIMULATION
+//#define SIMULATION
 // #define OVERTAKE
-#define TEST_FAST
 // #define TEST_REVERSE
 // #define TEST_MISSION_SWITCH
-// #define FAST_V0
+#define FAST_V0
 
 ///////////////////////////////////////////////////////////////////////////
 //

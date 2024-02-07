@@ -186,13 +186,13 @@ namespace jlb
                 damping = DAMPING_REVERSE;
             }
 #ifndef FAST_V0
-            else if ((current_velocity < (FAST_SPEED_TURN[current_lap] + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
+            if ((current_velocity < (FAST_SPEED_TURN[current_lap] + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
 			{
 				damping = DAMPING_TURN;
 				d5      = D5_MIN;
 			}
 #else
-            else if ((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
+            if ((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
 			{
 				damping = DAMPING_TURN;
 				d5      = D5_MIN;
@@ -201,7 +201,7 @@ namespace jlb
 #else
             float d5 = OFFSET + SLOPE * std::fabs(current_velocity);
 #endif
-            // if ((d5 < D5_MIN) || std::isnan(d5)) d5 = D5_MIN;
+            if ((d5 < D5_MIN) || std::isnan(d5)) d5 = D5_MIN;
             float               t5  = d5 / std::fabs(current_velocity);
             float               T   = t5 / 3.0f * damping;
             float               wp  = (1.0f / T) * sqrt(1.0f - damping * damping);

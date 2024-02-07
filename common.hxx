@@ -21,6 +21,7 @@ namespace jlb
     PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
     PARAM float STATE_MIN_TIME              = 0.5f;
     PARAM float LOCALIZATION_INACCURACY     = 0.1f;  // m
+    PARAM float FAST_LOCALIZATION_INACCURACY= 0.25f;  // m
     PARAM float LOCALIZATION_FALLBACK       = 0.0f;  // m
     PARAM float WEIGHT_PENALTY              = 1000.0f;
     PARAM float SAFETY_MARGIN               = 1.0f;
@@ -87,8 +88,8 @@ namespace jlb
     PARAM float OFFSET             = -4.625f;
     PARAM float SLOPE              = 3.5f;
     PARAM float DAMPING            = 0.95f;
-    PARAM float DAMPING_TURN       = 0.85f;
-    PARAM float D5_MIN             = 1.50f;
+    PARAM float DAMPING_TURN       = 0.87f;
+    PARAM float D5_MIN             = 2.0f;
     PARAM float OFFSET_EXP1        = 4.4f;
     PARAM float OFFSET_EXP2        = -1.38f;
     PARAM float D5_REVERSE         = 1.50f;
@@ -111,16 +112,16 @@ namespace jlb
     PARAM float FAST_SPEED_TURN = 1.2f;  // m/s
 #else
     PARAM float FAST_SPEED[6]      = {3.5f, 3.5f, 3.5f, 3.5f, 3.5f, 3.5f};  // m/s
-    PARAM float FAST_SPEED_TURN[6] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // m/s
+    PARAM float FAST_SPEED_TURN[6] = {1.20f, 1.20f, 1.20f, 1.20f, 1.20f, 1.20f};  // m/s
 #endif
     PARAM float FAST_SPEED_OVERTAKE        = 2.0f;   // m/s
     PARAM float FAST_SPEED_OVERTAKE_TURN   = 1.25f;  // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR      = 1.2f;   // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR_TURN = 0.8f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR      = 1.5f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR_TURN = 0.9f;   // m/s
     PARAM float LOW_SPEED_EPSILON          = 0.20f;  // m/s
 
     PARAM float SAFETY_CAR_THRESHOLD         = 1.50f;  // m
-    PARAM float SAFETY_CAR_TIMEOUT           = 2.0f;   // s
+    PARAM float SAFETY_CAR_TIMEOUT           = 1.5f;   // s
     PARAM float CROSS_SECTION_THRESHOLD      = 0.20f;  // %/100
     PARAM float OVERTAKE_FIRST_FORWARD_TIME  = 0.5f;   // s
     PARAM float OVERTAKE_FIRST_LEFT_TIME     = 0.6f;   // s
