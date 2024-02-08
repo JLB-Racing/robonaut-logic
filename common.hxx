@@ -18,14 +18,14 @@ namespace jlb
     //
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
-    PARAM float STATE_MIN_TIME              = 0.5f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.1f;  // m
-    PARAM float FAST_LOCALIZATION_INACCURACY= 0.25f;  // m
-    PARAM float LOCALIZATION_FALLBACK       = 0.0f;  // m
-    PARAM float WEIGHT_PENALTY              = 1000.0f;
-    PARAM float SAFETY_MARGIN               = 1.0f;
-    PARAM float FAST_DISCOUNT               = 0.6f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT  = 0.0f;
+    PARAM float STATE_MIN_TIME               = 0.5f;
+    PARAM float LOCALIZATION_INACCURACY      = 0.1f;   // m
+    PARAM float FAST_LOCALIZATION_INACCURACY = 0.25f;  // m
+    PARAM float LOCALIZATION_FALLBACK        = 0.0f;   // m
+    PARAM float WEIGHT_PENALTY               = 1000.0f;
+    PARAM float SAFETY_MARGIN                = 1.0f;
+    PARAM float FAST_DISCOUNT                = 0.6f;
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -111,7 +111,7 @@ namespace jlb
     PARAM float FAST_SPEED      = 5.0f;  // m/s
     PARAM float FAST_SPEED_TURN = 1.2f;  // m/s
 #else
-    PARAM float FAST_SPEED[6]      = {3.5f, 3.5f, 3.5f, 3.5f, 3.5f, 3.5f};  // m/s
+    PARAM float FAST_SPEED[6]      = {3.5f, 3.5f, 3.5f, 3.5f, 3.5f, 3.5f};        // m/s
     PARAM float FAST_SPEED_TURN[6] = {1.20f, 1.20f, 1.20f, 1.20f, 1.20f, 1.20f};  // m/s
 #endif
     PARAM float FAST_SPEED_OVERTAKE        = 2.0f;   // m/s
@@ -147,13 +147,14 @@ namespace jlb
     //
 
     /* AS STATE MACHINE*/
-    PARAM float STATE_TRANSITION_TIME_LIMIT = 0.0f;
-    PARAM float STATE_MIN_TIME              = 0.25f;
-    PARAM float LOCALIZATION_INACCURACY     = 0.2f;  // m
-    PARAM float LOCALIZATION_FALLBACK       = 0.0f;  // m
-    PARAM float WEIGHT_PENALTY              = 1000.0f;
-    PARAM float SAFETY_MARGIN               = 1.0f;
-    PARAM float FAST_DISCOUNT               = 0.6f;
+    PARAM float STATE_TRANSITION_TIME_LIMIT  = 0.0f;
+    PARAM float STATE_MIN_TIME               = 0.25f;
+    PARAM float LOCALIZATION_INACCURACY      = 0.2f;  // m
+    PARAM float FAST_LOCALIZATION_INACCURACY = 1.0f;  // m
+    PARAM float LOCALIZATION_FALLBACK        = 0.0f;  // m
+    PARAM float WEIGHT_PENALTY               = 1000.0f;
+    PARAM float SAFETY_MARGIN                = 1.0f;
+    PARAM float FAST_DISCOUNT                = 0.6f;
 
     ///////////////////////////////////////////////////////////////////////////
     //

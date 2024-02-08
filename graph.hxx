@@ -58,8 +58,8 @@ namespace jlb
                 weight += 1.5f * WEIGHT_PENALTY * (1 - pirate_section_percentage);
             }
             else if (to == pirate_after_next_node) { weight += WEIGHT_PENALTY; }
-            else if (from == pirate_after_next_node) { weight += WEIGHT_PENALTY * pirate_section_percentage; }
-
+            // else if (from == pirate_after_next_node) { weight += WEIGHT_PENALTY * pirate_section_percentage; }
+            else if (from == pirate_after_next_node) { weight += WEIGHT_PENALTY; }
             // FLOOD
             if (!flood && from != BALANCER_END_NODE && to == BALANCER_START_NODE) { weight = std::numeric_limits<float>::infinity(); }
 
