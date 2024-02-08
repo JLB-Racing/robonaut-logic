@@ -130,12 +130,19 @@ namespace jlb
                     auto [target_angle, target_speed] = controller.update(as_state.follow_car, true);
                     return ControlSignal{target_angle, target_speed};
 #endif
-                    if (fast_state == FastState::FIRST_SLOW || fast_state == FastState::SECOND_SLOW || fast_state == FastState::THIRD_SLOW ||
-                        fast_state == FastState::FOURTH_SLOW)
-                    {
-                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, false);
-                        return ControlSignal{target_angle, target_speed};
-                    }
+                    controller.set_direction(Direction::STRAIGHT);
+                    /*if ((fast_state == FastState::FIRST_SLOW || fast_state == FastState::SECOND_SLOW || fast_state == FastState::THIRD_SLOW ||
+                                               fast_state == FastState::FOURTH_SLOW))
+				   {
+					   controller.set_direction(Direction::RIGHT);
+				   }*/
+
+                    if ((fast_state == FastState::FIRST_SLOW || fast_state == FastState::SECOND_SLOW || fast_state == FastState::THIRD_SLOW ||
+                                                fast_state == FastState::FOURTH_SLOW) && as_state.section_ended)
+					{
+						auto [target_angle, target_speed] = controller.update(as_state.safety_car, false);
+						return ControlSignal{target_angle, target_speed};
+					}
                     else if (fast_state == FastState::THIRD_FAST && as_state.overtake_started)
                     {
                         if (as_state.overtake_time < OVERTAKE_FIRST_FORWARD_TIME)
@@ -157,7 +164,7 @@ namespace jlb
                     }
                     else
                     {
-                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, !as_state.safety_car);
+                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, true);
                         return ControlSignal{target_angle, target_speed};
                     }
 

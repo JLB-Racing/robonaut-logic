@@ -38,9 +38,9 @@ namespace jlb
     PARAM Direction START_DIRECTION   = Direction::RIGHT;
 
 #ifndef SIMULATION
-    PARAM float     MISSION_SWITCH_MIN_FORWARD_DIST    = 1.2f;   // m
-    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.3f;   // m
-    PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 0.3f;   // m
+    PARAM float     MISSION_SWITCH_MIN_FORWARD_DIST    = 0.4f;   // m
+    PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.6f;   // m
+    PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 1.2f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
     PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.5f;   // m
     PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::RIGHT;

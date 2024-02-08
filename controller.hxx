@@ -115,7 +115,7 @@ namespace jlb
                     }
                 }
 
-                if (passed_half) { tmp = std::fabs(line_positions[0]) < std::fabs(line_positions[1]) ? line_positions[0] : line_positions[1]; }
+                //if (passed_half) { tmp = std::fabs(line_positions[0]) < std::fabs(line_positions[1]) ? line_positions[0] : line_positions[1]; }
                 return tmp;
             }
             else if (line_positions.size() == 3)
@@ -138,28 +138,28 @@ namespace jlb
                         return 0.0f;
                 }
             }
-            /*else if (line_positions.size() == 4)
+            else if (line_positions.size() == 4)
             {
-                // switch (direction)
-                // {
-                //     case Direction::LEFT:
-                //     {
-                //         return line_positions[0];
-                //     }
-                //     case Direction::STRAIGHT:
-                //     {
-                //         return line_positions[1] + line_positions[2] / 2.0f;
-                //     }
-                //     case Direction::RIGHT:
-                //     {
-                //         return line_positions[3];
-                //     }
-                //     default:
-                //         return 0.0f;
-                // }
+                switch (direction)
+                {
+                    case Direction::LEFT:
+                    {
+                        return line_positions[0];
+                    }
+                    case Direction::STRAIGHT:
+                    {
+                        return line_positions[1] + line_positions[2] / 2.0f;
+                    }
+                    case Direction::RIGHT:
+                    {
+                        return line_positions[3];
+                    }
+                    default:
+                        return 0.0f;
+                }
 
-                return line_positions[1] + line_positions[2] / 2.0f;
-            }*/
+                //return line_positions[1] + line_positions[2] / 2.0f;
+            }
             else if(line_positions.size() > 5)
             {
             	return 0.0f;

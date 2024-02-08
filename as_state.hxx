@@ -15,7 +15,7 @@ namespace jlb
     struct CompositeState
     {
         Mission            mission              = Mission::STANDBY;
-        LabyrinthState     labyrinth_state      = LabyrinthState::START;
+        LabyrinthState     labyrinth_state      = LabyrinthState::EXPLORING;
         MissionSwitchState mission_switch_state = MissionSwitchState::STANDBY;
 
 #ifdef FAST_V0
@@ -28,7 +28,7 @@ namespace jlb
 
         CompositeState(FastState fast_state_)
             : mission{Mission::FAST},
-              labyrinth_state{LabyrinthState::START},
+              labyrinth_state{LabyrinthState::EXPLORING},
               mission_switch_state{MissionSwitchState::STANDBY},
               fast_state{fast_state_},
               target_speed{0.0f}
@@ -58,8 +58,8 @@ namespace jlb
     public:
         Mission            prev_mission         = Mission::STANDBY;
         Mission            mission              = Mission::STANDBY;
-        LabyrinthState     labyrinth_state      = LabyrinthState::START;
-        LabyrinthState     prev_labyrinth_state = LabyrinthState::START;
+        LabyrinthState     labyrinth_state      = LabyrinthState::EXPLORING;
+        LabyrinthState     prev_labyrinth_state = LabyrinthState::EXPLORING;
         MissionSwitchState mission_switch_state = MissionSwitchState::STANDBY;
 #ifdef FAST_V0
         FastState fast_state = FastState::OUT_ACCEL_ZONE;
@@ -88,8 +88,8 @@ namespace jlb
         char next_node = START_GATE;
         char goal_node = START_GATE;
 #endif
-        unsigned long selected_edge   = 0u;
-        float         target_distance = 0.0f;
+        unsigned long selected_edge   = 1u;
+        float         target_distance = 1.98f;
 
         Direction reverse_saved_dir = Direction::STRAIGHT;
 
@@ -705,7 +705,7 @@ namespace jlb
                     bool at_decision_point = under_gate || at_cross_section;
 
 #ifndef SIMULATION
-                    if ((!prev_at_decision_point && at_decision_point) || delta < LOCALIZATION_FALLBACK ||
+                    if (at_decision_point || delta < LOCALIZATION_FALLBACK ||
                         (labyrinth_state == LabyrinthState::REVERSE_ESCAPE && at_decision_point) ||
                         (labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER && next_node == BALANCER_START_NODE) ||
                         (labyrinth_state == LabyrinthState::FLOOD_SOLVING && next_node == BALANCER_END_NODE) ||
@@ -724,11 +724,6 @@ namespace jlb
                         bool decide = false;
                         switch (labyrinth_state)
                         {
-                            case LabyrinthState::START:
-                            {
-                                decide = true;
-                                break;
-                            }
                             case LabyrinthState::FLOOD_TO_BALANCER:
                             {
                                 if (next_node == BALANCER_START_NODE && delta < 0.01f) { decide = true; }
@@ -759,13 +754,6 @@ namespace jlb
 
                         if (decide)
                         {
-                            if (labyrinth_state == LabyrinthState::START)
-                            {
-                                prev_labyrinth_state    = labyrinth_state;
-                                labyrinth_state         = LabyrinthState::EXPLORING;
-                                odometry.distance_local = 0.0f;
-                            }
-
                             at_node = next_node;
 
                             // std::cout << "prev: " << previous_node << " at: " << at_node << " next: " << next_node << " goal: " << goal_node << " "
@@ -956,8 +944,7 @@ namespace jlb
                         else { target_speed = -LABYRINTH_SPEED_REVERSE; }
                     }
                     else if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
-                             labyrinth_state == LabyrinthState::ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER ||
-                             labyrinth_state == LabyrinthState::START)
+                             labyrinth_state == LabyrinthState::ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER)
                     {
                         if (graph[at_node].edges[selected_edge].fast && target_speed == LABYRINTH_SPEED_FAST) { target_speed = LABYRINTH_SPEED_FAST; }
                         else if (graph[at_node].edges[selected_edge].fast && target_speed == LABYRINTH_SPEED && odometry.distance_local > 0.2f)
@@ -999,11 +986,18 @@ namespace jlb
                     //
                     //      WHEN CAN WE SEE THE SAFETY CAR
                     //
+#ifdef OVERTAKE
                     if (safety_car_distance < SAFETY_CAR_THRESHOLD && (safety_car || (completed_laps == 2u && fast_state == FastState::FIRST_FAST) ||
-                                                                       (completed_laps == 2u && fast_state == FastState::THIRD_FAST)))
-                    {
-                        safety_car_time = 0.0;
-                    }
+                                                                                           (completed_laps == 2u && fast_state == FastState::THIRD_FAST)))
+					{
+						safety_car_time = 0.0;
+					}
+#else
+                    if (safety_car_distance < SAFETY_CAR_THRESHOLD && (safety_car || completed_laps == 0u || completed_laps == 1u))
+					{
+						safety_car_time = 0.0;
+					}
+#endif
 
                     ///////////////////////////////////////////////////////////////////////////
                     //
@@ -1017,13 +1011,41 @@ namespace jlb
                     //
                     //      WHEN WE SURE SEE THE SAFETY CAR
                     //
-                    if (completed_laps == 0u && (fast_state == FastState::FIRST_FAST || fast_state == FastState::FIRST_SLOW ||
-                                                 fast_state == FastState::SECOND_FAST || fast_state == FastState::SECOND_SLOW))
-                    {
-                        safety_car = true;
-                    }
 
+
+#ifdef OVERTAKE
+                    if (completed_laps == 0u && (fast_state == FastState::FIRST_FAST || fast_state == FastState::FIRST_SLOW ||
+                                                                     fast_state == FastState::SECOND_FAST || fast_state == FastState::SECOND_SLOW))
+					{
+						safety_car = true;
+					}
+#else
+                    if (completed_laps == 0u || completed_laps == 1u)
+					{
+						safety_car = true;
+					}
+#endif
+
+                    //safety_car = false;
                     follow_car = safety_car;
+
+                    float STATE_MIN_TIME_USED = 0.5f;
+
+                    if(safety_car)
+                    {
+                    	STATE_MIN_TIME_USED = SAFETY_CAR_STATE_MIN_TIME;
+                    }
+                    else if(fast_state == FastState::FIRST_FAST || fast_state == FastState::SECOND_FAST || fast_state == FastState::THIRD_FAST || fast_state == FastState::FOURTH_FAST)
+                    {
+                    	STATE_MIN_TIME_USED = STATE_MIN_TIME;
+                    }
+                    else if(fast_state == FastState::FIRST_SLOW || fast_state == FastState::FOURTH_SLOW)
+					{
+						STATE_MIN_TIME_USED = STATE_MIN_TIME_TURN;
+					}else if(fast_state == FastState::SECOND_SLOW || fast_state == FastState::THIRD_SLOW)
+					{
+						STATE_MIN_TIME_USED = STATE_MIN_TIME_TURN_LONG;
+					}
 
                     ///////////////////////////////////////////////////////////////////////////
                     //
@@ -1038,9 +1060,9 @@ namespace jlb
                             else if (completed_laps == 6u) { target_speed = FAST_SPEED[completed_laps - 1]; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
-                            if (state_time > STATE_MIN_TIME && num_lines_front == 1) { section_ended = true; }
+                            if (!section_ended && state_time > STATE_MIN_TIME_USED && (num_lines_front == 1)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 && ((section_ended && state_time > 2.0f * STATE_MIN_TIME) || prev_mission == Mission::LABYRINTH))
+                            if ((num_lines_front >= 3 || num_lines_rear >= 3) && ((section_ended && state_time > STATE_MIN_TIME_USED) || prev_mission == Mission::LABYRINTH))
                             {
                                 if (prev_mission == Mission::LABYRINTH) { prev_mission = Mission::FAST; }
                                 fast_state = FastState::FIRST_SLOW;
@@ -1059,9 +1081,9 @@ namespace jlb
                             else if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (state_time > STATE_MIN_TIME && num_lines_front == 1) { section_ended = true; }
+                            if (!section_ended && state_time > STATE_MIN_TIME_USED && (num_lines_front == 1)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 && section_ended && state_time > 2.0f * STATE_MIN_TIME)
+                            if ((num_lines_rear >= 3) && section_ended && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::SECOND_FAST;
                                 odometry.reset_local(true);
@@ -1077,9 +1099,9 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
-                            if (state_time > STATE_MIN_TIME && num_lines_front == 1) { section_ended = true; }
+                            if (!section_ended && state_time > STATE_MIN_TIME_USED && (num_lines_front == 1)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 && section_ended && state_time > 2.0f * STATE_MIN_TIME)
+                            if ((num_lines_front >= 3 || num_lines_rear >= 3) && section_ended && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::SECOND_SLOW;
                                 odometry.reset_local(true);
@@ -1095,9 +1117,9 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (state_time > STATE_MIN_TIME && num_lines_front == 1) { section_ended = true; }
+                            if (!section_ended && state_time > STATE_MIN_TIME_USED && (num_lines_front == 1)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 && section_ended && state_time > 2.0f * STATE_MIN_TIME)
+                            if ((num_lines_rear >= 3) && section_ended && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::THIRD_FAST;
                                 odometry.reset_local(true);
@@ -1182,10 +1204,10 @@ namespace jlb
                                 overtake_time += dt;
                             }
 #endif
-                            if (state_time > STATE_MIN_TIME && (num_lines_front == 1 || num_lines_front == 0)) { section_ended = true; }
+                            if (state_time > STATE_MIN_TIME_USED && ((num_lines_front == 1) || num_lines_front == 0)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 &&
-                                ((section_ended && state_time > 2.0f * STATE_MIN_TIME) ||
+                            if ((num_lines_front >= 3 || num_lines_rear >= 3) &&
+                                ((section_ended && state_time > STATE_MIN_TIME_USED) ||
                                  overtake_time > OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME +
                                                      OVERTAKE_SECOND_FORWARD_TIME + OVERTAKE_SECOND_RIGHT_TIME + OVERTAKE_SECOND_LEFT_TIME))
                             {
@@ -1204,9 +1226,9 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (state_time > STATE_MIN_TIME && num_lines_front == 1) { section_ended = true; }
+                            if (!section_ended && state_time > STATE_MIN_TIME_USED && (num_lines_front == 1)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 && section_ended && state_time > 2.0f * STATE_MIN_TIME)
+                            if ((num_lines_rear >= 3) && section_ended && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::FOURTH_FAST;
                                 odometry.reset_local(true);
@@ -1222,9 +1244,9 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 
-                            if (state_time > STATE_MIN_TIME && num_lines_front == 1) { section_ended = true; }
+                            if (!section_ended && state_time > STATE_MIN_TIME_USED && (num_lines_front == 1)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 && section_ended && state_time > 2.0f * STATE_MIN_TIME)
+                            if ((num_lines_front >= 3 || num_lines_rear >= 3) && section_ended && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::FOURTH_SLOW;
                                 odometry.reset_local(true);
@@ -1240,9 +1262,9 @@ namespace jlb
                             if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR_TURN; }
                             else { target_speed = FAST_SPEED_TURN[completed_laps]; }
 
-                            if (state_time > STATE_MIN_TIME && num_lines_front == 1) { section_ended = true; }
+                            if (!section_ended && state_time > STATE_MIN_TIME_USED && (num_lines_front == 1)) { section_ended = true; state_time  = 0.0f; }
 
-                            if (num_lines_front >= 3 && section_ended && state_time > 2.0f * STATE_MIN_TIME)
+                            if ((num_lines_rear >= 3) && section_ended && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::FIRST_FAST;
                                 odometry.reset_local(true);
@@ -1266,14 +1288,14 @@ namespace jlb
                     {
                         case FastState::IN_ACCEL_ZONE:
                         {
-                            if (num_lines_front == 1u && !started_state_transition)
+                            if ((num_lines_front == 1) && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
                             else if (num_lines_front != 1u && started_state_transition) { started_state_transition = false; }
 
-                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
+                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::OUT_ACCEL_ZONE;
                                 state_time = 0.0f;
@@ -1292,7 +1314,7 @@ namespace jlb
                             }
                             else if (num_lines_front != 3u && started_state_transition) { started_state_transition = false; }
 
-                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
+                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::IN_BRAKE_ZONE;
                                 state_time = 0.0f;
@@ -1304,14 +1326,14 @@ namespace jlb
                         }
                         case FastState::IN_BRAKE_ZONE:
                         {
-                            if (num_lines_front == 1u && !started_state_transition)
+                            if ((num_lines_front == 1) && !started_state_transition)
                             {
                                 started_state_transition = true;
                                 state_transition_time    = 0.0f;
                             }
                             else if (num_lines_front != 1u && started_state_transition) { started_state_transition = false; }
 
-                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
+                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::OUT_BRAKE_ZONE;
                                 state_time = 0.0f;
@@ -1330,7 +1352,7 @@ namespace jlb
                             }
                             else if (num_lines_front != 3u && started_state_transition) { started_state_transition = false; }
 
-                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME)
+                            if (started_state_transition && state_transition_time > STATE_TRANSITION_TIME_LIMIT && state_time > STATE_MIN_TIME_USED)
                             {
                                 fast_state = FastState::IN_ACCEL_ZONE;
                                 state_time = 0.0f;

@@ -19,7 +19,10 @@ namespace jlb
 
     /* AS STATE MACHINE*/
     PARAM float STATE_TRANSITION_TIME_LIMIT  = 0.0f;
-    PARAM float STATE_MIN_TIME               = 0.5f;
+    PARAM float STATE_MIN_TIME               = 0.25f;
+    PARAM float STATE_MIN_TIME_TURN          = 1.0f;
+    PARAM float STATE_MIN_TIME_TURN_LONG     = 1.5f;
+    PARAM float SAFETY_CAR_STATE_MIN_TIME 	 = 2.0f;
     PARAM float LOCALIZATION_INACCURACY      = 0.1f;   // m
     PARAM float FAST_LOCALIZATION_INACCURACY = 0.25f;  // m
     PARAM float LOCALIZATION_FALLBACK        = 0.0f;   // m
@@ -74,9 +77,9 @@ namespace jlb
     /* LATERAL PID CONTROLLER PARAMETERS */
     namespace lat
     {
-        PARAM float kP                      = 4.275f;  // 5.0f;
-        PARAM float kI                      = 0.0f;    // 0.25 f;
-        PARAM float kD                      = 4.75f;   // 5.7f;
+        PARAM float kP                      = 4.275f;
+        PARAM float kI                      = 0.0f;
+        PARAM float kD                      = 4.75f;
         PARAM float TAU                     = 0.05f;
         PARAM float T                       = 0.01f;
         PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
@@ -100,8 +103,8 @@ namespace jlb
     PARAM float MAX_DECELERATION = 6.5f;  // m/s^2
 
     /* LATERAL CONTROLLER PARAMETERS */
-    PARAM float LABYRINTH_SPEED         = 1.0f;   // m/s
-    PARAM float LABYRINTH_SPEED_FAST    = 1.5f;   // m/s
+    PARAM float LABYRINTH_SPEED         = 0.8f;   // m/s
+    PARAM float LABYRINTH_SPEED_FAST    = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
     PARAM float BALANCER_SPEED          = 1.5f;   // m/s
     PARAM float BALANCER_SPEED_REVERSE  = 0.4f;   // m/s
@@ -111,17 +114,17 @@ namespace jlb
     PARAM float FAST_SPEED      = 5.0f;  // m/s
     PARAM float FAST_SPEED_TURN = 1.2f;  // m/s
 #else
-    PARAM float FAST_SPEED[6]      = {3.5f, 3.5f, 3.5f, 3.5f, 3.5f, 3.5f};        // m/s
-    PARAM float FAST_SPEED_TURN[6] = {1.20f, 1.20f, 1.20f, 1.20f, 1.20f, 1.20f};  // m/s
+    PARAM float FAST_SPEED[6]      = {4.0f, 4.0f, 4.0f, 4.5f, 5.0f, 5.5f};        // m/s
+    PARAM float FAST_SPEED_TURN[6] = {1.40f, 1.20f, 1.20f, 1.20f, 1.20f, 1.20f};  // m/s
 #endif
     PARAM float FAST_SPEED_OVERTAKE        = 2.0f;   // m/s
     PARAM float FAST_SPEED_OVERTAKE_TURN   = 1.25f;  // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR      = 1.5f;   // m/s
-    PARAM float FAST_SPEED_SAFETY_CAR_TURN = 0.9f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR      = 1.75f;   // m/s
+    PARAM float FAST_SPEED_SAFETY_CAR_TURN = 1.0f;   // m/s
     PARAM float LOW_SPEED_EPSILON          = 0.20f;  // m/s
 
     PARAM float SAFETY_CAR_THRESHOLD         = 1.50f;  // m
-    PARAM float SAFETY_CAR_TIMEOUT           = 1.5f;   // s
+    PARAM float SAFETY_CAR_TIMEOUT           = 2.0f;   // s
     PARAM float CROSS_SECTION_THRESHOLD      = 0.20f;  // %/100
     PARAM float OVERTAKE_FIRST_FORWARD_TIME  = 0.5f;   // s
     PARAM float OVERTAKE_FIRST_LEFT_TIME     = 0.6f;   // s
