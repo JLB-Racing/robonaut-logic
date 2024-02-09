@@ -138,7 +138,7 @@ namespace jlb
 				   }*/
 
                     if ((fast_state == FastState::FIRST_SLOW || fast_state == FastState::SECOND_SLOW || fast_state == FastState::THIRD_SLOW ||
-                                                fast_state == FastState::FOURTH_SLOW) && as_state.section_ended)
+                                                fast_state == FastState::FOURTH_SLOW)) //&& as_state.section_ended
 					{
 						auto [target_angle, target_speed] = controller.update(as_state.safety_car, false);
 						return ControlSignal{target_angle, target_speed};

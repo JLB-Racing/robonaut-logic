@@ -483,7 +483,7 @@ namespace jlb
             // this->operator[]('P').add_edge('R', Direction::RIGHT, {'P'}, 2.41f, true);
             this->operator[]('Q').add_edge('M', Direction::STRAIGHT, {'V', 'X'}, 1.2f, true);
             this->operator[]('Q').add_edge('V', Direction::LEFT, {'M'}, 1.99f, false);
-            this->operator[]('Q').add_edge('X', Direction::RIGHT, {'M'}, 4.885f, true);
+            this->operator[]('Q').add_edge('X', Direction::RIGHT, {'M'}, 5.0f, true); //4.885f
             this->operator[]('R').add_edge('M', Direction::RIGHT, {'N', 'T'}, 1.98f, false);
             this->operator[]('R').add_edge('N', Direction::LEFT, {'M', 'P'}, 1.97f, false);
             this->operator[]('R').add_edge('T', Direction::RIGHT, {'M', 'P'}, 2.41f, true);
@@ -503,7 +503,7 @@ namespace jlb
             this->operator[]('W').add_edge('V', Direction::LEFT, {'O'}, 2.41f, true);
             this->operator[]('W').add_edge('S', Direction::RIGHT, {'O'}, 1.99f, false);
             this->operator[]('W').add_edge('O', Direction::STRAIGHT, {'S', 'V'}, 3.18f, true);
-            this->operator[]('X').add_edge('Q', Direction::LEFT, {'Y'}, 4.885f, true);
+            this->operator[]('X').add_edge('Q', Direction::LEFT, {'Y'}, 5.0f, true); //4.885f
             this->operator[]('X').add_edge('Y', Direction::STRAIGHT, {'Q'}, 2.100f, false);
             this->operator[]('Y').add_edge('X', Direction::STRAIGHT, {'Y'}, 2.100f, false);
 #else

@@ -1026,7 +1026,7 @@ namespace jlb
 					}
 #endif
 
-                    //safety_car = false;
+                    safety_car = false;
                     follow_car = safety_car;
 
                     float STATE_MIN_TIME_USED = 0.5f;

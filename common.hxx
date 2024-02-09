@@ -77,9 +77,9 @@ namespace jlb
     /* LATERAL PID CONTROLLER PARAMETERS */
     namespace lat
     {
-        PARAM float kP                      = 4.275f;
+        PARAM float kP                      = 6.0f;
         PARAM float kI                      = 0.0f;
-        PARAM float kD                      = 4.75f;
+        PARAM float kD                      = 2.0f;
         PARAM float TAU                     = 0.05f;
         PARAM float T                       = 0.01f;
         PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
@@ -106,7 +106,7 @@ namespace jlb
     PARAM float LABYRINTH_SPEED         = 0.8f;   // m/s
     PARAM float LABYRINTH_SPEED_FAST    = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
-    PARAM float BALANCER_SPEED          = 1.5f;   // m/s
+    PARAM float BALANCER_SPEED          = 1.0f;   // m/s
     PARAM float BALANCER_SPEED_REVERSE  = 0.4f;   // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.75f;  // m/s
 
@@ -115,7 +115,7 @@ namespace jlb
     PARAM float FAST_SPEED_TURN = 1.2f;  // m/s
 #else
     PARAM float FAST_SPEED[6]      = {4.0f, 4.0f, 4.0f, 4.5f, 5.0f, 5.5f};        // m/s
-    PARAM float FAST_SPEED_TURN[6] = {1.40f, 1.20f, 1.20f, 1.20f, 1.20f, 1.20f};  // m/s
+    PARAM float FAST_SPEED_TURN[6] = {1.20f, 1.20f, 1.20f, 1.20f, 1.20f, 1.20f};  // m/s
 #endif
     PARAM float FAST_SPEED_OVERTAKE        = 2.0f;   // m/s
     PARAM float FAST_SPEED_OVERTAKE_TURN   = 1.25f;  // m/s

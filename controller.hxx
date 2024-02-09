@@ -140,7 +140,7 @@ namespace jlb
             }
             else if (line_positions.size() == 4)
             {
-                switch (direction)
+                /*switch (direction)
                 {
                     case Direction::LEFT:
                     {
@@ -156,9 +156,9 @@ namespace jlb
                     }
                     default:
                         return 0.0f;
-                }
+                }*/
 
-                //return line_positions[1] + line_positions[2] / 2.0f;
+                return line_positions[1] + line_positions[2] / 2.0f;
             }
             else if(line_positions.size() > 5)
             {
