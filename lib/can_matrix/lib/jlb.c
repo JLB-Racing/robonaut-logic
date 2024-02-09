@@ -1057,6 +1057,7 @@ uint32_t Unpack_logic_5_jlb(logic_5_t* _m, const uint8_t* _d, uint8_t dlc_)
   _m->flood = (uint8_t) ( ((_d[3] >> 1U) & (0x01U)) );
   _m->collected_valid_gates = (uint8_t) ( ((_d[3] >> 2U) & (0x1FU)) );
   _m->collected_gates = (uint8_t) ( (_d[4] & (0x1FU)) );
+  _m->controller_type = (uint8_t) ( (_d[5] & (0xFFU)) );
 
 #ifdef JLB_USE_DIAG_MONITORS
   _m->mon1.dlc_error = (dlc_ < logic_5_DLC);
@@ -1080,6 +1081,7 @@ uint32_t Pack_logic_5_jlb(logic_5_t* _m, __CoderDbcCanFrame_t__* cframe)
   cframe->Data[2] |= (uint8_t) ( (_m->pirate_previous & (0xFFU)) );
   cframe->Data[3] |= (uint8_t) ( (_m->follow_car & (0x01U)) | ((_m->flood & (0x01U)) << 1U) | ((_m->collected_valid_gates & (0x1FU)) << 2U) );
   cframe->Data[4] |= (uint8_t) ( (_m->collected_gates & (0x1FU)) );
+  cframe->Data[5] |= (uint8_t) ( (_m->controller_type & (0xFFU)) );
 
   cframe->MsgId = (uint32_t) logic_5_CANID;
   cframe->DLC = (uint8_t) logic_5_DLC;
@@ -1098,6 +1100,7 @@ uint32_t Pack_logic_5_jlb(logic_5_t* _m, uint8_t* _d, uint8_t* _len, uint8_t* _i
   _d[2] |= (uint8_t) ( (_m->pirate_previous & (0xFFU)) );
   _d[3] |= (uint8_t) ( (_m->follow_car & (0x01U)) | ((_m->flood & (0x01U)) << 1U) | ((_m->collected_valid_gates & (0x1FU)) << 2U) );
   _d[4] |= (uint8_t) ( (_m->collected_gates & (0x1FU)) );
+  _d[5] |= (uint8_t) ( (_m->controller_type & (0xFFU)) );
 
   *_len = (uint8_t) logic_5_DLC;
   *_ide = (uint8_t) logic_5_IDE;

@@ -1091,6 +1091,8 @@ typedef struct
 
   uint8_t collected_gates : 5;               //      Bits= 5
 
+  uint8_t controller_type;                   //      Bits= 8
+
 #else
 
   uint8_t pirate_after_next;                 //      Bits= 8 Unit:'char'
@@ -1106,6 +1108,8 @@ typedef struct
   uint8_t collected_valid_gates;             //      Bits= 5
 
   uint8_t collected_gates;                   //      Bits= 5
+
+  uint8_t controller_type;                   //      Bits= 8
 
 #endif // JLB_USE_BITS_SIGNAL
 
