@@ -42,7 +42,7 @@ namespace jlb
     PARAM float     MISSION_SWITCH_FIRST_FORWARD_DIST  = 0.8f;   // m
     PARAM float     MISSION_SWITCH_SECOND_FORWARD_DIST = 1.2f;   // m
     PARAM float     MISSION_SWITCH_STEERING_ANGLE      = 22.5f;  // deg
-    PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.45f;   // m
+    PARAM float     MISSION_SWITCH_LATERAL_DIST        = 0.6f;   // m
     PARAM Direction MISSION_SWITCH_DIRECTION           = Direction::RIGHT;
 
     PARAM float FIRST_FAST_DIST  = 100.0f;  // m

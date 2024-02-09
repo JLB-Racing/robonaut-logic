@@ -37,6 +37,7 @@ BU_:
 
 
 BO_ 37 logic_5: 8 Vector__XXX
+ SG_ controller_type : 40|8@1+ (1,0) [0|255] "" Vector__XXX
  SG_ collected_valid_gates : 26|5@1+ (1,0) [0|31] "" Vector__XXX
  SG_ collected_gates : 32|5@1+ (1,0) [0|31] "" Vector__XXX
  SG_ flood : 25|1@1+ (1,0) [0|0] "" Vector__XXX

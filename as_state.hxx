@@ -1056,7 +1056,11 @@ namespace jlb
                         case FastState::FIRST_FAST:
                         {
                             target_distance = FIRST_FAST_DIST;
-                            if (prev_mission == Mission::LABYRINTH || safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
+                            if(prev_mission == Mission::LABYRINTH)
+                            {
+                            	target_speed = MISSION_SWITCH_SPEED;
+                            }
+                            else if (safety_car) { target_speed = FAST_SPEED_SAFETY_CAR; }
                             else if (completed_laps == 6u) { target_speed = FAST_SPEED[completed_laps - 1]; }
                             else { target_speed = FAST_SPEED[completed_laps]; }
 

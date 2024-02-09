@@ -74,12 +74,17 @@ namespace jlb
         PARAM float FOLLOW_DISTANCE         = 0.40f;
     }  // namespace obj
 
+    PARAM float kAng           = 1.25f;
+    PARAM float kDist          = 2.5f;
+    PARAM float kSoft          = 0.5f;
+    PARAM float kDamp          = 0.0f;
+
     /* LATERAL PID CONTROLLER PARAMETERS */
     namespace lat
     {
-        PARAM float kP                      = 6.0f;
+        PARAM float kP                      = 4.275f; //6.0
         PARAM float kI                      = 0.0f;
-        PARAM float kD                      = 2.0f;
+        PARAM float kD                      = 4.75f;	//2.0
         PARAM float TAU                     = 0.05f;
         PARAM float T                       = 0.01f;
         PARAM float LIM_MIN                 = -MAX_WHEEL_ANGLE;
@@ -90,13 +95,13 @@ namespace jlb
 
     PARAM float OFFSET             = -4.625f;
     PARAM float SLOPE              = 3.5f;
-    PARAM float DAMPING            = 0.95f;
+    PARAM float DAMPING            = 0.8f;
     PARAM float DAMPING_TURN       = 0.87f;
-    PARAM float D5_MIN             = 2.0f;
-    PARAM float OFFSET_EXP1        = 4.4f;
+    PARAM float D5_MIN             = 1.0f;
+    PARAM float OFFSET_EXP1        = 3.5f;
     PARAM float OFFSET_EXP2        = -1.38f;
-    PARAM float D5_REVERSE         = 1.50f;
-    PARAM float DAMPING_REVERSE    = 0.80f;
+    PARAM float D5_REVERSE         = 0.30f;
+    PARAM float DAMPING_REVERSE    = 0.5f;
     PARAM float MULTIPLIER_REVERSE = 1.55f;
 
     PARAM float MAX_ACCELERATION = 7.5f;  // m/s^2

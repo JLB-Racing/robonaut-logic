@@ -160,15 +160,16 @@ namespace jlb
 
                 return line_positions[1] + line_positions[2] / 2.0f;
             }
-            else if(line_positions.size() > 5)
+            else if(line_positions.size() >= 5)
             {
             	return 0.0f;
             }
             else
             {
-                float sum = 0.0f;
+                /*float sum = 0.0f;
                 for (auto &i : line_positions) { sum += i; }
-                return sum / line_positions.size();
+                return sum / line_positions.size();*/
+            	return 0.0f;
             }
         }
 
@@ -180,17 +181,17 @@ namespace jlb
 
 #ifndef SIMULATION
             float d5 = OFFSET_EXP1 + std::log2(std::fabs(current_velocity) + OFFSET_EXP2);
-            if (target_speed < 0.0f)
-            {
-                d5      = D5_REVERSE;
-                damping = DAMPING_REVERSE;
-            }
 #ifndef FAST_V0
             if ((current_velocity < (FAST_SPEED_TURN[current_lap] + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
 			{
 				damping = DAMPING_TURN;
 				d5      = D5_MIN;
 			}
+            if (target_speed < 0.0f)
+            {
+                d5      = D5_REVERSE;
+                damping = DAMPING_REVERSE;
+            }
 #else
             if ((current_velocity < (FAST_SPEED_TURN + LOW_SPEED_EPSILON)) || (current_velocity < (LABYRINTH_SPEED + LOW_SPEED_EPSILON)))
 			{
@@ -217,7 +218,9 @@ namespace jlb
             return {kP.real(), kDelta.real()};
         }
 
-        void lateral_control([[maybe_unused]] const float dt, [[maybe_unused]] bool state_space = false)
+        float stanley(const float cross_track_error, const float heading_error) { return kAng * heading_error + std::atan2(kDist * cross_track_error, kSoft + kDamp * current_velocity); }
+
+        void lateral_control([[maybe_unused]] const float dt, [[maybe_unused]] bool state_space = false, bool stanley_controller = false)
         {
             if (line_positions_front.size() != 0)
             {
@@ -248,7 +251,14 @@ namespace jlb
                 auto [kP, kDelta] = get_control_params();
                 target_angle      = -kP * cross_track_error - kDelta * heading_error;
             }
-            else { target_angle = -lateral_pid.update(0, cross_track_error, dt); }
+            else if(stanley_controller)
+            {
+                target_angle = stanley(cross_track_error, heading_error);
+            }
+            else
+            {
+            	target_angle = -lateral_pid.update(0, cross_track_error, dt);
+            }
 #else
             auto [kP, kDelta] = get_control_params();
             target_angle      = -kP * cross_track_error - kDelta * heading_error;
@@ -281,7 +291,7 @@ namespace jlb
             }
         }
 
-        ControlSignal update(bool follow_car = false, bool state_space = false)
+        ControlSignal update(bool follow_car = false, bool state_space = false, bool stanley = false)
         {
 #ifndef SIMULATION
             tick_counter_prev = tick_counter;

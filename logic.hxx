@@ -38,12 +38,12 @@ namespace jlb
                         if (mission_switch_state == MissionSwitchState::STANDBY)
                         {
                             controller.set_target_speed(0.0f);
-                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
                             return ControlSignal{target_angle, target_speed};
                         }
                         else if (mission_switch_state == MissionSwitchState::FIRST_FORWARD)
                         {
-                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
                             return ControlSignal{target_angle, target_speed};
                         }
                         else if (mission_switch_state == MissionSwitchState::FIRST_TURN)
@@ -55,11 +55,11 @@ namespace jlb
                             if (false)
 #endif
                             {
-                                auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                                auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
                                 return ControlSignal{target_angle, target_speed};
                             }
 
-                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
 
                             if (MISSION_SWITCH_DIRECTION == Direction::RIGHT)
                             {
@@ -74,7 +74,7 @@ namespace jlb
                         {
                             if (controller.line_positions_front.size() > 0)
                             {
-                                auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                                auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
                                 return ControlSignal{target_angle, target_speed};
                             }
 
@@ -91,7 +91,7 @@ namespace jlb
                         }
                         else if (mission_switch_state == MissionSwitchState::SECOND_FORWARD)
                         {
-                            auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                            auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
                             return ControlSignal{target_angle, target_speed};
                         }
                         else { return ControlSignal{0.0f, 0.0f}; }
@@ -104,19 +104,19 @@ namespace jlb
                     else if (labyrinth_state == LabyrinthState::STANDBY || labyrinth_state == LabyrinthState::ERROR)
                     {
                         controller.set_target_speed(0.0f);
-                        auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
 
                         return ControlSignal{target_angle, target_speed};
                     }
                     else if (labyrinth_state == LabyrinthState::REVERSE_ESCAPE || labyrinth_state == LabyrinthState::FLOOD_TO_LABYRINTH)
                     {
                         if (controller.target_speed < 0.0f && odometry.vx_t < 0.0f) { controller.swap_front_rear(); }
-                        auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car, true, false);
                         return ControlSignal{target_angle, target_speed};
                     }
                     else
                     {
-                        auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                        auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, true);
                         return ControlSignal{target_angle, target_speed};
                     }
                     break;
@@ -140,31 +140,31 @@ namespace jlb
                     if ((fast_state == FastState::FIRST_SLOW || fast_state == FastState::SECOND_SLOW || fast_state == FastState::THIRD_SLOW ||
                                                 fast_state == FastState::FOURTH_SLOW)) //&& as_state.section_ended
 					{
-						auto [target_angle, target_speed] = controller.update(as_state.safety_car, false);
+						auto [target_angle, target_speed] = controller.update(as_state.safety_car, false, false);
 						return ControlSignal{target_angle, target_speed};
 					}
                     else if (fast_state == FastState::THIRD_FAST && as_state.overtake_started)
                     {
                         if (as_state.overtake_time < OVERTAKE_FIRST_FORWARD_TIME)
                         {
-                            auto [target_angle, target_speed] = controller.update(true, false);
+                            auto [target_angle, target_speed] = controller.update(true, false, false);
                             return ControlSignal{target_angle, target_speed};
                         }
                         else if ((as_state.overtake_time > OVERTAKE_FIRST_FORWARD_TIME + OVERTAKE_FIRST_LEFT_TIME + OVERTAKE_FIRST_RIGHT_TIME &&
                                   as_state.num_lines_front > 0))
                         {
-                            auto [target_angle, target_speed] = controller.update(false, false);
+                            auto [target_angle, target_speed] = controller.update(false, false, false);
                             return ControlSignal{target_angle, target_speed};
                         }
                         else
                         {
-                            auto [target_angle, target_speed] = controller.update(false, false);
+                            auto [target_angle, target_speed] = controller.update(false, false, false);
                             return ControlSignal{as_state.overtake_steering_angle, target_speed};
                         }
                     }
                     else
                     {
-                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, true);
+                        auto [target_angle, target_speed] = controller.update(as_state.safety_car, true, false);
                         return ControlSignal{target_angle, target_speed};
                     }
 
@@ -192,7 +192,7 @@ namespace jlb
                 }
                 default:
                 {
-                    auto [target_angle, target_speed] = controller.update(as_state.follow_car);
+                    auto [target_angle, target_speed] = controller.update(as_state.follow_car, false, false);
                     return ControlSignal{target_angle, target_speed};
                     break;
                 }
