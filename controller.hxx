@@ -62,6 +62,8 @@ namespace jlb
         bool passed_half    = false;
         bool deadman_switch = false;
 
+        uint8_t controller_type = 0u;
+
         Controller() {}
 
         ~Controller() {}
@@ -248,15 +250,22 @@ namespace jlb
 #ifndef SIMULATION
             if ((target_speed < 0.0f && current_velocity < 0.0f) || state_space)
             {
+            	controller_type = 0;
                 auto [kP, kDelta] = get_control_params();
                 target_angle      = -kP * cross_track_error - kDelta * heading_error;
+                if(target_speed > 0.0f)
+                {
+                    target_angle += 0.02f;
+                }
             }
             else if(stanley_controller)
             {
+            	controller_type = 1;
                 target_angle = stanley(cross_track_error, heading_error);
             }
             else
             {
+            	controller_type = 2;
             	target_angle = -lateral_pid.update(0, cross_track_error, dt);
             }
 #else

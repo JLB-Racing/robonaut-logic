@@ -268,6 +268,59 @@ namespace jlb
             odometry              = Odometry{START_X, START_Y, START_ORIENTATION};
         }
 
+        void reset_signal_fast(int section)
+        {
+        	if (as_state.mission == Mission::STANDBY)
+			{
+				as_state.fast_reset = true;
+				as_state.mission         = Mission::FAST;
+
+				switch(section)
+				{
+				case 0:
+				{
+					as_state.fast_state = FastState::FIRST_FAST;
+					break;
+				}
+				case 1:
+				{
+					as_state.fast_state = FastState::FIRST_SLOW;
+					break;
+				}
+				case 2:
+				{
+					as_state.fast_state = FastState::SECOND_FAST;
+					break;
+				}
+				case 3:
+				{
+					as_state.fast_state = FastState::SECOND_SLOW;
+					break;
+				}
+				case 4:
+				{
+					as_state.fast_state = FastState::THIRD_FAST;
+					break;
+				}
+				case 5:
+				{
+					as_state.fast_state = FastState::THIRD_SLOW;
+					break;
+				}
+				case 6:
+				{
+					as_state.fast_state = FastState::FOURTH_FAST;
+					break;
+				}
+				case 7:
+				{
+					as_state.fast_state = FastState::FOURTH_SLOW;
+					break;
+				}
+				}
+			}
+        }
+
         Odometry     odometry;
         Controller   controller;
         Graph        graph;

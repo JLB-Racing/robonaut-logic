@@ -62,7 +62,7 @@ namespace jlb
     /* OBJECT PID CONTROLLER PARAMETERS */
     namespace obj
     {
-        PARAM float kP                      = 3.0f;
+        PARAM float kP                      = 2.0f;
         PARAM float kI                      = 0.5f;
         PARAM float kD                      = 0.0f;
         PARAM float TAU                     = 0.05f;
@@ -95,10 +95,10 @@ namespace jlb
 
     PARAM float OFFSET             = -4.625f;
     PARAM float SLOPE              = 3.5f;
-    PARAM float DAMPING            = 0.8f;
+    PARAM float DAMPING            = 0.95f;
     PARAM float DAMPING_TURN       = 0.87f;
-    PARAM float D5_MIN             = 1.0f;
-    PARAM float OFFSET_EXP1        = 3.5f;
+    PARAM float D5_MIN             = 1.55f;
+    PARAM float OFFSET_EXP1        = 4.4f;
     PARAM float OFFSET_EXP2        = -1.38f;
     PARAM float D5_REVERSE         = 0.30f;
     PARAM float DAMPING_REVERSE    = 0.5f;
@@ -111,8 +111,8 @@ namespace jlb
     PARAM float LABYRINTH_SPEED         = 0.8f;   // m/s
     PARAM float LABYRINTH_SPEED_FAST    = 1.0f;   // m/s
     PARAM float LABYRINTH_SPEED_REVERSE = 0.5f;   // m/s
-    PARAM float BALANCER_SPEED          = 1.0f;   // m/s
-    PARAM float BALANCER_SPEED_REVERSE  = 0.4f;   // m/s
+    PARAM float BALANCER_SPEED          = 0.85f;   // m/s
+    PARAM float BALANCER_SPEED_REVERSE  = 0.35f;   // m/s
     PARAM float MISSION_SWITCH_SPEED    = 0.75f;  // m/s
 
 #ifdef FAST_V0

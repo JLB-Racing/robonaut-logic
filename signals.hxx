@@ -448,6 +448,7 @@ namespace jlb
             jlb_rx.logic_5.flood                 = as_state.flood;
             jlb_rx.logic_5.collected_valid_gates = as_state.collected_valid_gates;
             jlb_rx.logic_5.collected_gates       = graph.collected_nodes.size();
+            jlb_rx.logic_5.controller_type       = controller.controller_type;
 
             char    data[logic_5_DLC + 2] = {0};
             uint8_t ide                   = logic_5_IDE;

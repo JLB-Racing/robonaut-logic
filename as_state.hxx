@@ -100,6 +100,7 @@ namespace jlb
         char  pirate_next_node          = '@';
         char  pirate_after_next_node    = '@';
         float pirate_section_percentage = 0.0f;
+        float prev_pirate_section_percentage = 0.0f;
 
         float mission_switch_steering_angle = deg2rad(MAX_WHEEL_ANGLE) * 2.0f;
         float mission_switch_arc_length     = 0.0f;
@@ -118,6 +119,7 @@ namespace jlb
         bool    overtake_started        = false;
         float   overtake_time           = 0.0f;
         float   overtake_steering_angle = 0.0f;
+        bool	fast_reset = false;
 
         bool pirate_intersecting(const char node_) { return node_ == pirate_next_node || node_ == pirate_after_next_node; }
 
@@ -171,6 +173,7 @@ namespace jlb
             pirate_previous_node      = prev_node_;
             pirate_next_node          = next_node_;
             pirate_after_next_node    = after_next_node_;
+            prev_pirate_section_percentage = pirate_section_percentage;
             pirate_section_percentage = section_percentage_;
             graph.pirate_callback(prev_node_, next_node_, after_next_node_, section_percentage_);
         }
@@ -260,7 +263,7 @@ namespace jlb
                     escape_callback();
                 }
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node) && !flood)
             {
                 if (result.path.size() > 1)
                 {
@@ -303,7 +306,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ESCAPE;
                 escape_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node) && !flood)
             {
                 if (result.path.size() > 1)
                 {
@@ -390,7 +393,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ERROR;
                 error_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && at_node == BALANCER_START_NODE)
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && at_node == BALANCER_START_NODE && !flood)
             {
                 prev_labyrinth_state = labyrinth_state;
                 labyrinth_state      = LabyrinthState::STANDBY;
@@ -446,7 +449,7 @@ namespace jlb
                 labyrinth_state      = LabyrinthState::ESCAPE;
                 escape_callback();
             }
-            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node))
+            else if (result.weight >= WEIGHT_PENALTY * SAFETY_MARGIN && !pirate_intersecting(at_node) && !flood)
             {
                 if (result.path.size() > 1)
                 {
@@ -491,7 +494,7 @@ namespace jlb
                         labyrinth_state = LabyrinthState::ESCAPE;
                         escape_callback();
                     }
-                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
+                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN || (flood && prev_pirate_section_percentage == pirate_section_percentage))
                     {
                         prev_labyrinth_state = labyrinth_state;
                         labyrinth_state      = LabyrinthState::EXPLORING;
@@ -507,7 +510,7 @@ namespace jlb
                         labyrinth_state = LabyrinthState::ESCAPE;
                         escape_callback();
                     }
-                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
+                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN || (flood && prev_pirate_section_percentage == pirate_section_percentage))
                     {
                         prev_labyrinth_state = labyrinth_state;
                         labyrinth_state      = LabyrinthState::FINISHED;
@@ -516,7 +519,7 @@ namespace jlb
                     else if (result.path.size() > 1)
                     {
                         auto new_result = graph.Dijkstra(at_node, result.path[1], MISSION_SWITCH_NODE);
-                        if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
+                        if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN || (flood && prev_pirate_section_percentage == pirate_section_percentage))
                         {
                             prev_labyrinth_state = labyrinth_state;
                             labyrinth_state      = LabyrinthState::FINISHED;
@@ -534,7 +537,7 @@ namespace jlb
                         escape_callback();
                         return;
                     }
-                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
+                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN || (flood && prev_pirate_section_percentage == pirate_section_percentage))
                     {
                         prev_labyrinth_state = labyrinth_state;
                         labyrinth_state      = LabyrinthState::FLOOD_TO_BALANCER;
@@ -544,7 +547,7 @@ namespace jlb
                     else if (result.path.size() > 1)
                     {
                         auto new_result = graph.Dijkstra(at_node, result.path[1], BALANCER_START_NODE);
-                        if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN)
+                        if (std::fabs(result.weight - new_result.weight) < WEIGHT_PENALTY * SAFETY_MARGIN || (flood && prev_pirate_section_percentage == pirate_section_percentage))
                         {
                             prev_labyrinth_state = labyrinth_state;
                             labyrinth_state      = LabyrinthState::FLOOD_TO_BALANCER;
@@ -562,7 +565,7 @@ namespace jlb
                         error_callback();
                         return;
                     }
-                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN)
+                    else if (result.weight < WEIGHT_PENALTY * SAFETY_MARGIN || (flood && prev_pirate_section_percentage == pirate_section_percentage))
                     {
                         prev_labyrinth_state = labyrinth_state;
                         labyrinth_state      = LabyrinthState::FLOOD_TO_LABYRINTH;
@@ -799,10 +802,10 @@ namespace jlb
                                 }
                                 case LabyrinthState::REVERSE_ESCAPE:
                                 {
-                                    if (next_node == pirate_next_node || (next_node == pirate_previous_node && previous_node == pirate_next_node))
-                                    // if (next_node == pirate_next_node ||
-                                    //     (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
-                                    //     (next_node == pirate_previous_node && previous_node == pirate_next_node))
+                                    //if (next_node == pirate_next_node || (next_node == pirate_previous_node && previous_node == pirate_next_node))
+                                    if (next_node == pirate_next_node ||
+                                        (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
+                                        (next_node == pirate_previous_node && previous_node == pirate_next_node))
                                     {
                                         labyrinth_state = LabyrinthState::REVERSE_ESCAPE;
                                         reverse_escape_callback();
@@ -894,15 +897,15 @@ namespace jlb
                             break;
                         }
                     }
-                    if ((next_node == pirate_next_node || (next_node == pirate_previous_node && previous_node == pirate_next_node)) &&
+                    ///if ((next_node == pirate_next_node || (next_node == pirate_previous_node && previous_node == pirate_next_node)) &&
+                    ///    labyrinth_state != LabyrinthState::REVERSE_ESCAPE && labyrinth_state != LabyrinthState::FLOOD_TO_LABYRINTH &&
+                    ///    mission_switch_state != MissionSwitchState::FIRST_TURN && mission_switch_state != MissionSwitchState::SECOND_TURN &&
+                    ///    mission_switch_state != MissionSwitchState::SECOND_FORWARD)
+                    if ((next_node == pirate_next_node || (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
+                         (next_node == pirate_previous_node && previous_node == pirate_next_node)) &&
                         labyrinth_state != LabyrinthState::REVERSE_ESCAPE && labyrinth_state != LabyrinthState::FLOOD_TO_LABYRINTH &&
                         mission_switch_state != MissionSwitchState::FIRST_TURN && mission_switch_state != MissionSwitchState::SECOND_TURN &&
                         mission_switch_state != MissionSwitchState::SECOND_FORWARD)
-                    // if ((next_node == pirate_next_node || (next_node == pirate_after_next_node && pirate_section_percentage > 0.5f) ||
-                    //      (next_node == pirate_previous_node && previous_node == pirate_next_node)) &&
-                    //     labyrinth_state != LabyrinthState::REVERSE_ESCAPE && labyrinth_state != LabyrinthState::FLOOD_TO_LABYRINTH &&
-                    //     mission_switch_state != MissionSwitchState::FIRST_TURN && mission_switch_state != MissionSwitchState::SECOND_TURN &&
-                    //     mission_switch_state != MissionSwitchState::SECOND_FORWARD)
                     {
                         if (labyrinth_state == LabyrinthState::EXPLORING || labyrinth_state == LabyrinthState::FINISHED ||
                             labyrinth_state == LabyrinthState::FLOOD_TO_BALANCER)
@@ -1026,7 +1029,11 @@ namespace jlb
 					}
 #endif
 
-                    safety_car = false;
+                    if(fast_reset)
+                    {
+                    	safety_car = false;
+                    }
+
                     follow_car = safety_car;
 
                     float STATE_MIN_TIME_USED = 0.5f;
@@ -1056,7 +1063,7 @@ namespace jlb
                         case FastState::FIRST_FAST:
                         {
                             target_distance = FIRST_FAST_DIST;
-                            if(prev_mission == Mission::LABYRINTH)
+                            if(prev_mission == Mission::LABYRINTH && !fast_reset)
                             {
                             	target_speed = MISSION_SWITCH_SPEED;
                             }
